@@ -61,24 +61,6 @@ type MoonrakerSystemMemory struct {
 	Used      int `json:"used"`
 }
 
-// XXX Define the metrics we wish to expose
-var (
-	fooMetric = prometheus.NewGauge(prometheus.GaugeOpts{Name: "foo_metric", Help: "Shows whether a foo has occurred in our cluster"})
-	barMetric = prometheus.NewGauge(prometheus.GaugeOpts{Name: "bar_metric", Help: "Shows whether a bar has occurred in our cluster"})
-)
-
-func init() {
-	//Register metrics with prometheus
-	prometheus.MustRegister(fooMetric)
-	prometheus.MustRegister(barMetric)
-
-	//Set fooMetric to 1
-	fooMetric.Set(0)
-
-	//Set barMetric to 0
-	barMetric.Set(1)
-}
-
 func New(ctx context.Context, target string, logger log.Logger) *collector {
 	return &collector{ctx: ctx, target: target, logger: logger}
 }
@@ -91,17 +73,22 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 
-	result := fetchMoonrakerProcessStats(c.target)
+	result, err := fetchMoonrakerProcessStats(c.target)
+	if err != nil {
+		c.logger.Debug(err)
+		return
+	}
 
 	memUnits := result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].MemUnits
 	if memUnits != "kB" {
-		log.Fatalf("unregognized memory units %s", memUnits)
-	}
-
+		log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
+	} else {
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
 		prometheus.GaugeValue,
 		float64(result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].Memory))
+	}
+
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_moonraker_cpu_usage", "Moonraker CPU usage.", nil, nil),
 		prometheus.GaugeValue,
@@ -136,33 +123,30 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		result.Result.SystemUptime)
 	}
 
-func fetchMoonrakerProcessStats(klipperHost string) *MoonrakerProcessStatsQueryResponse {
+func fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/proc_stats"
 	log.Info("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
-		log.Warn("Failed to hit the /machine/proc_stats endpoint")
-		// return false
+		log.Error(err)
+		return nil, err
 	}
 	defer res.Body.Close()
-	log.Debug("Reading body of response")
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		log.Fatal(err)
-		// return false
+		return nil, err
 	}
 
 	var response MoonrakerProcessStatsQueryResponse
 
-	log.Debug("Json unmarshal body of response")
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Fatal(err)
-		// return false
+		return nil, err
 	}
 
-	log.Debug("Json unmarshaled:", response)
 	log.Info("Collected metrics from " + procStatsUrl)
 
-	return &response
+	return &response, nil
 }
