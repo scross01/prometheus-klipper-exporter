@@ -31,6 +31,8 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		return
 	}
 
+	// Process Stats
+
 	memUnits := result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].MemUnits
 	if memUnits != "kB" {
 		log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
@@ -74,6 +76,47 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.GaugeValue,
 		result.Result.SystemUptime)
 
+	for key, element := range result.Result.Network {
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_rx_bytes", "Klipper network recieved bytes.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.RxBytes))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_tx_bytes", "Klipper network transmitted bytes.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.TxBytes))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_rx_packets", "Klipper network recieved packets.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.RxPackets))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_tx_packets", "Klipper network transmitted packets.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.TxPackets))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_rx_errs", "Klipper network recieved errored packets.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.RxErrs))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_tx_errs", "Klipper network transmitted errored packets.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.TxErrs))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_rx_drop", "Klipper network recieved dropped packets.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.RxDrop))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_tx_drop", "Klipper network transmitted dropped packtes.", nil, nil),
+			prometheus.GaugeValue,
+			float64(element.TxDrop))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_network_" + key + "_bandwidth", "Klipper network bandwidth.", nil, nil),
+			prometheus.GaugeValue,
+			element.Bandwidth)
+	}
+
+	// Directory Information
+	
 	result2, err := fetchMoonrakerDirectoryInfo(c.target)
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
@@ -88,11 +131,15 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		prometheus.GaugeValue,
 		float64(result2.Result.DiskUsage.Free))
 	
+	// Job Queue
+
 	result3, err := fetchMoonrakerJobQueue(c.target)
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
 		prometheus.GaugeValue,
 		float64(len(result3.Result.QueuedJobs)))
+
+	// System Info
 
 	result4, err := fetchMoonrakerSystemInfo(c.target)
 	ch <- prometheus.MustNewConstMetric(
