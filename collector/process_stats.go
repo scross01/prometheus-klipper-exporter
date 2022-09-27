@@ -30,8 +30,8 @@ type MoonrakerProcStats struct {
 }
 
 type MoonrakerNetworkStats struct {
-	RxBytes   int     `json:"rx_bytes"`
-	TxBytes   int     `json:"tx_bytes"`
+	RxBytes   int64   `json:"rx_bytes"`
+	TxBytes   int64   `json:"tx_bytes"`
 	RxPackets int     `json:"rx_packets"`
 	TxPackets int     `json:"tx_packets"`
 	RxErrs    int     `json:"rx_errs"`

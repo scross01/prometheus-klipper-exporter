@@ -13,9 +13,9 @@ import (
 type MoonrakerDirecotryInfoQueryResponse struct {
 	Result struct {
 		DiskUsage struct { 
-			Total int `json:"total"`
-			Used  int `json:"used"`
-			Free  int `json:"free"`	
+			Total int64 `json:"total"`
+			Used  int64 `json:"used"`
+			Free  int64 `json:"free"`	
 		} `json:"disk_usage"`	
 	} `json:"result"`
 }
