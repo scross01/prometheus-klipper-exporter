@@ -4,6 +4,7 @@ Change Log
 v0.3.0
 ------
 
+- Separate metrics into optional modules
 - Add network stats for all network interfaces
 - Update logging
 - Fixes range exception for large gauges on 32-bits rpi OS
