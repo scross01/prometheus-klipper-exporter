@@ -23,7 +23,7 @@ type MoonrakerSystemInfoQueryResponse struct {
 
 func (c collector)fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/system_info"
-	c.logger.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
 		c.logger.Error(err)

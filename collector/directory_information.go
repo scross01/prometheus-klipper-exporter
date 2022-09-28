@@ -21,7 +21,7 @@ type MoonrakerDirecotryInfoQueryResponse struct {
 
 func (c collector)fetchMoonrakerDirectoryInfo(klipperHost string) (*MoonrakerDirecotryInfoQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/files/directory?path=gcodes&extended=false"
-	c.logger.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
 		c.logger.Error(err)

@@ -56,7 +56,7 @@ type MoonrakerSystemMemory struct {
 
 func (c collector)fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/proc_stats"
-	c.logger.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
 		c.logger.Error(err)

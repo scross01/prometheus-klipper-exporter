@@ -22,7 +22,7 @@ type MoonrakerQueuedJob struct {
 
 func (c collector)fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/job_queue/status"
-	c.logger.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
 		c.logger.Error(err)

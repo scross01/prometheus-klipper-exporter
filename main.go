@@ -26,10 +26,15 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 		return
 	}
 
-	log.Infof("Starting metrics collection for %s", target)
+	// Set default modules
+	modules := []string{"process_stats", "job_queue", "system_info"}
+	if len(query["modules"]) > 0 {
+		modules = query["modules"]
+	}
+	logger.Infof("Starting metrics collection of %s for %s", modules, target)
 
 	registry := prometheus.NewRegistry()
-	c := collector.New(r.Context(), target, logger)
+	c := collector.New(r.Context(), target, modules, logger)
 	registry.MustRegister(c)
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
