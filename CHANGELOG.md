@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+v0.3.0
+------
+
+- Add network stats for all network interfaces
+- Update logging
+- Fixes range exception for large gauges on 32-bits rpi OS
+
 v0.2.0
 ------
 

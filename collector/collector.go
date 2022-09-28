@@ -25,7 +25,7 @@ func (c collector) Describe(ch chan<- *prometheus.Desc) {
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 
-	result, err := fetchMoonrakerProcessStats(c.target)
+	result, err := c.fetchMoonrakerProcessStats(c.target)
 	if err != nil {
 		c.logger.Debug(err)
 		return
@@ -35,7 +35,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 	memUnits := result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].MemUnits
 	if memUnits != "kB" {
-		log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
+		c.logger.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
 	} else {
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
@@ -117,7 +117,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 	// Directory Information
 	
-	result2, err := fetchMoonrakerDirectoryInfo(c.target)
+	result2, err := c.fetchMoonrakerDirectoryInfo(c.target)
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
 		prometheus.GaugeValue,
@@ -133,7 +133,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	
 	// Job Queue
 
-	result3, err := fetchMoonrakerJobQueue(c.target)
+	result3, err := c.fetchMoonrakerJobQueue(c.target)
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
 		prometheus.GaugeValue,
@@ -141,7 +141,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 	// System Info
 
-	result4, err := fetchMoonrakerSystemInfo(c.target)
+	result4, err := c.fetchMoonrakerSystemInfo(c.target)
 	ch <- prometheus.MustNewConstMetric(
 		prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 		prometheus.GaugeValue,

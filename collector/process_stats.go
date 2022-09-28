@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -32,8 +31,8 @@ type MoonrakerProcStats struct {
 type MoonrakerNetworkStats struct {
 	RxBytes   int64   `json:"rx_bytes"`
 	TxBytes   int64   `json:"tx_bytes"`
-	RxPackets int     `json:"rx_packets"`
-	TxPackets int     `json:"tx_packets"`
+	RxPackets int64   `json:"rx_packets"`
+	TxPackets int64   `json:"tx_packets"`
 	RxErrs    int     `json:"rx_errs"`
 	TxErrs    int     `json:"tx_errs"`
 	RxDrop    int     `json:"rx_drop"`
@@ -55,18 +54,18 @@ type MoonrakerSystemMemory struct {
 	Used      int `json:"used"`
 }
 
-func fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
+func (c collector)fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/proc_stats"
-	log.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Info("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
-		log.Error(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
 
@@ -74,11 +73,9 @@ func fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQuery
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
-
-	log.Info("Collected metrics from " + procStatsUrl)
 
 	return &response, nil
 }

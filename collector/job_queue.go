@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -21,18 +20,18 @@ type MoonrakerQueuedJob struct {
 	TimeInQueue int `json:"time_in_queue"`	
 }
 
-func fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
+func (c collector)fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/job_queue/status"
-	log.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Info("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
-		log.Error(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
 
@@ -40,11 +39,9 @@ func fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, err
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
-
-	log.Info("Collected metrics from " + procStatsUrl)
 
 	return &response, nil
 }

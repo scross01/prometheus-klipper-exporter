@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 
-	log "github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -22,18 +21,18 @@ type MoonrakerSystemInfoQueryResponse struct {
 	} `json:"result"`
 }
 
-func fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
+func (c collector)fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/system_info"
-	log.Info("Collecting metrics from " + procStatsUrl)
+	c.logger.Info("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 	if err != nil {
-		log.Error(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
 
@@ -41,11 +40,9 @@ func fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResp
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Fatal(err)
+		c.logger.Fatal(err)
 		return nil, err
 	}
-
-	log.Info("Collected metrics from " + procStatsUrl)
 
 	return &response, nil
 }
