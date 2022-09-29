@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+- Add `temperature` metric collection
+
 v0.3.0
 ------
 

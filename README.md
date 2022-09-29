@@ -91,3 +91,4 @@ in the `prometheus.yml` configuration file.
 | `job_queue` | x | `klipper_job_queue_length` |
 | `system_info` | x | `klipper_system_cpu_count` |
 | `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
+| `temperature` | | `klipper_extruder_power`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_temperature_sensor_*_temperature` |

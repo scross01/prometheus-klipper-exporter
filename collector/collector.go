@@ -2,6 +2,7 @@ package collector
 
 import (
 	"context"
+	"strings"
 
 	"golang.org/x/exp/slices"
 	"github.com/prometheus/client_golang/prometheus"
@@ -160,5 +161,26 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 			prometheus.GaugeValue,
 			float64(result.Result.SystemInfo.CpuInfo.CpuCount))	
+	}
+
+	// Temperature Store
+	if slices.Contains(c.modules, "temperature") {
+		c.logger.Infof("Collecting system_info for %s", c.target)
+		result, _ := c.fetchTemperatureData(c.target)
+
+		for k, v := range result.Result {
+			c.logger.Debug(k)
+			item := strings.ReplaceAll(k, " ", "_")
+			attributes := v.(map[string]interface{})
+			for k1, v1 := range attributes {
+				c.logger.Debug("  " + k1)
+				values := v1.([]interface{})
+				label := strings.ReplaceAll(k1[0:len(k1)-1], " ", "_")
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_" + item + "_" + label, "Klipper " + k + " " + label, nil, nil),
+					prometheus.GaugeValue,
+					values[len(values)-1].(float64))
+			}
+		}
 	}
 }
