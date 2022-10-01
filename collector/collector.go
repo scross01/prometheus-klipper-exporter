@@ -274,5 +274,42 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_fan_rpm", "Klipper fan rpm.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.Fan.Rpm)
+
+		// idle_timeout
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_printing_time", "The amount of time the printer has been in the Printing state.", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.IdleTimeout.PrintingTime)
+
+		// virtual_sdcard
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_file_progress", "The print progress reported as a percentage of the file read.", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.VirtualSdCard.Progress)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_file_position", "The current file position in bytes.", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.VirtualSdCard.FilePosition)
+
+		// print_stats
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_total_duration", "The total time (in seconds) elapsed since a print has started.", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.PrintStats.TotalDuration)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_print_duration", "The total time spent printing (in seconds).", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.PrintStats.PrintDuration)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_filament_used", "The amount of filament used during the current print (in mm)..", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.PrintStats.FilamentUsed)
+
+		// display_status
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_print_gcode_progress", "The percentage of print progress, as reported by M73.", nil, nil),
+			prometheus.CounterValue,
+			result.Result.Status.DisplayStatus.Progress)
+
 	}
 }

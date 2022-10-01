@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+- Add additional `printer_object` metrics from idle_timeout, virtual_sdcard,
+  print_stats, and display_staus
 - Fixes heater bed metric collection
 
 v0.4.0
