@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+v0.4.0
+------
+
+- Add `printer_object` metrics for gcode_move, toolheat, extruder, heater_bed, and fan.
 - Add `temperature` metric collection
 
 v0.3.0

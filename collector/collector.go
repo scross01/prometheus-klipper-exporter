@@ -183,4 +183,97 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			}
 		}
 	}
+
+	// Printer Objects
+	if slices.Contains(c.modules, "printer_objects") {
+		c.logger.Infof("Collecting printer_objects for %s", c.target)
+		result, _ := c.fetchMoonrakerPrinterObjects(c.target)
+
+		// gcode_move
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_gcode_speed_factor", "Klipper gcode speed factor.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.GcodeMove.SpeedFactor)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_gcode_speed", "Klipper gcode speed.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.GcodeMove.Speed)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_gcode_extrude_factor", "Klipper gcode extrude factor.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.GcodeMove.ExtrudeFactor)
+
+		// toolhead
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_print_time", "Klipper toolhead print time.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.PrintTime)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_estimated_print_time", "Klipper estimated print time.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.EstimatedPrintTime)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_max_velocity", "Klipper toolhead max velocity.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.MaxVelocity)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_max_accel", "Klipper toolhead max acceleration.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.MaxAccel)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_max_accel_to_decel", "Klipper toolhead max acceleration to deceleration.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.MaxAccelToDecel)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_toolhead_square_corner_velocity", "Klipper toolhead square corner velocity.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Toolhead.SquareCornerVelocity)
+
+		// extruder
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_extruder_temperature", "Klipper extruder temperature.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Extruder.Temperature)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_extruder_target", "Klipper extruder target.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Extruder.Target)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_extruder_power", "Klipper extruder power.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Extruder.Power)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_extruder_pressure_advance", "Klipper extruder pressure advance.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Extruder.PressureAdvance)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_extruder_smooth_time", "Klipper extruder smooth time.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Extruder.SmoothTime)
+
+		// heater_bed
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_heater_bed_temperature", "Klipper header bed temperature.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.HeaterBed.Temperature)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_heater_bed_target", "Klipper heater bed target.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.HeaterBed.Target)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_heater_bed_power", "Klipper header bed power.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.HeaterBed.Power)
+
+		// fan
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_fan_speed", "Klipper fan speed.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.Fan.Speed)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_fan_rpm", "Klipper fan rpm.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.Status.Fan.Rpm))
+
+	}
 }

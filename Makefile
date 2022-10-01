@@ -28,7 +28,10 @@ clean:
 	rm -rf build/release-$(VERSION)/*
 
 fmt:
+	(cd collector && go fmt)
 	go fmt
+
+
 
 run: fmt
 	go run .	
