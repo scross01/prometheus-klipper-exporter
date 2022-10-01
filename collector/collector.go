@@ -253,7 +253,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 		// heater_bed
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_heater_bed_temperature", "Klipper header bed temperature.", nil, nil),
+			prometheus.NewDesc("klipper_heater_bed_temperature", "Klipper heater bed temperature.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.HeaterBed.Temperature)
 		ch <- prometheus.MustNewConstMetric(
@@ -261,7 +261,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue,
 			result.Result.Status.HeaterBed.Target)
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_heater_bed_power", "Klipper header bed power.", nil, nil),
+			prometheus.NewDesc("klipper_heater_bed_power", "Klipper heater bed power.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.HeaterBed.Power)
 
@@ -273,7 +273,6 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_fan_rpm", "Klipper fan rpm.", nil, nil),
 			prometheus.GaugeValue,
-			float64(result.Result.Status.Fan.Rpm))
-
+			result.Result.Status.Fan.Rpm)
 	}
 }

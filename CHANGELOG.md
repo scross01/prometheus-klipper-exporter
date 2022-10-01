@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+- Fixes heater bed metric collection
+
 v0.4.0
 ------
 

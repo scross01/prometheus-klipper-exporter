@@ -15,7 +15,7 @@ type MoonrakerPrinterObjectResponse struct {
 			GcodeMove PrinterObjectGcodeMove `json:"gcode_move"`
 			Toolhead  PrinterObjectToolhead  `json:"toolhead"`
 			Extruder  PrinterObjectExtruder  `json:"extruder"`
-			HeaterBed PrinterObjectHeaterBed `json:"heater_bed`
+			HeaterBed PrinterObjectHeaterBed `json:"heater_bed"`
 			Fan       PrinterObjectFan       `json:"fan"`
 		} `json:"status"`
 	} `json:"result"`
@@ -60,7 +60,7 @@ const heaterBedQuery = "heater_bed"
 
 type PrinterObjectFan struct {
 	Speed float64 `json:"speed"`
-	Rpm   int32   `json:"rpm"`
+	Rpm   float64 `json:"rpm"`
 }
 
 const fanQuery = "fan"
@@ -92,7 +92,7 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*MoonrakerP
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		c.logger.Fatal(err)
-		return nil, err
+		return nil, err	
 	}
 
 	return &response, nil

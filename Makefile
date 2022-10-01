@@ -1,7 +1,7 @@
 VERSIONFILE=version.txt
 VERSION=`cat $(VERSIONFILE)`
 
-build: fmt
+build:
 	go build .
 
 release: build-rpi build-linux build-macos build-windows
@@ -31,10 +31,7 @@ fmt:
 	(cd collector && go fmt)
 	go fmt
 
-
-
-run: fmt
+run:
 	go run .	
 
-
-# .PHONY build build-all: build-rpi build-linux build-macos-m1 build-windows run
+.PHONY: build
