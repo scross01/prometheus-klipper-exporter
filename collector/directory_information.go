@@ -11,15 +11,15 @@ import (
 
 type MoonrakerDirecotryInfoQueryResponse struct {
 	Result struct {
-		DiskUsage struct { 
+		DiskUsage struct {
 			Total int64 `json:"total"`
 			Used  int64 `json:"used"`
-			Free  int64 `json:"free"`	
-		} `json:"disk_usage"`	
+			Free  int64 `json:"free"`
+		} `json:"disk_usage"`
 	} `json:"result"`
 }
 
-func (c collector)fetchMoonrakerDirectoryInfo(klipperHost string) (*MoonrakerDirecotryInfoQueryResponse, error) {
+func (c collector) fetchMoonrakerDirectoryInfo(klipperHost string) (*MoonrakerDirecotryInfoQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/files/directory?path=gcodes&extended=false"
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)

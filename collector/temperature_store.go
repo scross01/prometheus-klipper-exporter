@@ -13,7 +13,7 @@ type TemperatureDataQueryResponse struct {
 	Result map[string]interface{} `json:"result"`
 }
 
-func (c collector)fetchTemperatureData(klipperHost string) (*TemperatureDataQueryResponse, error) {
+func (c collector) fetchTemperatureData(klipperHost string) (*TemperatureDataQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/temperature_store"
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)

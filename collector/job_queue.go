@@ -11,16 +11,16 @@ import (
 
 type MoonrakerJobQueueResponse struct {
 	Result struct {
-		QueuedJobs  []MoonrakerQueuedJob `json:"queued_jobs"`
-		QueueState 	string               `json:"queue_state"`
+		QueuedJobs []MoonrakerQueuedJob `json:"queued_jobs"`
+		QueueState string               `json:"queue_state"`
 	} `json:"result"`
 }
 
 type MoonrakerQueuedJob struct {
-	TimeInQueue int `json:"time_in_queue"`	
+	TimeInQueue int `json:"time_in_queue"`
 }
 
-func (c collector)fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
+func (c collector) fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/server/job_queue/status"
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)

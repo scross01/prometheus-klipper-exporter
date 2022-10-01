@@ -4,16 +4,16 @@ import (
 	"context"
 	"strings"
 
-	"golang.org/x/exp/slices"
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/exp/slices"
 )
 
 type collector struct {
-	ctx    context.Context
-	target string
+	ctx     context.Context
+	target  string
 	modules []string
-	logger log.Logger
+	logger  log.Logger
 }
 
 func New(ctx context.Context, target string, modules []string, logger log.Logger) *collector {
@@ -44,10 +44,10 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			if memUnits != "kB" {
 				c.logger.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
 			} else {
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
-				prometheus.GaugeValue,
-				float64(result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].Memory))
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
+					prometheus.GaugeValue,
+					float64(result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].Memory))
 			}
 
 			ch <- prometheus.MustNewConstMetric(
@@ -87,39 +87,39 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		if slices.Contains(c.modules, "network_stats") {
 			for key, element := range result.Result.Network {
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_rx_bytes", "Klipper network recieved bytes.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_bytes", "Klipper network recieved bytes.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.RxBytes))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_tx_bytes", "Klipper network transmitted bytes.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_tx_bytes", "Klipper network transmitted bytes.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.TxBytes))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_rx_packets", "Klipper network recieved packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_packets", "Klipper network recieved packets.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.RxPackets))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_tx_packets", "Klipper network transmitted packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_tx_packets", "Klipper network transmitted packets.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.TxPackets))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_rx_errs", "Klipper network recieved errored packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_errs", "Klipper network recieved errored packets.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.RxErrs))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_tx_errs", "Klipper network transmitted errored packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_tx_errs", "Klipper network transmitted errored packets.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.TxErrs))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_rx_drop", "Klipper network recieved dropped packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_drop", "Klipper network recieved dropped packets.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.RxDrop))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_tx_drop", "Klipper network transmitted dropped packtes.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_tx_drop", "Klipper network transmitted dropped packtes.", nil, nil),
 					prometheus.GaugeValue,
 					float64(element.TxDrop))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_" + key + "_bandwidth", "Klipper network bandwidth.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_bandwidth", "Klipper network bandwidth.", nil, nil),
 					prometheus.GaugeValue,
 					element.Bandwidth)
 			}
@@ -144,7 +144,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			float64(result.Result.DiskUsage.Free))
 	}
 	// Job Queue
-	if slices.Contains(c.modules, "job_queue") {	
+	if slices.Contains(c.modules, "job_queue") {
 		c.logger.Infof("Collecting job_queue for %s", c.target)
 		result, _ := c.fetchMoonrakerJobQueue(c.target)
 		ch <- prometheus.MustNewConstMetric(
@@ -160,7 +160,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 			prometheus.GaugeValue,
-			float64(result.Result.SystemInfo.CpuInfo.CpuCount))	
+			float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 	}
 
 	// Temperature Store
@@ -177,7 +177,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 				values := v1.([]interface{})
 				label := strings.ReplaceAll(k1[0:len(k1)-1], " ", "_")
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_" + item + "_" + label, "Klipper " + k + " " + label, nil, nil),
+					prometheus.NewDesc("klipper_"+item+"_"+label, "Klipper "+k+" "+label, nil, nil),
 					prometheus.GaugeValue,
 					values[len(values)-1].(float64))
 			}

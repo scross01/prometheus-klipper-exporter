@@ -54,7 +54,7 @@ type MoonrakerSystemMemory struct {
 	Used      int `json:"used"`
 }
 
-func (c collector)fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
+func (c collector) fetchMoonrakerProcessStats(klipperHost string) (*MoonrakerProcessStatsQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/proc_stats"
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)

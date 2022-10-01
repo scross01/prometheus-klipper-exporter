@@ -12,16 +12,16 @@ import (
 type MoonrakerSystemInfoQueryResponse struct {
 	Result struct {
 		SystemInfo struct {
-			CpuInfo	struct { 
+			CpuInfo struct {
 				CpuCount    int    `json:"cpu_count"`
 				TotalMemory int    `json:"total_memory"`
-				MemoryUnits string `json:"memory_units"`	
-			} `json:"cpu_info"`	
+				MemoryUnits string `json:"memory_units"`
+			} `json:"cpu_info"`
 		} `json:"system_info"`
 	} `json:"result"`
 }
 
-func (c collector)fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
+func (c collector) fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
 	var procStatsUrl = "http://" + klipperHost + "/machine/system_info"
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
