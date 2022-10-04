@@ -53,7 +53,7 @@ Replace `klipper.local` with the hostname or IP address of the Klipper host,
 and replace `klipper-exporter.local` with the hostname or IP address of the host
 runnging `prometheus-klipper-exporter`.
 
-To monitor multiple Klipper instances add mutiple entries to the
+To monitor multiple Klipper instances add multiple entries to the
 `static_config`.`targets` for the `klipper` job. e.g.
 
 ```yaml
@@ -70,12 +70,11 @@ Build
 make build
 ```
 
-
 Modules
 -------
 
-Configure sets of metrics to be collected by including the `modules` parameter
-in the `prometheus.yml` configuration file.
+You can configure different sets of metrics to be collected by including the
+`modules` parameter in the `prometheus.yml` configuration file.
 
 ```yaml
     ...
@@ -83,6 +82,9 @@ in the `prometheus.yml` configuration file.
       modules: [ "process_stats", "job_queue", "system_info" ]
     ...
 ```
+
+If the modules params are omitted then only the default metrics are collected. Each
+group of metrics is queried from a different Moonraker API endpoint.
 
 | module | default | metrics |
 |--------|---------|---------|
