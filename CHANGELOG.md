@@ -1,6 +1,9 @@
 Change Log
 ==========
 
+- Fixes issue with linux builds [#1](https://github.com/scross01/prometheus-klipper-exporter/issues/1)
+- Fixes typo in metric descriptions
+
 v0.5.0
 ------
 
