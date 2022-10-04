@@ -80,7 +80,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 				float64(result.Result.SystemMemory.Used))
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc("klipper_system_uptime", "Klipper system uptime.", nil, nil),
-				prometheus.GaugeValue,
+				prometheus.CounterValue,
 				result.Result.SystemUptime)
 		}
 
@@ -88,35 +88,35 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			for key, element := range result.Result.Network {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_rx_bytes", "Klipper network recieved bytes.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.RxBytes))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_tx_bytes", "Klipper network transmitted bytes.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.TxBytes))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_rx_packets", "Klipper network recieved packets.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.RxPackets))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_tx_packets", "Klipper network transmitted packets.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.TxPackets))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_rx_errs", "Klipper network recieved errored packets.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.RxErrs))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_tx_errs", "Klipper network transmitted errored packets.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.TxErrs))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_rx_drop", "Klipper network recieved dropped packets.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.RxDrop))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_tx_drop", "Klipper network transmitted dropped packtes.", nil, nil),
-					prometheus.GaugeValue,
+					prometheus.CounterValue,
 					float64(element.TxDrop))
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_network_"+key+"_bandwidth", "Klipper network bandwidth.", nil, nil),

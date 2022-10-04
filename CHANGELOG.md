@@ -1,8 +1,11 @@
 Change Log
 ==========
 
-- Add additional `printer_object` metrics from idle_timeout, virtual_sdcard,
-  print_stats, and display_staus
+v0.5.0
+------
+
+- Add additional `printer_object` metrics from idle_timeout, virtual_sdcard, print_stats, and display_staus
+- Changes some metric types from Gauge to Counter
 - Fixes heater bed metric collection
 
 v0.4.0
