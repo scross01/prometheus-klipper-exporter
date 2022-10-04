@@ -31,7 +31,7 @@ scrape_configs:
     static_configs:
       - targets: [ 'klipper.local:7125' ]
     params:
-      modules: [ "process_stats", "job_queue", "system_info", "network_stats", "directory_info", "temperature", "printer_objects" ]
+      modules: [ "process_stats", "job_queue", "system_info", "network_stats", "directory_info", "printer_objects" ]
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -113,6 +113,10 @@ You can configure different sets of metrics to be collected by including the
 
 If the modules params are omitted then only the default metrics are collected. Each
 group of metrics is queried from a different Moonraker API endpoint.
+
+> _Note: `temperature` module contains a subset of the metrics reported by the
+`printer_objects` module. The two modules cannot be configured together.
+[Issue #2](https://github.com/scross01/prometheus-klipper-exporter/issues/2)_
 
 | module | default | metrics |
 |--------|---------|---------|
