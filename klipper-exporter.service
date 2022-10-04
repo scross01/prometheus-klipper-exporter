@@ -1,0 +1,14 @@
+# Systemd Prometheus Klipper Exporter Service
+
+[Unit]
+Description=Prometheus exporter for Klipper.
+After=moonraker.Service
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/klipper-exporter
+ExecStart=/home/pi/klipper-exporter/prometheus-klipper-exporter
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -67,7 +67,35 @@ Build
 -----
 
 ```sh
-make build
+$ make build
+```
+
+Installation
+------------
+
+You will typically want to install the exporter binary on a host that will be
+constantly running, either the Klipper host iteself, or a separate server, and
+ensure that the process restarts on system restart.
+
+### systemd
+
+Example installation on Raspberry Pi, using systemd to run the exporter.
+
+```sh
+$ ssh pi@klipper.local
+[klipper]$ mkdir /home/pi/klipper-exporter
+[klipper]$ exit
+
+$ scp prometheus-klipper-exporter pi@klipper.local:/home/pi/klipper-exporter
+$ scp klipper-exporter.service pi@klipper.local:/home/pi/
+
+$ ssh pi@klipper.local
+[klipper]$ sudo mv klipper-exporter.service /etc/systemd/system/
+[klipper]$ sudo systemctl daemon-reload
+[klipper]$ sudo systemctl enable klipper-exporter.service
+[klipper]$ sudo systemctl start klipper-exporter.service
+[klipper]$ sudo systemctl status klipper-exporter.service
+[klipper]$ exit
 ```
 
 Modules
