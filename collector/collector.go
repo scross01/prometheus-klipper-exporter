@@ -87,7 +87,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		if slices.Contains(c.modules, "network_stats") {
 			for key, element := range result.Result.Network {
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_"+key+"_rx_bytes", "Klipper network recieved bytes.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_bytes", "Klipper network received bytes.", nil, nil),
 					prometheus.CounterValue,
 					float64(element.RxBytes))
 				ch <- prometheus.MustNewConstMetric(
@@ -95,7 +95,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.CounterValue,
 					float64(element.TxBytes))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_"+key+"_rx_packets", "Klipper network recieved packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_packets", "Klipper network received packets.", nil, nil),
 					prometheus.CounterValue,
 					float64(element.RxPackets))
 				ch <- prometheus.MustNewConstMetric(
@@ -103,7 +103,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.CounterValue,
 					float64(element.TxPackets))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_"+key+"_rx_errs", "Klipper network recieved errored packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_errs", "Klipper network received errored packets.", nil, nil),
 					prometheus.CounterValue,
 					float64(element.RxErrs))
 				ch <- prometheus.MustNewConstMetric(
@@ -111,7 +111,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.CounterValue,
 					float64(element.TxErrs))
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_network_"+key+"_rx_drop", "Klipper network recieved dropped packets.", nil, nil),
+					prometheus.NewDesc("klipper_network_"+key+"_rx_drop", "Klipper network received dropped packets.", nil, nil),
 					prometheus.CounterValue,
 					float64(element.RxDrop))
 				ch <- prometheus.MustNewConstMetric(
