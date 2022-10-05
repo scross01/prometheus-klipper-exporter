@@ -24,6 +24,9 @@ build-windows:
 	mkdir -p build/release-$(VERSION)
 	env GOOS=windows GOARCH=amd64 go build -o build/release-$(VERSION)/prometheus-klipper-exporter-windows-amd64-$(VERSION).exe .
 
+build-docker:
+	docker build -t klipper-exporter .
+
 clean:
 	rm -rf build/release-$(VERSION)/*
 

@@ -98,6 +98,14 @@ $ ssh pi@klipper.local
 [klipper]$ exit
 ```
 
+### docker
+
+To run the exporter as a docker container.
+
+```sh
+$ docker run -d -p 9101:9101 ghcr.io/scross01/prometheus-klipper-exporter:latest
+```
+
 Modules
 -------
 

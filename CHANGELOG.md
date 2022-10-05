@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+v0.5.1
+------
+
+- Added `Dockerfile` and Docker usage instructions. Fixes [#6](https://github.com/scross01/prometheus-klipper-exporter/issues/6)
 - Fixes issue with linux builds [#1](https://github.com/scross01/prometheus-klipper-exporter/issues/1)
 - Fixes typo in metric descriptions
 
