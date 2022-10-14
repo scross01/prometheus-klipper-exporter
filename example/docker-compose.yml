@@ -1,0 +1,51 @@
+version: '2'
+services:
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    hostname: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+    expose:
+      - 9090
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+      
+  grafana:
+    hostname: grafana
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    volumes:
+      - grafana-data:/var/lib/grafana
+    environment:
+      GF_SERVER_ROOT_URL: http://localhost
+      GF_SECURITY_ADMIN_PASSWORD: 'password1234!@#$' # change password
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: 'Editor'
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+    ports:
+      - "3000:3000/tcp"
+
+  klipper-exporter:
+    hostname: klipper-exporter
+    image: ghcr.io/scross01/prometheus-klipper-exporter:latest
+    container_name: klipper-exporter
+    restart: unless-stopped
+    expose:
+      - 9101
+
+volumes:
+  prometheus-data:
+    external: false
+  grafana-data:
+    external: false
