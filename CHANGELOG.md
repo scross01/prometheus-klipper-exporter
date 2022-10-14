@@ -1,6 +1,8 @@
 Change Log
 ==========
 
+- Added [example](./example/) docker deployment for grafana, prometheus and the klipper-exporter
+
 v0.5.1
 ------
 
