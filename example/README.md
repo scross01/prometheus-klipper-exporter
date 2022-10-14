@@ -1,7 +1,7 @@
 Example docker deployment
 =========================
 
-Example deployment of Grafana, Prometheus and the premetheus-klipper-exporter for
+Example deployment of Grafana, Prometheus and the prometheus-klipper-exporter for
 collecting and viewing the 3d printer metrics that can be deployed using docker compose.
 
 ```mermaid
