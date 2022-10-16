@@ -4,8 +4,8 @@ Change Log
 v0.6.0
 ------
 
-- Added support for `temperate_sensor` metrics to `printer_objects` collector. Fixes #3
-- Added support for `temperate_fan` metrics to `printer_objects` collector. Fixes #4
+- Added support for `temperature_sensor` metrics to `printer_objects` collector. Fixes #3
+- Added support for `temperature_fan` metrics to `printer_objects` collector. Fixes #4
 - Added support for `output_pin` metrics to `printer_objects` collector. Fixes #5
 - Added [example](./example/) docker deployment for grafana, prometheus and the klipper-exporter
 
