@@ -5,24 +5,32 @@ package collector
 import (
 	"encoding/json"
 	"io/ioutil"
-
 	"net/http"
+	"strings"
+
+	"github.com/mitchellh/mapstructure"
 )
 
-type MoonrakerPrinterObjectResponse struct {
+type PrinterObjectResponse struct {
 	Result struct {
-		Status struct {
-			GcodeMove     PrinterObjectGcodeMove     `json:"gcode_move"`
-			Toolhead      PrinterObjectToolhead      `json:"toolhead"`
-			Extruder      PrinterObjectExtruder      `json:"extruder"`
-			HeaterBed     PrinterObjectHeaterBed     `json:"heater_bed"`
-			Fan           PrinterObjectFan           `json:"fan"`
-			IdleTimeout   PrinterObjectIdleTimeout   `json:"idle_timeout"`
-			VirtualSdCard PrinterObjectVirtualSdCard `json:"virtual_sdcard"`
-			PrintStats    PrinterObjectPrintStats    `json:"print_stats"`
-			DisplayStatus PrinterObjectDisplayStatus `json:"display_status"`
-		} `json:"status"`
+		Status PrinterObjectStatus `json:"status"`
 	} `json:"result"`
+}
+
+type PrinterObjectStatus struct {
+	GcodeMove     PrinterObjectGcodeMove     `json:"gcode_move"`
+	Toolhead      PrinterObjectToolhead      `json:"toolhead"`
+	Extruder      PrinterObjectExtruder      `json:"extruder"`
+	HeaterBed     PrinterObjectHeaterBed     `json:"heater_bed"`
+	Fan           PrinterObjectFan           `json:"fan"`
+	IdleTimeout   PrinterObjectIdleTimeout   `json:"idle_timeout"`
+	VirtualSdCard PrinterObjectVirtualSdCard `json:"virtual_sdcard"`
+	PrintStats    PrinterObjectPrintStats    `json:"print_stats"`
+	DisplayStatus PrinterObjectDisplayStatus `json:"display_status"`
+	// dynamic sensor attributes populated using custom unmarsaling
+	TemperatureSensors map[string]PrinterObjectTemperatureSensor
+	TemperatureFans    map[string]PrinterObjectTemperatureFan
+	OutputPins         map[string]PrinterObjectOutputPin
 }
 
 type PrinterObjectGcodeMove struct {
@@ -96,9 +104,156 @@ type PrinterObjectDisplayStatus struct {
 	Progress float64 `json:"progress"`
 }
 
-const DisplayStatusQuery = "display_status"
+const displayStatusQuery = "display_status"
 
-func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*MoonrakerPrinterObjectResponse, error) {
+type PrinterObjectTemperatureSensor struct {
+	Temperature     float64 `mapstructure:"temperature"`
+	MeasuredMinTemp float64 `mapstructure:"measured_min_temp"`
+	MeasuredMaxTemp float64 `mapstructure:"measured_max_temp"`
+}
+
+type PrinterObjectTemperatureFan struct {
+	Speed       float64 `mapstructure:"speed"`
+	Temperature float64 `mapstructure:"temperature"`
+	Target      float64 `mapstructure:"target"`
+}
+
+type PrinterObjectOutputPin struct {
+	Value float64 `mapstructure:"value"`
+}
+
+type _PrinterObjectStatus PrinterObjectStatus
+
+func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
+	status := _PrinterObjectStatus{}
+
+	if err = json.Unmarshal(bs, &status); err == nil {
+		*f = PrinterObjectStatus(status)
+	}
+
+	m := make(map[string]interface{})
+
+	if err = json.Unmarshal(bs, &m); err == nil {
+		// find `temperature_sensor` `temperature_fan` and `output_pin` items
+		// and store in a map keyed by sensor name
+		temperatureSensors := make(map[string]PrinterObjectTemperatureSensor)
+		temperatureFans := make(map[string]PrinterObjectTemperatureFan)
+		outputPins := make(map[string]PrinterObjectOutputPin)
+		for k, v := range m {
+			if strings.HasPrefix(k, "temperature_sensor") {
+				key := strings.Replace(k, "temperature_sensor ", "", 1)
+				value := PrinterObjectTemperatureSensor{}
+				mapstructure.Decode(v, &value)
+				temperatureSensors[key] = value
+			}
+			if strings.HasPrefix(k, "temperature_fan") {
+				key := strings.Replace(k, "temperature_fan ", "", 1)
+				value := PrinterObjectTemperatureFan{}
+				mapstructure.Decode(v, &value)
+				temperatureFans[key] = value
+			}
+			if strings.HasPrefix(k, "output_pin") {
+				key := strings.Replace(k, "output_pin ", "", 1)
+				value := PrinterObjectOutputPin{}
+				mapstructure.Decode(v, &value)
+				outputPins[key] = value
+			}
+		}
+		f.TemperatureSensors = temperatureSensors
+		f.TemperatureFans = temperatureFans
+		f.OutputPins = outputPins
+	}
+	return err
+}
+
+type PrinterObjectsList struct {
+	Result struct {
+		Objects []string `json:"objects"`
+	} `json:"result"`
+}
+
+var (
+	customTemperatureSensors []string = nil
+	customTemperatureFans    []string = nil
+	customOutputPins         []string = nil
+)
+
+// fetchCustomSensors queries klipper for the complete list and printer objects and
+// returns the subset of `temperature_sensor`, `temperature_fan` and `output_pin`
+// objects that have custom names.
+func (c collector) fetchCustomSensors(klipperHost string) (*[]string, *[]string, *[]string, error) {
+	var url = "http://" + klipperHost + "/printer/objects/list"
+	res, err := http.Get(url)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, nil, nil, err
+	}
+
+	defer res.Body.Close()
+	data, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		c.logger.Fatal(err)
+		return nil, nil, nil, err
+	}
+
+	var response PrinterObjectsList
+
+	err = json.Unmarshal(data, &response)
+	if err != nil {
+		c.logger.Fatal(err)
+		return nil, nil, nil, err
+	}
+
+	temperatureSensors := []string{}
+	temperatureFans := []string{}
+	outputPins := []string{}
+	for o := range response.Result.Objects {
+		// find temperature_sensor
+		if strings.HasPrefix(response.Result.Objects[o], "temperature_sensor ") {
+			temperatureSensors = append(temperatureSensors, strings.Replace(response.Result.Objects[o], "temperature_sensor ", "", 1))
+		}
+		// find temperature_fan
+		if strings.HasPrefix(response.Result.Objects[o], "temperature_fan ") {
+			temperatureFans = append(temperatureFans, strings.Replace(response.Result.Objects[o], "temperature_fan ", "", 1))
+		}
+		// find output_pin
+		if strings.HasPrefix(response.Result.Objects[o], "output_pin ") {
+			outputPins = append(outputPins, strings.Replace(response.Result.Objects[o], "output_pin ", "", 1))
+		}
+	}
+
+	return &temperatureSensors, &temperatureFans, &outputPins, nil
+}
+
+func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*PrinterObjectResponse, error) {
+
+	// Get the list of custom sensors if not already set. This saves fetching the full
+	// list on every poll, but any new sensors will only be added is the exporter is restarted.
+	if customTemperatureSensors == nil ||
+		customTemperatureSensors == nil ||
+		customOutputPins == nil {
+		ts, tf, op, err := c.fetchCustomSensors(klipperHost)
+		if err != nil {
+			c.logger.Error(err)
+			return nil, err
+		}
+		c.logger.Infof("Found custom sensors: %+v %+v %+v", ts, tf, op)
+		customTemperatureSensors = *ts
+		customTemperatureFans = *tf
+		customOutputPins = *op
+	}
+
+	customSensorsQuery := ""
+	for ts := range customTemperatureSensors {
+		customSensorsQuery += "&temperature_sensor%20" + customTemperatureSensors[ts]
+	}
+	for tf := range customTemperatureFans {
+		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[tf]
+	}
+	for op := range customOutputPins {
+		customSensorsQuery += "&output_pin%20" + customOutputPins[op]
+	}
+
 	var procStatsUrl = "http://" +
 		klipperHost + "/printer/objects/query" +
 		"?" + gcodeMoveQuery +
@@ -109,7 +264,9 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*MoonrakerP
 		"&" + idleTimeoutQuery +
 		"&" + virtualSdCardQuery +
 		"&" + printStatsQuery +
-		"&" + DisplayStatusQuery
+		"&" + displayStatusQuery +
+		customSensorsQuery
+
 	c.logger.Debug("Collecting metrics from " + procStatsUrl)
 	res, err := http.Get(procStatsUrl)
 
@@ -124,13 +281,16 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*MoonrakerP
 		return nil, err
 	}
 
-	var response MoonrakerPrinterObjectResponse
+	c.logger.Tracef("%+v", string(data))
+
+	var response PrinterObjectResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		c.logger.Fatal(err)
 		return nil, err
 	}
+	c.logger.Tracef("%+v", response)
 
 	return &response, nil
 }

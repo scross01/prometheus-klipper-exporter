@@ -311,5 +311,44 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.CounterValue,
 			result.Result.Status.DisplayStatus.Progress)
 
+		// temperature_sensor
+		for sk, sv := range result.Result.Status.TemperatureSensors {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+sk+"_temperature", "The temperature of the "+sk+" temperature sensor", nil, nil),
+				prometheus.GaugeValue,
+				sv.Temperature)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+sk+"_measured_min_temp", "The measured minimun temperature of the "+sk+" temperature sensor", nil, nil),
+				prometheus.GaugeValue,
+				sv.MeasuredMinTemp)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+sk+"_measured_max_temp", "The measured maximum temperature of the "+sk+" temperature sensor", nil, nil),
+				prometheus.GaugeValue,
+				sv.MeasuredMaxTemp)
+		}
+
+		// temperature_fan
+		for fk, fv := range result.Result.Status.TemperatureFans {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+fk+"_speed", "The speed of the "+fk+" temperature fan", nil, nil),
+				prometheus.GaugeValue,
+				fv.Speed)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+fk+"_temperature", "The temperature of the "+fk+" temperature fan", nil, nil),
+				prometheus.GaugeValue,
+				fv.Temperature)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_temperature_sensor_"+fk+"_target", "The target temperature for the "+fk+" temperature fan", nil, nil),
+				prometheus.GaugeValue,
+				fv.Target)
+		}
+
+		// output_pin
+		for k, v := range result.Result.Status.OutputPins {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_output_pin_"+k+"_value", "The value of the "+k+" output pin", nil, nil),
+				prometheus.GaugeValue,
+				v.Value)
+		}
 	}
 }
