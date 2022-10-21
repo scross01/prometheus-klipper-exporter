@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.6.1
+------
+
+- Fixes #8. Invalid metric for sensors with unsupported characters in the name
+
 v0.6.0
 ------
 
