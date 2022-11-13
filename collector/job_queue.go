@@ -17,7 +17,7 @@ type MoonrakerJobQueueResponse struct {
 }
 
 type MoonrakerQueuedJob struct {
-	TimeInQueue int `json:"time_in_queue"`
+	TimeInQueue float64 `json:"time_in_queue"`
 }
 
 func (c collector) fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {

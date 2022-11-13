@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.6.2
+------
+
+- Fixes #9. Change TimeInQueue type from into to float64
+
 v0.6.1
 ------
 
