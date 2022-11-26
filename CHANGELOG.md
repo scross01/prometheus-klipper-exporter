@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+v0.7.0-beta
+-----------
+
+- Breaking change: `printer_objects` `klipper_temperature_sensor_*` metrics now
+  use labels for each sensor instead of separate metrics
+- Breaking change: `printer_objects` `klipper_temperature_fan_*` metrics now use
+  labels for each fan instead of separate metrics
+- Breaking change: `printer_objects` `klipper_output_pin_*` metrics now use labels
+  for each output pin instead for separate metrics
+
 v0.6.2
 ------
 

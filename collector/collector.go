@@ -34,6 +34,11 @@ func getValidMetricName(str string) string {
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
 }
 
+func getValidLabelName(str string) string {
+	// convert hyphens to underscores and strip out all other invalid characters
+	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
+}
+
 // Collect implements Prometheus.Collector.
 func (c collector) Collect(ch chan<- prometheus.Metric) {
 
@@ -321,46 +326,63 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			result.Result.Status.DisplayStatus.Progress)
 
 		// temperature_sensor
+		temperatureSensorLabels := []string{"sensor"}
+		temperatureSensor := prometheus.NewDesc("klipper_temperature_sensor_temperature", "The temperature of the temperature sensor", temperatureSensorLabels, nil)
+		temperatureSensorMinTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_min_temp", "The measured minimun temperature of the temperature sensor", temperatureSensorLabels, nil)
+		temperatureSensorMaxTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_max_temp", "The measured maximum temperature of the temperature sensor", temperatureSensorLabels, nil)
 		for sk, sv := range result.Result.Status.TemperatureSensors {
-			metricName := getValidMetricName(sk)
+			sensorName := getValidLabelName(sk)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_temperature", "The temperature of the "+sk+" temperature sensor", nil, nil),
+				temperatureSensor,
 				prometheus.GaugeValue,
-				sv.Temperature)
+				sv.Temperature, 
+				sensorName)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_measured_min_temp", "The measured minimun temperature of the "+sk+" temperature sensor", nil, nil),
+				temperatureSensorMinTemp,
 				prometheus.GaugeValue,
-				sv.MeasuredMinTemp)
+				sv.MeasuredMinTemp, 
+				sensorName)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_measured_max_temp", "The measured maximum temperature of the "+sk+" temperature sensor", nil, nil),
+				temperatureSensorMaxTemp,
 				prometheus.GaugeValue,
-				sv.MeasuredMaxTemp)
+				sv.MeasuredMaxTemp, 
+				sensorName)
 		}
 
 		// temperature_fan
+		fanLabels := []string{"fan"}
+		fanSpeed := prometheus.NewDesc("klipper_temperature_fan_speed", "The speed of the temperature fan", fanLabels, nil)
+		fanTemperature := prometheus.NewDesc("klipper_temperature_fan_temperature", "The temperature of the temperature fan", fanLabels, nil)
+		fanTarget := prometheus.NewDesc("klipper_temperature_fan_target", "The target temperature for the temperature fan", fanLabels, nil)
 		for fk, fv := range result.Result.Status.TemperatureFans {
-			metricName := getValidMetricName(fk)
+			fanName := getValidLabelName(fk)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_speed", "The speed of the "+fk+" temperature fan", nil, nil),
+				fanSpeed,
 				prometheus.GaugeValue,
-				fv.Speed)
+				fv.Speed,
+				fanName)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_temperature", "The temperature of the "+fk+" temperature fan", nil, nil),
+				fanTemperature,
 				prometheus.GaugeValue,
-				fv.Temperature)
+				fv.Temperature,
+				fanName)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_temperature_sensor_"+metricName+"_target", "The target temperature for the "+fk+" temperature fan", nil, nil),
+				fanTarget,
 				prometheus.GaugeValue,
-				fv.Target)
+				fv.Target,
+				fanName)
 		}
 
 		// output_pin
+		pinLabels := []string{"pin"}
+		pinValue := prometheus.NewDesc("klipper_output_pin_value", "The value of the output pin", pinLabels, nil)
 		for k, v := range result.Result.Status.OutputPins {
-			metricName := getValidMetricName(k)
+			pinName := getValidLabelName(k)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_output_pin_"+metricName+"_value", "The value of the "+k+" output pin", nil, nil),
+				pinValue,
 				prometheus.GaugeValue,
-				v.Value)
+				v.Value,
+				pinName)
 		}
 	}
 }
