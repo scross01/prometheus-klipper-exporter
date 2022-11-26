@@ -4,12 +4,15 @@ Change Log
 v0.7.0-beta
 -----------
 
-- Breaking change: `printer_objects` `klipper_temperature_sensor_*` metrics now
-  use labels for each sensor instead of separate metrics
-- Breaking change: `printer_objects` `klipper_temperature_fan_*` metrics now use
-  labels for each fan instead of separate metrics
-- Breaking change: `printer_objects` `klipper_output_pin_*` metrics now use labels
-  for each output pin instead for separate metrics
+- Fixes #11. Query custom temperature sensor, fan, and output pin config separatelly
+  for each configured klipper host
+- Fixes #10. Use labels for temperature sensor, fan, and output pin metrics
+- Breaking change: `printer_objects` `klipper_temperature_sensor_*` metrics
+  renamed, now use labels for each sensor instead of separate metrics
+- Breaking change: `printer_objects` `klipper_temperature_fan_*` metrics
+  renamed now use labels for each fan instead of separate metrics
+- Breaking change: `printer_objects` `klipper_output_pin_*` metrics renamed, now
+  use labels for each output pin instead for separate metrics
 
 v0.6.2
 ------

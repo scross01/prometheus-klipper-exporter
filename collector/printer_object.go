@@ -173,9 +173,9 @@ type PrinterObjectsList struct {
 }
 
 var (
-	customTemperatureSensors []string = nil
-	customTemperatureFans    []string = nil
-	customOutputPins         []string = nil
+	customTemperatureSensors map[string][]string = make(map[string][]string)
+	customTemperatureFans    map[string][]string = make(map[string][]string)
+	customOutputPins         map[string][]string = make(map[string][]string)
 )
 
 // fetchCustomSensors queries klipper for the complete list and printer objects and
@@ -229,29 +229,29 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*PrinterObj
 
 	// Get the list of custom sensors if not already set. This saves fetching the full
 	// list on every poll, but any new sensors will only be added is the exporter is restarted.
-	if customTemperatureSensors == nil ||
-		customTemperatureSensors == nil ||
-		customOutputPins == nil {
+	if _, ok := customTemperatureSensors[klipperHost]; ok {
+		// already have custom sensors, skip
+	} else {
 		ts, tf, op, err := c.fetchCustomSensors(klipperHost)
 		if err != nil {
 			c.logger.Error(err)
 			return nil, err
 		}
 		c.logger.Infof("Found custom sensors: %+v %+v %+v", ts, tf, op)
-		customTemperatureSensors = *ts
-		customTemperatureFans = *tf
-		customOutputPins = *op
+		customTemperatureSensors[klipperHost] = *ts
+		customTemperatureFans[klipperHost] = *tf
+		customOutputPins[klipperHost] = *op
 	}
 
 	customSensorsQuery := ""
-	for ts := range customTemperatureSensors {
-		customSensorsQuery += "&temperature_sensor%20" + customTemperatureSensors[ts]
+	for ts := range customTemperatureSensors[klipperHost] {
+		customSensorsQuery += "&temperature_sensor%20" + customTemperatureSensors[klipperHost][ts]
 	}
-	for tf := range customTemperatureFans {
-		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[tf]
+	for tf := range customTemperatureFans[klipperHost] {
+		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[klipperHost][tf]
 	}
-	for op := range customOutputPins {
-		customSensorsQuery += "&output_pin%20" + customOutputPins[op]
+	for op := range customOutputPins[klipperHost] {
+		customSensorsQuery += "&output_pin%20" + customOutputPins[klipperHost][op]
 	}
 
 	var procStatsUrl = "http://" +
