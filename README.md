@@ -129,7 +129,7 @@ group of metrics is queried from a different Moonraker API endpoint.
 | module | default | metrics |
 |--------|---------|---------|
 | `process_stats` | x | `klipper_moonraker_cpu_usage`<br/>`klipper_moonraker_memory_kb`<br/>`klipper_moonraker_websocket_connections`<br/>`klipper_system_cpu`<br/>`klipper_system_cpu_temp`<br/>`klipper_system_memory_available`<br/>`klipper_system_memory_total`<br/>`klipper_system_memory_used`<br/>`klipper_system_uptime`<br/> |
-| `network_stats` |   | Per interface (e.g. `lo`, `wlan`):<br/>`klipper_network_*_tx_bandwidth`<br/>`klipper_network_*_rx_bytes`<br/>`klipper_network_*_tx_bytes`<br/>`klipper_network_*_rx_drop`<br/>`klipper_network_*_tx_drop`<br/>`klipper_network_*_rx_errs`<br/>`klipper_network_*_tx_errs`<br/>`klipper_network_*_rx_packets`<br/>`klipper_network_*_tx_packets` |
+| `network_stats` |   | `klipper_network_tx_bandwidth`<br/>`klipper_network_rx_bytes`<br/>`klipper_network_tx_bytes`<br/>`klipper_network_rx_drop`<br/>`klipper_network_tx_drop`<br/>`klipper_network_rx_errs`<br/>`klipper_network_tx_errs`<br/>`klipper_network_rx_packets`<br/>`klipper_network_tx_packets`<br/>(labels: `interface`. e.g. `lo`, `wlan`) |
 | `job_queue` | x | `klipper_job_queue_length` |
 | `system_info` | x | `klipper_system_cpu_count` |
 | `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
