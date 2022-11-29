@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-v0.7.0-beta
------------
+v0.7.0
+------
 
 - Fixes #11. Query custom temperature sensor, fan, and output pin config separatelly
   for each configured klipper host
