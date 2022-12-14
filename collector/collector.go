@@ -186,6 +186,35 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue,
 			float64(len(result.Result.QueuedJobs)))
 	}
+	// Job History
+	if slices.Contains(c.modules, "history") {
+		c.logger.Infof("Collecting history for %s", c.target)
+		result, _ := c.fetchMoonrakerHistory(c.target)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_total_jobs", "Klipper number of total jobs.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.Jobs))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_total_time", "Klipper total time.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.TotalTime))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_total_print_time", "Klipper total print time.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.PrintTime))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_total_filament_used", "Klipper total meters of filament used.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.FilamentUsed))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_longest_job", "Klipper total longest job.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.LongestJob))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_longest_print", "Klipper total longest print.", nil, nil),
+			prometheus.GaugeValue,
+			float64(result.Result.JobTotals.LongestPrint))
+	}
 
 	// System Info
 	if slices.Contains(c.modules, "system_info") {
