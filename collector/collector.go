@@ -384,17 +384,17 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			ch <- prometheus.MustNewConstMetric(
 				temperatureSensor,
 				prometheus.GaugeValue,
-				sv.Temperature, 
+				sv.Temperature,
 				sensorName)
 			ch <- prometheus.MustNewConstMetric(
 				temperatureSensorMinTemp,
 				prometheus.GaugeValue,
-				sv.MeasuredMinTemp, 
+				sv.MeasuredMinTemp,
 				sensorName)
 			ch <- prometheus.MustNewConstMetric(
 				temperatureSensorMaxTemp,
 				prometheus.GaugeValue,
-				sv.MeasuredMaxTemp, 
+				sv.MeasuredMaxTemp,
 				sensorName)
 		}
 

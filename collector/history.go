@@ -12,12 +12,12 @@ import (
 type MoonrakerHistoryResponse struct {
 	Result struct {
 		JobTotals struct {
-			Jobs int64 `json:"total_jobs"`
-			TotalTime  float64 `json:"total_time"`
-			PrintTime  float64 `json:"total_print_time"`
-			FilamentUsed  float64 `json:"total_filament_used"`
-			LongestJob  float64 `json:"longest_job"`
-			LongestPrint  float64 `json:"longest_print"`
+			Jobs         int64   `json:"total_jobs"`
+			TotalTime    float64 `json:"total_time"`
+			PrintTime    float64 `json:"total_print_time"`
+			FilamentUsed float64 `json:"total_filament_used"`
+			LongestJob   float64 `json:"longest_job"`
+			LongestPrint float64 `json:"longest_print"`
 		} `json:"job_totals"`
 	} `json:"result"`
 }
