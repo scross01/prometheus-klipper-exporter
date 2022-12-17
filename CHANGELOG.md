@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+v0.7.1
+------
+
+- Added history data metrics including total print time or total filament used.
+  Add the new `history` module in your `prometheus.yml` config. Thanks to @r4ptor #12
+
 v0.7.0
 ------
 

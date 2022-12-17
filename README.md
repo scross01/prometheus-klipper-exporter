@@ -28,13 +28,10 @@ These changes affect the following metrics groups
 - `klipper_temperature_fan_`*
 - `klipper_output_pin_`*
 
-
 For example:
 
 - `klipper_network_`**<code>wlan0</code>**`_rx_bytes` becomes `klipper_network_rx_bytes{interface="`**<code>wlan0</code>**`"}`
 - `klipper_temperature_sensor_`**<code>mtu</code>**`_temperature` becomes `klipper_temperature_sensor_temperature{sensor="`**<code>mtu</code>**`"}`
-
-
 
 Usage
 -----
@@ -57,7 +54,7 @@ scrape_configs:
     static_configs:
       - targets: [ 'klipper.local:7125' ]
     params:
-      modules: [ "process_stats", "job_queue", "system_info", "network_stats", "directory_info", "printer_objects" ]
+      modules: [ "process_stats", "job_queue", "system_info", "network_stats", "directory_info", "printer_objects", "history" ]
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -161,3 +158,4 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
 | `temperature` | | `klipper_extruder_power`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_temperature_sensor_*_temperature` |
 | `printer_objects` | | `klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_fan_rpm`<br/>`klipper_fan_speed`<br/>`klipper_gcode_extrude_factor`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_output_pin_value{pin="`*pin*`"}`<br/>`klipper_printing_time`<br/>`klipper_print_filament_used`<br/>`klipper_print_file_position`<br/>`klipper_print_file_progress`<br/>`klipper_print_gcode_progress`<br/>`klipper_print_total_duration`<br/>`klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}`<br/>`klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
+| `history` | | `klipper_total_jobs`<br/>`klipper_total_time`<br/>`klipper_total_print_time`<br/>`klipper_total_filament_used`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>
