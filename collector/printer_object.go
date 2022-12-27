@@ -181,14 +181,23 @@ var (
 // fetchCustomSensors queries klipper for the complete list and printer objects and
 // returns the subset of `temperature_sensor`, `temperature_fan` and `output_pin`
 // objects that have custom names.
-func (c collector) fetchCustomSensors(klipperHost string) (*[]string, *[]string, *[]string, error) {
+func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, error) {
 	var url = "http://" + klipperHost + "/printer/objects/list"
-	res, err := http.Get(url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, nil, nil, err
 	}
-
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, nil, nil, err
+	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
@@ -225,14 +234,14 @@ func (c collector) fetchCustomSensors(klipperHost string) (*[]string, *[]string,
 	return &temperatureSensors, &temperatureFans, &outputPins, nil
 }
 
-func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*PrinterObjectResponse, error) {
+func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey string) (*PrinterObjectResponse, error) {
 
 	// Get the list of custom sensors if not already set. This saves fetching the full
 	// list on every poll, but any new sensors will only be added is the exporter is restarted.
 	if _, ok := customTemperatureSensors[klipperHost]; ok {
 		// already have custom sensors, skip
 	} else {
-		ts, tf, op, err := c.fetchCustomSensors(klipperHost)
+		ts, tf, op, err := c.fetchCustomSensors(klipperHost, apiKey)
 		if err != nil {
 			c.logger.Error(err)
 			return nil, err
@@ -254,7 +263,7 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*PrinterObj
 		customSensorsQuery += "&output_pin%20" + customOutputPins[klipperHost][op]
 	}
 
-	var procStatsUrl = "http://" +
+	var url = "http://" +
 		klipperHost + "/printer/objects/query" +
 		"?" + gcodeMoveQuery +
 		"&" + toolheadQuery +
@@ -267,9 +276,18 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string) (*PrinterObj
 		"&" + displayStatusQuery +
 		customSensorsQuery
 
-	c.logger.Debug("Collecting metrics from " + procStatsUrl)
-	res, err := http.Get(procStatsUrl)
+	c.logger.Debug("Collecting metrics from " + url)
 
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, err

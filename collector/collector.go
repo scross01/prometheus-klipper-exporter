@@ -14,11 +14,12 @@ type collector struct {
 	ctx     context.Context
 	target  string
 	modules []string
+	apiKey  string
 	logger  log.Logger
 }
 
-func New(ctx context.Context, target string, modules []string, logger log.Logger) *collector {
-	return &collector{ctx: ctx, target: target, modules: modules, logger: logger}
+func New(ctx context.Context, target string, modules []string, apiKey string, logger log.Logger) *collector {
+	return &collector{ctx: ctx, target: target, modules: modules, apiKey: apiKey, logger: logger}
 }
 
 // Describe implements Prometheus.Collector.
@@ -47,7 +48,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 		c.logger.Infof("Collecting process_stats for %s", c.target)
 
-		result, err := c.fetchMoonrakerProcessStats(c.target)
+		result, err := c.fetchMoonrakerProcessStats(c.target, c.apiKey)
 		if err != nil {
 			c.logger.Debug(err)
 			return
@@ -163,7 +164,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// Directory Information
 	if slices.Contains(c.modules, "directory_info") {
 		c.logger.Infof("Collecting directory_info for %s", c.target)
-		result, _ := c.fetchMoonrakerDirectoryInfo(c.target)
+		result, _ := c.fetchMoonrakerDirectoryInfo(c.target, c.apiKey)
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
 			prometheus.GaugeValue,
@@ -180,7 +181,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// Job Queue
 	if slices.Contains(c.modules, "job_queue") {
 		c.logger.Infof("Collecting job_queue for %s", c.target)
-		result, _ := c.fetchMoonrakerJobQueue(c.target)
+		result, _ := c.fetchMoonrakerJobQueue(c.target, c.apiKey)
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
 			prometheus.GaugeValue,
@@ -189,7 +190,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// Job History
 	if slices.Contains(c.modules, "history") {
 		c.logger.Infof("Collecting history for %s", c.target)
-		result, _ := c.fetchMoonrakerHistory(c.target)
+		result, _ := c.fetchMoonrakerHistory(c.target, c.apiKey)
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_total_jobs", "Klipper number of total jobs.", nil, nil),
 			prometheus.GaugeValue,
@@ -219,7 +220,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// System Info
 	if slices.Contains(c.modules, "system_info") {
 		c.logger.Infof("Collecting system_info for %s", c.target)
-		result, _ := c.fetchMoonrakerSystemInfo(c.target)
+		result, _ := c.fetchMoonrakerSystemInfo(c.target, c.apiKey)
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
 			prometheus.GaugeValue,
@@ -229,7 +230,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// Temperature Store
 	if slices.Contains(c.modules, "temperature") {
 		c.logger.Infof("Collecting system_info for %s", c.target)
-		result, _ := c.fetchTemperatureData(c.target)
+		result, _ := c.fetchTemperatureData(c.target, c.apiKey)
 
 		for k, v := range result.Result {
 			c.logger.Debug(k)
@@ -250,7 +251,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	// Printer Objects
 	if slices.Contains(c.modules, "printer_objects") {
 		c.logger.Infof("Collecting printer_objects for %s", c.target)
-		result, _ := c.fetchMoonrakerPrinterObjects(c.target)
+		result, _ := c.fetchMoonrakerPrinterObjects(c.target, c.apiKey)
 
 		// gcode_move
 		ch <- prometheus.MustNewConstMetric(

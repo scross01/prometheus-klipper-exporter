@@ -22,10 +22,20 @@ type MoonrakerHistoryResponse struct {
 	} `json:"result"`
 }
 
-func (c collector) fetchMoonrakerHistory(klipperHost string) (*MoonrakerHistoryResponse, error) {
-	var procStatsUrl = "http://" + klipperHost + "/server/history/totals"
-	c.logger.Debug("Collecting metrics from " + procStatsUrl)
-	res, err := http.Get(procStatsUrl)
+func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*MoonrakerHistoryResponse, error) {
+	var url = "http://" + klipperHost + "/server/history/totals"
+	c.logger.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, err

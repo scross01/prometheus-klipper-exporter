@@ -21,10 +21,20 @@ type MoonrakerSystemInfoQueryResponse struct {
 	} `json:"result"`
 }
 
-func (c collector) fetchMoonrakerSystemInfo(klipperHost string) (*MoonrakerSystemInfoQueryResponse, error) {
-	var procStatsUrl = "http://" + klipperHost + "/machine/system_info"
-	c.logger.Debug("Collecting metrics from " + procStatsUrl)
-	res, err := http.Get(procStatsUrl)
+func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (*MoonrakerSystemInfoQueryResponse, error) {
+	var url = "http://" + klipperHost + "/machine/system_info"
+	c.logger.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, err

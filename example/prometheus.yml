@@ -4,19 +4,33 @@ scrape_configs:
     scrape_interval: 5s
     metrics_path: /probe
     static_configs:
-      - targets: [ 'klipper.home.lan:7125' ]
+      - targets: [ 'klipper:7125' ] # the klipper host
     params:
-      modules: [ 'process_stats', 'network_stats', 'system_info', 'job_queue', 'directory_info', 'printer_objects', 'history' ]
+      modules: [ 
+        'process_stats',
+        'network_stats',
+        'system_info',
+        'job_queue',
+        'directory_info',
+        'printer_objects',
+        'history',
+      ]
+    # Enable API Key authentication.
+    # Only set one of `credentials` or `credentials_file`
+    # authorization:
+    #   type: APIKEY
+    #   credentials: '<apikey>'
+    #   credentials_file: `/path/to/private/apikey.txt`
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: study-imac.home.lan:9101
+        replacement: klipper-exporter:9101 # host where the klipper-exporter is running
 
   - job_name: "klipper-exporter"
     scrape_interval: 5s
     metrics_path: /metrics
     static_configs:
-      - targets: [ 'study-imac.home.lan:9101' ]
+      - targets: [ 'klipper-exporter:9101' ] # host where the klipper-exporter is running

@@ -20,10 +20,20 @@ type MoonrakerQueuedJob struct {
 	TimeInQueue float64 `json:"time_in_queue"`
 }
 
-func (c collector) fetchMoonrakerJobQueue(klipperHost string) (*MoonrakerJobQueueResponse, error) {
-	var procStatsUrl = "http://" + klipperHost + "/server/job_queue/status"
-	c.logger.Debug("Collecting metrics from " + procStatsUrl)
-	res, err := http.Get(procStatsUrl)
+func (c collector) fetchMoonrakerJobQueue(klipperHost string, apiKey string) (*MoonrakerJobQueueResponse, error) {
+	var url = "http://" + klipperHost + "/server/job_queue/status"
+	c.logger.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		c.logger.Error(err)
+		return nil, err
+	}
+	if apiKey != "" {
+		req.Header.Set("X-API-KEY", apiKey)
+	}
+	res, err := client.Do(req)
 	if err != nil {
 		c.logger.Error(err)
 		return nil, err

@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.8.0
+------
+
+- Enabled option to set API Key for authentication in `prometheus.yml`
+
 v0.7.1
 ------
 

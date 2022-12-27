@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -14,7 +15,7 @@ import (
 // Command line configuration options
 var (
 	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
-	debug         = flag.Bool("debug", false, "Enable debug logging")
+	debug         = flag.Bool("debug", false, "Enable debug logging.")
 )
 
 func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
@@ -28,13 +29,21 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 
 	// Set default modules
 	modules := []string{"process_stats", "job_queue", "system_info"}
+	// get `modules` configuration passed from the prometheus.yml
 	if len(query["modules"]) > 0 {
 		modules = query["modules"]
 	}
 	logger.Infof("Starting metrics collection of %s for %s", modules, target)
 
+	// get the API Key from passed from the prometheus.yml `authorization` config
+	auth := r.Header.Get("Authorization")
+	apiKey := ""
+	if auth != "" && strings.HasPrefix(auth, "APIKEY") {
+		apiKey = strings.Replace(auth, "APIKEY ", "", 1)
+	}
+
 	registry := prometheus.NewRegistry()
-	c := collector.New(r.Context(), target, modules, logger)
+	c := collector.New(r.Context(), target, modules, apiKey, logger)
 	registry.MustRegister(c)
 	h := promhttp.HandlerFor(registry, promhttp.HandlerOpts{})
 	h.ServeHTTP(w, r)
