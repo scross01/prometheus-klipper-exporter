@@ -228,6 +228,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	// Temperature Store
+	// (deprecated since v0.8.0, use `printer_objects` instead)
 	if slices.Contains(c.modules, "temperature") {
 		c.logger.Infof("Collecting system_info for %s", c.target)
 		result, _ := c.fetchTemperatureData(c.target, c.apiKey)

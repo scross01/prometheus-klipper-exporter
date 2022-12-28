@@ -10,28 +10,12 @@ to enabled a single exporter to collect metrics from multiple Klipper instances.
 Metrics for the exporter itself are served from the `/metrics` endpoint and Klipper
 metrics are serviced from the `/probe` endpoint with a specified `target`.
 
-⚠️ Breaking Changes upgrading to v0.7.0
----------------------------------------
+⚠️ Breaking Changes upgrading to v0.8.0
+--------------------------------------
 
-The `v0.7.0` release introduces several metric changes that will break any
-grafana charts that have previously been defined using the old metric names from
-v0.6.x or earlier.
-
-`v0.7.0` now uses labels for network interfaces, temperature sensors,
-temperature fans, and output pins, rather than defining separate metrics
-for each unique entity.
-
-These changes affect the following metrics groups
-
-- `klipper_network_`*
-- `klipper_temperature_sensor_`*
-- `klipper_temperature_fan_`*
-- `klipper_output_pin_`*
-
-For example:
-
-- `klipper_network_`**<code>wlan0</code>**`_rx_bytes` becomes `klipper_network_rx_bytes{interface="`**<code>wlan0</code>**`"}`
-- `klipper_temperature_sensor_`**<code>mtu</code>**`_temperature` becomes `klipper_temperature_sensor_temperature{sensor="`**<code>mtu</code>**`"}`
+`v0.8.0` deprecates the `tempurature` module option which contains a subset of
+the metrics reported by the `printer_objects`. If you where using the
+`tempurature` module then switch the configuration to use `printer_objects` instead.
 
 Usage
 -----
@@ -153,10 +137,6 @@ You can configure different sets of metrics to be collected by including the
 If the modules params are omitted then only the default metrics are collected. Each
 group of metrics is queried from a different Moonraker API endpoint.
 
-> _Note: `temperature` module contains a subset of the metrics reported by the
-`printer_objects` module. The two modules cannot be configured together.
-[Issue #2](https://github.com/scross01/prometheus-klipper-exporter/issues/2)_
-
 | module | default | metrics |
 |--------|---------|---------|
 | `process_stats` | x | `klipper_moonraker_cpu_usage`<br/>`klipper_moonraker_memory_kb`<br/>`klipper_moonraker_websocket_connections`<br/>`klipper_system_cpu`<br/>`klipper_system_cpu_temp`<br/>`klipper_system_memory_available`<br/>`klipper_system_memory_total`<br/>`klipper_system_memory_used`<br/>`klipper_system_uptime`<br/> |
@@ -164,7 +144,6 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `job_queue` | x | `klipper_job_queue_length` |
 | `system_info` | x | `klipper_system_cpu_count` |
 | `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
-| `temperature` | | `klipper_extruder_power`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_temperature_sensor_*_temperature` |
 | `printer_objects` | | `klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_fan_rpm`<br/>`klipper_fan_speed`<br/>`klipper_gcode_extrude_factor`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_output_pin_value{pin="`*pin*`"}`<br/>`klipper_printing_time`<br/>`klipper_print_filament_used`<br/>`klipper_print_file_position`<br/>`klipper_print_file_progress`<br/>`klipper_print_gcode_progress`<br/>`klipper_print_total_duration`<br/>`klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}`<br/>`klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
 | `history` | | `klipper_total_jobs`<br/>`klipper_total_time`<br/>`klipper_total_print_time`<br/>`klipper_total_filament_used`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>
 
@@ -238,3 +217,28 @@ in the config or referenced from file.
 
 Only one API key can be set for each job.  If you have multiple klipper hosts with
 different API keys, create a separate job for each host.
+
+History of breaking changes
+---------------------------
+
+### ⚠️ Breaking Changes upgrading to v0.7.0
+
+The `v0.7.0` release introduces several metric changes that will break any
+grafana charts that have previously been defined using the old metric names from
+v0.6.x or earlier.
+
+`v0.7.0` now uses labels for network interfaces, temperature sensors,
+temperature fans, and output pins, rather than defining separate metrics
+for each unique entity.
+
+These changes affect the following metrics groups
+
+- `klipper_network_`*
+- `klipper_temperature_sensor_`*
+- `klipper_temperature_fan_`*
+- `klipper_output_pin_`*
+
+For example:
+
+- `klipper_network_`**<code>wlan0</code>**`_rx_bytes` becomes `klipper_network_rx_bytes{interface="`**<code>wlan0</code>**`"}`
+- `klipper_temperature_sensor_`**<code>mtu</code>**`_temperature` becomes `klipper_temperature_sensor_temperature{sensor="`**<code>mtu</code>**`"}`

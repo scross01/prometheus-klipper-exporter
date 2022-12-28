@@ -5,8 +5,10 @@ v0.8.0
 ------
 
 - Added option to set API Key for authentication in `prometheus.yml`, `-moonraker.apikey`
-  command line option, or `MOONRAKER_APIKEY` environment variable. Fixes #
+  command line option, or `MOONRAKER_APIKEY` environment variable. Fixes #15.
 - Added `-verbose` option for trace level debug logging
+- Breaking change: The `temperature` module is deprecated as it contains a subset
+  of the metrics reported by the `printer_objects` module. Closes #2.
 
 v0.7.1
 ------
