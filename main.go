@@ -52,7 +52,7 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	} else {
 		logger.Trace("API key not set")
 	}
-	
+
 	registry := prometheus.NewRegistry()
 	c := collector.New(r.Context(), target, modules, apiKey, logger)
 	registry.MustRegister(c)
