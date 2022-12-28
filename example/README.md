@@ -86,6 +86,15 @@ Use the new datasource to explore the metrics and create dashboards.
 
 ![Grafana Explore](./images/grafana-explore.png)
 
+Example Dashboard
+-----------------
+
+An example dashboard is included at [`grafana-dashboard.json`](./grafana-dashboard.json).
+Open http://localhost:3000/dashboard/import and select "Upload JSON file". Select
+the Prometheus data source and click "Import".
+
+![Example Grafana Dashboard](./images/grafana-dashboard.png)
+
 Known Issues
 ------------
 
