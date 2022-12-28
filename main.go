@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -15,7 +16,9 @@ import (
 // Command line configuration options
 var (
 	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
+	klipperApiKey = flag.String("moonraker.apikey", "", "API Key to authenticate with the Klipper APIs.")
 	debug         = flag.Bool("debug", false, "Enable debug logging.")
+	verbose       = flag.Bool("verbose", false, "Enable verbose trace level logging")
 )
 
 func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
@@ -35,13 +38,21 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	}
 	logger.Infof("Starting metrics collection of %s for %s", modules, target)
 
-	// get the API Key from passed from the prometheus.yml `authorization` config
-	auth := r.Header.Get("Authorization")
+	// set api key. prometheus.yml > command line arg > environment variable
 	apiKey := ""
+	auth := r.Header.Get("Authorization")
 	if auth != "" && strings.HasPrefix(auth, "APIKEY") {
 		apiKey = strings.Replace(auth, "APIKEY ", "", 1)
+		logger.Trace("Using API key from prometheus.yml authorization configuration")
+	} else if *klipperApiKey != "" {
+		apiKey = *klipperApiKey
+		logger.Trace("Using API key from -moonraker.apikey command line argument")
+	} else if apiKey = os.Getenv("MOONRAKER_APIKEY"); apiKey != "" {
+		logger.Trace("Using API key from MOONRAKER_APIKEY environment variable")
+	} else {
+		logger.Trace("API key not set")
 	}
-
+	
 	registry := prometheus.NewRegistry()
 	c := collector.New(r.Context(), target, modules, apiKey, logger)
 	registry.MustRegister(c)
@@ -56,6 +67,9 @@ func main() {
 		logger.SetLevel(log.DebugLevel)
 	} else {
 		logger.SetLevel(log.InfoLevel)
+	}
+	if *verbose {
+		logger.SetLevel(log.TraceLevel)
 	}
 
 	http.Handle("/metrics", promhttp.Handler())

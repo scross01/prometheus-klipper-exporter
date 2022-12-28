@@ -4,7 +4,9 @@ Change Log
 v0.8.0
 ------
 
-- Enabled option to set API Key for authentication in `prometheus.yml`
+- Added option to set API Key for authentication in `prometheus.yml`, `-moonraker.apikey`
+  command line option, or `MOONRAKER_APIKEY` environment variable. Fixes #
+- Added `-verbose` option for trace level debug logging
 
 v0.7.1
 ------

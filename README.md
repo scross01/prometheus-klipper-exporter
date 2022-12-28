@@ -199,7 +199,30 @@ $ ./fetch-apikey.sh
 abcdef01234567890123456789012345
 ```
 
-Add the API key to the `prometheus.yml` scrape config, adding an `authorization`
+The API key can be set in one of three ways, from the scrape job configuraion in
+`prometheus.yml`, using the `-moonraker-apikey` command line argument, or
+setting the `MOONRAKER_APIKEY` environment variable.
+
+#### Environment variable
+
+Set in the `MOONRAKER_APIKEY` environment variable.
+
+```sh
+$ export MOONRAKER_APIKEY='abcdef01234567890123456789012345'
+$ prometheus-klipper-exporter
+```
+
+#### Command line argument
+
+Set on the klipper exporter command line using `-moonraker.apikey` option.
+
+```sh
+$ prometheus-klipper-exporter -moonraker.apikey='abcdef01234567890123456789012345'
+```
+
+#### Prometheus scrape configuration
+
+Add the API key to the `prometheus.yml` scrape config, Add `authorization`
 configuration with the type set to `APIKEY`.  The key can either to set directly
 in the config or referenced from file.
 
