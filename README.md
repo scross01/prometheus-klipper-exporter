@@ -121,6 +121,8 @@ To run the exporter as a docker container.
 $ docker run -d -p 9101:9101 ghcr.io/scross01/prometheus-klipper-exporter:latest
 ```
 
+See the [example/README.md](example/README.md) for a complete example running Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
+
 Modules
 -------
 

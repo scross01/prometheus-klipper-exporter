@@ -4,13 +4,19 @@ Example docker deployment
 Example deployment of Grafana, Prometheus and the prometheus-klipper-exporter for
 collecting and viewing the 3d printer metrics that can be deployed using docker compose.
 
+I recommend running Prometheus/Grafana on a separate host from Klipper. If you
+are running on a Raspberry Pi or similar device you should consider configuring the
+docker volumes to use external storage on either a connected USB drive, or
+network attached storage, to avoid the consistent writes to the SD Card which can
+reduce the lifespan of the card.
+
 ```mermaid
 graph LR;
     subgraph docker
-        grafana-->prometheus
-        prometheus-->klipper-exporter
+        Grafana-->Prometheus
+        Prometheus-->klipper-exporter[klipper-exporter:9101]
     end
-    klipper-exporter-->klipper([klipper])
+    klipper-exporter-->klipper([Klipper<br/>klipper.local:7125])
 ```
 
 The [`docker-compose.yml`](./docker-compose.yml) stack defines three containers.
@@ -27,7 +33,7 @@ the klipper host.
 ```yml
     ...
     static_configs:
-      - targets: [ 'klipper:7125' ]
+      - targets: [ 'klipper.local:7125' ]
     ...
 ```
 
