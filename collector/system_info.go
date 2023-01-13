@@ -42,7 +42,7 @@ func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 

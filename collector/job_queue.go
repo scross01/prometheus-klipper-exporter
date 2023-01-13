@@ -41,7 +41,7 @@ func (c collector) fetchMoonrakerJobQueue(klipperHost string, apiKey string) (*M
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 
@@ -49,7 +49,7 @@ func (c collector) fetchMoonrakerJobQueue(klipperHost string, apiKey string) (*M
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 

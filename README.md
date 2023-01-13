@@ -10,13 +10,6 @@ to enabled a single exporter to collect metrics from multiple Klipper instances.
 Metrics for the exporter itself are served from the `/metrics` endpoint and Klipper
 metrics are serviced from the `/probe` endpoint with a specified `target`.
 
-⚠️ Breaking Changes upgrading to v0.8.0
---------------------------------------
-
-`v0.8.0` deprecates the `tempurature` module option which contains a subset of
-the metrics reported by the `printer_objects`. If you where using the
-`tempurature` module then switch the configuration to use `printer_objects` instead.
-
 Usage
 -----
 
@@ -121,7 +114,8 @@ To run the exporter as a docker container.
 $ docker run -d -p 9101:9101 ghcr.io/scross01/prometheus-klipper-exporter:latest
 ```
 
-See the [example/README.md](example/README.md) for a complete example running Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
+See the [example/README.md](example/README.md) for a complete example running
+Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
 
 Modules
 -------
@@ -146,7 +140,7 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `job_queue` | x | `klipper_job_queue_length` |
 | `system_info` | x | `klipper_system_cpu_count` |
 | `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
-| `printer_objects` | | `klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_fan_rpm`<br/>`klipper_fan_speed`<br/>`klipper_gcode_extrude_factor`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_output_pin_value{pin="`*pin*`"}`<br/>`klipper_printing_time`<br/>`klipper_print_filament_used`<br/>`klipper_print_file_position`<br/>`klipper_print_file_progress`<br/>`klipper_print_gcode_progress`<br/>`klipper_print_total_duration`<br/>`klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}`<br/>`klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
+| `printer_objects` | | `klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_fan_rpm`<br/>`klipper_fan_speed`<br/>`klipper_gcode_extrude_factor`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_mcu_awake`<br/>`klipper_mcu_clock_frequency`<br/>`klipper_mcu_invalid_bytes`<br/>`klipper_mcu_read_bytes`<br/>`klipper_mcu_ready_bytes`<br/>`klipper_mcu_receive_seq`<br/>`klipper_mcu_retransmit_bytes`<br/>`klipper_mcu_retransmit_seq`<br/>`klipper_mcu_rto`<br/>`klipper_mcu_rttvar`<br/>`klipper_mcu_send_seq`<br/>`klipper_mcu_stalled_bytes`<br/>`klipper_mcu_srtt`<br/>`klipper_mcu_write_bytes`<br/>`klipper_output_pin_value{pin="`*pin*`"}`<br/>`klipper_printing_time`<br/>`klipper_print_filament_used`<br/>`klipper_print_file_position`<br/>`klipper_print_file_progress`<br/>`klipper_print_gcode_progress`<br/>`klipper_print_total_duration`<br/>`klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}`<br/>`klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
 | `history` | | `klipper_total_jobs`<br/>`klipper_total_time`<br/>`klipper_total_print_time`<br/>`klipper_total_filament_used`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>
 
 Authentication
@@ -220,10 +214,41 @@ in the config or referenced from file.
 Only one API key can be set for each job.  If you have multiple klipper hosts with
 different API keys, create a separate job for each host.
 
-History of breaking changes
----------------------------
+Command line options
+--------------------
 
-### ⚠️ Breaking Changes upgrading to v0.7.0
+`-help`
+
+  Display the command line help.
+
+`-logging.level <level>`
+
+  Set the logging output verbosity to one of `Trace`, `Debug`, `Info`,
+  `Warning`, `Error`, `Fatal` and `Panic`. Default level is `Info` which will
+  log anything that is info level or above (warning, error, fatal, panic).
+
+`-moonraker.apikey <string>`
+
+  Set the API Key to authenticate with the Klipper APIs.
+  See [API Key Authentication](#api-key-authentication)
+
+`-web.listen-address [<ip_address>]:<port>`
+
+  Address on which to expose metrics and web interface. Default is `:9101`
+  which will listen on port `9101` on all interfaces, which is the equiviment
+  of `0.0.0.0:9101`.  Include the IP address to limit to listening on a specific
+  interface, e.g. `192.168.1.99:7070`.
+
+⚠️ History of breaking changes
+-----------------------------
+
+### Upgrading to v0.8.0
+
+`v0.8.0` deprecates the `tempurature` module option which contains a subset of
+the metrics reported by the `printer_objects`. If you where using the
+`tempurature` module then switch the configuration to use `printer_objects` instead.
+
+### Upgrading to v0.7.0
 
 The `v0.7.0` release introduces several metric changes that will break any
 grafana charts that have previously been defined using the old metric names from

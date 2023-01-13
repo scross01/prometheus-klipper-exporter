@@ -1,6 +1,14 @@
 Change Log
 ==========
 
+v0.9.0
+------
+
+- Added new MCU `klipper_mcu_*` metrics to `printer_objects` metric collection.
+- Added new `-logging.level <level>` command line option to set specific log
+  output level. The `-debug` and `-verbose` options have been deprecated and
+  will be removed in a future release. Address #17.
+
 v0.8.0
 ------
 
