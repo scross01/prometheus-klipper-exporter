@@ -225,7 +225,7 @@ func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, nil, nil, err
 	}
 
@@ -233,7 +233,7 @@ func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, nil, nil, err
 	}
 
@@ -320,7 +320,7 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 
@@ -330,7 +330,7 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 	c.logger.Tracef("%+v", response)

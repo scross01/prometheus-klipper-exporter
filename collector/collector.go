@@ -50,7 +50,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 
 		result, err := c.fetchMoonrakerProcessStats(c.target, c.apiKey)
 		if err != nil {
-			c.logger.Debug(err)
+			c.logger.Error(err)
 			return
 		}
 
@@ -238,11 +238,9 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		result, _ := c.fetchTemperatureData(c.target, c.apiKey)
 
 		for k, v := range result.Result {
-			c.logger.Debug(k)
 			item := strings.ReplaceAll(k, " ", "_")
 			attributes := v.(map[string]interface{})
 			for k1, v1 := range attributes {
-				c.logger.Debug("  " + k1)
 				values := v1.([]interface{})
 				label := strings.ReplaceAll(k1[0:len(k1)-1], " ", "_")
 				ch <- prometheus.MustNewConstMetric(

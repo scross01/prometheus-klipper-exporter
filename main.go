@@ -15,10 +15,12 @@ import (
 
 // Command line configuration options
 var (
-	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
+	loggingLevel  = flag.String("logging.level", "Info", "Logging output level. Set to one of Trace, Debug, Info, Warning, Error, Fatal, or Panic")
 	klipperApiKey = flag.String("moonraker.apikey", "", "API Key to authenticate with the Klipper APIs.")
-	debug         = flag.Bool("debug", false, "Enable debug logging.")
-	verbose       = flag.Bool("verbose", false, "Enable verbose trace level logging")
+	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
+	// TODO deprecated, to be removed.
+	debug   = flag.Bool("debug", false, "(Deprecated) Enable debug logging. Use -logging.level instead.")
+	verbose = flag.Bool("verbose", false, "(Deprecated) Enable verbose trace level logging. Use -logging.level instead.")
 )
 
 func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
@@ -43,14 +45,14 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 	auth := r.Header.Get("Authorization")
 	if auth != "" && strings.HasPrefix(auth, "APIKEY") {
 		apiKey = strings.Replace(auth, "APIKEY ", "", 1)
-		logger.Trace("Using API key from prometheus.yml authorization configuration")
+		logger.Debug("Using API key from prometheus.yml authorization configuration")
 	} else if *klipperApiKey != "" {
 		apiKey = *klipperApiKey
-		logger.Trace("Using API key from -moonraker.apikey command line argument")
+		logger.Debug("Using API key from -moonraker.apikey command line argument")
 	} else if apiKey = os.Getenv("MOONRAKER_APIKEY"); apiKey != "" {
-		logger.Trace("Using API key from MOONRAKER_APIKEY environment variable")
+		logger.Debug("Using API key from MOONRAKER_APIKEY environment variable")
 	} else {
-		logger.Trace("API key not set")
+		logger.Debug("API key not set")
 	}
 
 	registry := prometheus.NewRegistry()
@@ -63,12 +65,20 @@ func handler(w http.ResponseWriter, r *http.Request, logger log.Logger) {
 func main() {
 	var logger = log.New()
 	flag.Parse()
+
+	level, err := log.ParseLevel(strings.ToLower(*loggingLevel))
+	if err != nil {
+		logger.Fatalf("Invalid logging level '%s'", *loggingLevel)
+	}
+	logger.SetLevel(level)
+
+	// TODO remove when -debug and -verbose options are removed
 	if *debug {
+		logger.Warn("-debug option is deprecated, change to using '-logging.level debug'")
 		logger.SetLevel(log.DebugLevel)
-	} else {
-		logger.SetLevel(log.InfoLevel)
 	}
 	if *verbose {
+		logger.Warn("-verbose option is deprecated, change to using '-logging.level trace'")
 		logger.SetLevel(log.TraceLevel)
 	}
 

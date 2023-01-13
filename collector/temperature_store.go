@@ -34,7 +34,7 @@ func (c collector) fetchTemperatureData(klipperHost string, apiKey string) (*Tem
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 
@@ -42,7 +42,7 @@ func (c collector) fetchTemperatureData(klipperHost string, apiKey string) (*Tem
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 

@@ -43,7 +43,7 @@ func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*Mo
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 
@@ -51,7 +51,7 @@ func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*Mo
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Fatal(err)
+		c.logger.Error(err)
 		return nil, err
 	}
 

@@ -10,13 +10,6 @@ to enabled a single exporter to collect metrics from multiple Klipper instances.
 Metrics for the exporter itself are served from the `/metrics` endpoint and Klipper
 metrics are serviced from the `/probe` endpoint with a specified `target`.
 
-⚠️ Breaking Changes upgrading to v0.8.0
---------------------------------------
-
-`v0.8.0` deprecates the `tempurature` module option which contains a subset of
-the metrics reported by the `printer_objects`. If you where using the
-`tempurature` module then switch the configuration to use `printer_objects` instead.
-
 Usage
 -----
 
@@ -121,7 +114,8 @@ To run the exporter as a docker container.
 $ docker run -d -p 9101:9101 ghcr.io/scross01/prometheus-klipper-exporter:latest
 ```
 
-See the [example/README.md](example/README.md) for a complete example running Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
+See the [example/README.md](example/README.md) for a complete example running
+Prometheus, Grafana, and the klipper-exporter in Docker using docker compose.
 
 Modules
 -------
@@ -220,10 +214,41 @@ in the config or referenced from file.
 Only one API key can be set for each job.  If you have multiple klipper hosts with
 different API keys, create a separate job for each host.
 
-History of breaking changes
----------------------------
+Command line options
+--------------------
 
-### ⚠️ Breaking Changes upgrading to v0.7.0
+`-help`
+
+  Display the command line help.
+
+`-logging.level <level>`
+
+  Set the logging output verbosity to one of `Trace`, `Debug`, `Info`,
+  `Warning`, `Error`, `Fatal` and `Panic`. Default level is `Info` which will
+  log anything that is info level or above (warning, error, fatal, panic).
+
+`-moonraker.apikey <string>`
+
+  Set the API Key to authenticate with the Klipper APIs.
+  See [API Key Authentication](#api-key-authentication)
+
+`-web.listen-address [<ip_address>]:<port>`
+
+  Address on which to expose metrics and web interface. Default is `:9101`
+  which will listen on port `9101` on all interfaces, which is the equiviment
+  of `0.0.0.0:9101`.  Include the IP address to limit to listening on a specific
+  interface, e.g. `192.168.1.99:7070`.
+
+⚠️ History of breaking changes
+-----------------------------
+
+### Upgrading to v0.8.0
+
+`v0.8.0` deprecates the `tempurature` module option which contains a subset of
+the metrics reported by the `printer_objects`. If you where using the
+`tempurature` module then switch the configuration to use `printer_objects` instead.
+
+### Upgrading to v0.7.0
 
 The `v0.7.0` release introduces several metric changes that will break any
 grafana charts that have previously been defined using the old metric names from
