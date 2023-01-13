@@ -27,11 +27,35 @@ type PrinterObjectStatus struct {
 	VirtualSdCard PrinterObjectVirtualSdCard `json:"virtual_sdcard"`
 	PrintStats    PrinterObjectPrintStats    `json:"print_stats"`
 	DisplayStatus PrinterObjectDisplayStatus `json:"display_status"`
+	Mcu           PrinterObjectMcu           `json:"mcu"`
 	// dynamic sensor attributes populated using custom unmarsaling
 	TemperatureSensors map[string]PrinterObjectTemperatureSensor
 	TemperatureFans    map[string]PrinterObjectTemperatureFan
 	OutputPins         map[string]PrinterObjectOutputPin
 }
+
+type PrinterObjectMcu struct {
+	LastStats struct {
+		McuAwake float64 `json:"mcu_awake"`
+		// McuTaskAvg float64 `json:"mcu_task_avg"` // value returned in the format 1.5e-05
+		// McuTaskStddev float64 `json:"mcu_task_stddev"` // value returned in the formate 1e-05
+		BytesWrite      float64 `json:"bytes_write"`
+		BytesRead       float64 `json:"bytes_read"`
+		BytesRetransmit float64 `json:"bytes_retransmit"`
+		BytesInvalid    float64 `json:"bytes_invalid"`
+		SendSeq         float64 `json:"send_seq"`
+		ReceiveSeq      float64 `json:"receive_seq"`
+		RetransmitSeq   float64 `json:"retransmit_seq"`
+		Srtt            float64 `json:"srtt"`
+		Rttvar          float64 `json:"rttvar"`
+		Rto             float64 `json:"rto"`
+		ReadyBytes      float64 `json:"ready_bytes"`
+		StalledBytes    float64 `json:"stalled_bytes"`
+		Freq            float64 `json:"freq"`
+	} `json:"last_stats"`
+}
+
+const mcuQuery string = "mcu=last_stats"
 
 type PrinterObjectGcodeMove struct {
 	SpeedFactor   float64 `json:"speed_factor"`
@@ -274,6 +298,7 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 		"&" + virtualSdCardQuery +
 		"&" + printStatsQuery +
 		"&" + displayStatusQuery +
+		"&" + mcuQuery +
 		customSensorsQuery
 
 	c.logger.Debug("Collecting metrics from " + url)

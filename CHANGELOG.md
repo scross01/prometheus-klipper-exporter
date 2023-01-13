@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.9.0
+------
+
+- Added new MCU `klipper_mcu_*` metrics to `printer_objects` metric collection.
+
 v0.8.0
 ------
 
