@@ -95,7 +95,7 @@ Use the new datasource to explore the metrics and create dashboards.
 Example Dashboard
 -----------------
 
-An example dashboard is included at [`grafana-dashboard.json`](./grafana-dashboard.json).
+Dashboard [`18467`](https://grafana.com/grafana/dashboards/18467-klipper-dashboard/).
 Open http://localhost:3000/dashboard/import and select "Upload JSON file". Select
 the Prometheus data source and click "Import".
 
