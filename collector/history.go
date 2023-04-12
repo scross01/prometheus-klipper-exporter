@@ -95,7 +95,7 @@ func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*Mo
 
 	return &response, nil
 }
-func (c collector) fetchMoonrakerHistoryCurrenty(klipperHost string, apiKey string) (*MoonrakerHistoryCurrentPrintResponse, error) {
+func (c collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey string) (*MoonrakerHistoryCurrentPrintResponse, error) {
 	var url = "http://" + klipperHost + "/server/history/list?limit=1&start=0&since=1&order=desc"
 	c.logger.Debug("Collecting metrics from " + url)
 

@@ -219,8 +219,28 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_longest_print", "Klipper total longest print.", nil, nil),
 			prometheus.GaugeValue,
 			float64(result.Result.JobTotals.LongestPrint))
-		c.CollectCurrentPrint(ch)
+	}
 
+	// Current Print from Job History
+	if slices.Contains(c.modules, "history") {
+		c.logger.Infof("Collecting active print for %s", c.target)
+		result, _ := c.fetchMoonrakerHistoryCurrent(c.target, c.apiKey)
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
+			prometheus.GaugeValue,
+			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
+			prometheus.GaugeValue,
+			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
+			prometheus.GaugeValue,
+			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
+			prometheus.GaugeValue,
+			c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
 	}
 
 	// System Info
@@ -271,7 +291,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_gcode_extrude_factor", "Klipper gcode extrude factor.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.GcodeMove.ExtrudeFactor)
-		//GcodePosition
+		// gcode position
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode Position Axle X.", nil, nil),
 			prometheus.GaugeValue,
@@ -511,31 +531,8 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 		}
 	}
 }
-func (c collector) CollectCurrentPrint(ch chan<- prometheus.Metric) {
-	c.logger.Infof("Collecting history for %s", c.target)
-	result, _ := c.fetchMoonrakerHistoryCurrenty(c.target, c.apiKey)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_current_print_object_height", "Current print Object Height", nil, nil),
-		prometheus.GaugeValue,
-		c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight),
-	)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_current_print_first_layer_height", "Current print First Layer Height", nil, nil),
-		prometheus.GaugeValue,
-		c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight),
-	)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_current_print_layer_height", "Current print  Layer Height", nil, nil),
-		prometheus.GaugeValue,
-		c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight),
-	)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_current_print_total_duration", "Current print Total Duration", nil, nil),
-		prometheus.GaugeValue,
-		c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration),
-	)
 
-}
+// only return metric if current job status is in progress
 func (c collector) checkConditionStatusPrint(result *MoonrakerHistoryCurrentPrintResponse, value float64) float64 {
 	var valueToReturn float64 = 0
 	if result.Result.Jobs[0].Status == "in_progress" {
