@@ -58,12 +58,13 @@ type PrinterObjectMcu struct {
 const mcuQuery string = "mcu=last_stats"
 
 type PrinterObjectGcodeMove struct {
-	SpeedFactor   float64 `json:"speed_factor"`
-	Speed         float64 `json:"speed"`
-	ExtrudeFactor float64 `json:"extrude_factor"`
+	SpeedFactor   float64   `json:"speed_factor"`
+	Speed         float64   `json:"speed"`
+	ExtrudeFactor float64   `json:"extrude_factor"`
+	GcodePosition []float64 `json:"gcode_position"`
 }
 
-const gcodeMoveQuery string = "gcode_move=speed_factor,speed,extrude_factor"
+const gcodeMoveQuery string = "gcode_move=speed_factor,speed,extrude_factor,gcode_position"
 
 type PrinterObjectToolhead struct {
 	PrintTime            float64 `json:"print_time"`

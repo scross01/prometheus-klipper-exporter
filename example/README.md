@@ -101,6 +101,13 @@ the Prometheus data source and click "Import".
 
 ![Example Grafana Dashboard](./images/grafana-dashboard.png)
 
+Thanks to @danilodorgam there is also an alternative example dashboard published
+on grafana.com
+
+- Dashboard [`18467`](https://grafana.com/grafana/dashboards/18467-klipper-dashboard/).
+
+![Example Grafana Dashboard by @danilodorgam](https://grafana.com/api/dashboards/18467/images/14100/image)
+
 Known Issues
 ------------
 
