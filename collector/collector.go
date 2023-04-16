@@ -291,19 +291,25 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			prometheus.NewDesc("klipper_gcode_extrude_factor", "Klipper gcode extrude factor.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.GcodeMove.ExtrudeFactor)
+
 		// gcode position
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode Position Axle X.", nil, nil),
+			prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.GcodeMove.GcodePosition[0])
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode Position Axle Y.", nil, nil),
+			prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode position Y axis.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.GcodeMove.GcodePosition[1])
 		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode Position Axle Z.", nil, nil),
+			prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode position Z axis.", nil, nil),
 			prometheus.GaugeValue,
 			result.Result.Status.GcodeMove.GcodePosition[2])
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_gcode_position_e", "Klipper gcode position for extruder.", nil, nil),
+			prometheus.GaugeValue,
+			result.Result.Status.GcodeMove.GcodePosition[3])
+
 		// mcu
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_mcu_awake", "Klipper mcu awake.", nil, nil),
