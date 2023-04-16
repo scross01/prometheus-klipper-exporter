@@ -1,8 +1,8 @@
 Change Log
 ==========
 
-v0.10.0-beta
-------------
+v0.10.0
+-------
 
 - Added metrics related to the current print (@danilodorgam #18)
   `klipper_current_print_*`, `klipper_gcode_position_*`
