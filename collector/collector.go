@@ -225,22 +225,24 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 	if slices.Contains(c.modules, "history") {
 		c.logger.Infof("Collecting active print for %s", c.target)
 		result, _ := c.fetchMoonrakerHistoryCurrent(c.target, c.apiKey)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
+		if len(result.Result.Jobs) >= 1 {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
+				prometheus.GaugeValue,
+				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
+				prometheus.GaugeValue,
+				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
+				prometheus.GaugeValue,
+				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
+				prometheus.GaugeValue,
+				c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
+		}
 	}
 
 	// System Info
@@ -293,23 +295,24 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			result.Result.Status.GcodeMove.ExtrudeFactor)
 
 		// gcode position
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.GcodePosition[0])
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode position Y axis.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.GcodePosition[1])
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode position Z axis.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.GcodePosition[2])
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_position_e", "Klipper gcode position for extruder.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.GcodePosition[3])
-
+		if len(result.Result.Status.GcodeMove.GcodePosition) >= 4 {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.GcodePosition[0])
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode position Y axis.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.GcodePosition[1])
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode position Z axis.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.GcodePosition[2])
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_position_e", "Klipper gcode position for extruder.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.GcodePosition[3])
+		}
 		// mcu
 		ch <- prometheus.MustNewConstMetric(
 			prometheus.NewDesc("klipper_mcu_awake", "Klipper mcu awake.", nil, nil),
@@ -541,7 +544,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 // only return metric if current job status is in progress
 func (c collector) checkConditionStatusPrint(result *MoonrakerHistoryCurrentPrintResponse, value float64) float64 {
 	var valueToReturn float64 = 0
-	if result.Result.Jobs[0].Status == "in_progress" {
+	if len(result.Result.Jobs) >= 1 && result.Result.Jobs[0].Status == "in_progress" {
 		valueToReturn = value
 	}
 	return valueToReturn
