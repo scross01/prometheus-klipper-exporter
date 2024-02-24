@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.10.1
+-------
+
+- Fixed out of range errors for some metrics. Thanks to @hsmade #19
+
 v0.10.0
 -------
 
