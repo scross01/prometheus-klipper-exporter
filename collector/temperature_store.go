@@ -4,8 +4,8 @@ package collector
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
+	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 )
 
@@ -13,14 +13,14 @@ type TemperatureDataQueryResponse struct {
 	Result map[string]interface{} `json:"result"`
 }
 
-func (c collector) fetchTemperatureData(klipperHost string, apiKey string) (*TemperatureDataQueryResponse, error) {
+func (c Collector) fetchTemperatureData(klipperHost string, apiKey string) (*TemperatureDataQueryResponse, error) {
 	var url = "http://" + klipperHost + "/server/temperature_store"
-	c.logger.Debug("Collecting metrics from " + url)
+	log.Debug("Collecting metrics from " + url)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if apiKey != "" {
@@ -28,13 +28,13 @@ func (c collector) fetchTemperatureData(klipperHost string, apiKey string) (*Tem
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
@@ -42,7 +42,7 @@ func (c collector) fetchTemperatureData(klipperHost string, apiKey string) (*Tem
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 

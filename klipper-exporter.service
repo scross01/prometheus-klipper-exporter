@@ -2,13 +2,16 @@
 
 [Unit]
 Description=Prometheus exporter for Klipper.
-After=moonraker.Service
+After=moonraker.service
+StartLimitBurst=6
+StartLimitIntervalSec=5
 
 [Service]
 User=pi
 WorkingDirectory=/home/pi/klipper-exporter
 ExecStart=/home/pi/klipper-exporter/prometheus-klipper-exporter
 Restart=always
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target
