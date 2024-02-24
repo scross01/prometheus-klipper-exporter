@@ -295,7 +295,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 			result.Result.Status.GcodeMove.ExtrudeFactor)
 
 		// gcode position
-		if len(result.Result.Status.GcodeMove.GcodePosition >= 4) {
+		if len(result.Result.Status.GcodeMove.GcodePosition) >= 4 {
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
 				prometheus.GaugeValue,
@@ -544,7 +544,7 @@ func (c collector) Collect(ch chan<- prometheus.Metric) {
 // only return metric if current job status is in progress
 func (c collector) checkConditionStatusPrint(result *MoonrakerHistoryCurrentPrintResponse, value float64) float64 {
 	var valueToReturn float64 = 0
-	if len(result.Result.Jobs >= 1) && result.Result.Jobs[0].Status == "in_progress" {
+	if len(result.Result.Jobs) >= 1 && result.Result.Jobs[0].Status == "in_progress" {
 		valueToReturn = value
 	}
 	return valueToReturn
