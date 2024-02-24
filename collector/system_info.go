@@ -4,8 +4,8 @@ package collector
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
+	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 )
 
@@ -21,14 +21,14 @@ type MoonrakerSystemInfoQueryResponse struct {
 	} `json:"result"`
 }
 
-func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (*MoonrakerSystemInfoQueryResponse, error) {
+func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (*MoonrakerSystemInfoQueryResponse, error) {
 	var url = "http://" + klipperHost + "/machine/system_info"
-	c.logger.Debug("Collecting metrics from " + url)
+	log.Debug("Collecting metrics from " + url)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if apiKey != "" {
@@ -36,13 +36,13 @@ func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (c collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 

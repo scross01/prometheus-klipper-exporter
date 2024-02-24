@@ -4,7 +4,8 @@ package collector
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 	"strings"
 
@@ -206,13 +207,13 @@ var (
 // fetchCustomSensors queries klipper for the complete list and printer objects and
 // returns the subset of `temperature_sensor`, `temperature_fan` and `output_pin`
 // objects that have custom names.
-func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, error) {
+func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, error) {
 	var url = "http://" + klipperHost + "/printer/objects/list"
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, nil, nil, err
 	}
 	if apiKey != "" {
@@ -220,13 +221,13 @@ func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, nil, nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, nil, nil, err
 	}
 
@@ -234,7 +235,7 @@ func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, nil, nil, err
 	}
 
@@ -259,7 +260,7 @@ func (c collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	return &temperatureSensors, &temperatureFans, &outputPins, nil
 }
 
-func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey string) (*PrinterObjectResponse, error) {
+func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey string) (*PrinterObjectResponse, error) {
 
 	// Get the list of custom sensors if not already set. This saves fetching the full
 	// list on every poll, but any new sensors will only be added is the exporter is restarted.
@@ -268,10 +269,10 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	} else {
 		ts, tf, op, err := c.fetchCustomSensors(klipperHost, apiKey)
 		if err != nil {
-			c.logger.Error(err)
+			log.Error(err)
 			return nil, err
 		}
-		c.logger.Infof("Found custom sensors: %+v %+v %+v", ts, tf, op)
+		log.Infof("Found custom sensors: %+v %+v %+v", ts, tf, op)
 		customTemperatureSensors[klipperHost] = *ts
 		customTemperatureFans[klipperHost] = *tf
 		customOutputPins[klipperHost] = *op
@@ -302,12 +303,12 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 		"&" + mcuQuery +
 		customSensorsQuery
 
-	c.logger.Debug("Collecting metrics from " + url)
+	log.Debug("Collecting metrics from " + url)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if apiKey != "" {
@@ -315,26 +316,26 @@ func (c collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
-	c.logger.Tracef("%+v", string(data))
+	log.Tracef("%+v", string(data))
 
 	var response PrinterObjectResponse
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
-	c.logger.Tracef("%+v", response)
+	log.Tracef("%+v", response)
 
 	return &response, nil
 }

@@ -4,8 +4,8 @@ package collector
 
 import (
 	"encoding/json"
-	"io/ioutil"
-
+	log "github.com/sirupsen/logrus"
+	"io"
 	"net/http"
 )
 
@@ -60,14 +60,14 @@ type MoonrakerHistoryCurrentPrintResponse struct {
 	} `json:"result"`
 }
 
-func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*MoonrakerHistoryResponse, error) {
+func (c Collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*MoonrakerHistoryResponse, error) {
 	var url = "http://" + klipperHost + "/server/history/totals"
-	c.logger.Debug("Collecting metrics from " + url)
+	log.Debug("Collecting metrics from " + url)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if apiKey != "" {
@@ -75,13 +75,13 @@ func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*Mo
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
@@ -89,20 +89,20 @@ func (c collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*Mo
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
 	return &response, nil
 }
-func (c collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey string) (*MoonrakerHistoryCurrentPrintResponse, error) {
+func (c Collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey string) (*MoonrakerHistoryCurrentPrintResponse, error) {
 	var url = "http://" + klipperHost + "/server/history/list?limit=1&start=0&since=1&order=desc"
-	c.logger.Debug("Collecting metrics from " + url)
+	log.Debug("Collecting metrics from " + url)
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	if apiKey != "" {
@@ -110,13 +110,13 @@ func (c collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey strin
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 	defer res.Body.Close()
-	data, err := ioutil.ReadAll(res.Body)
+	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
@@ -124,7 +124,7 @@ func (c collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey strin
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		c.logger.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
