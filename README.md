@@ -39,6 +39,7 @@ scrape_configs:
         "directory_info",
         "printer_objects",
         "history",
+        "spoolman",
       ]
     relabel_configs:
       - source_labels: [__address__]
