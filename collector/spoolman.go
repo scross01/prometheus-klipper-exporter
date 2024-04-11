@@ -11,8 +11,8 @@ type SpoolmanStatusQueryResponse struct {
 	Result struct {
 		SpoolmanConnected bool `json:"spoolman_connected"`
 		PendingReports    []struct {
-			SpoolId      int `json:"spool_id"`
-			FilamentUsed int `json:"filament_used"`
+			SpoolId      int     `json:"spool_id"`
+			FilamentUsed float64 `json:"filament_used"`
 		} `json:"pending_reports"`
 		SpoolId int `json:"spool_id"`
 	} `json:"result"`
