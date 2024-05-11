@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.10.2
+-------
+
+- Fixed Panic when the network in unreachable #24
+
 v0.10.1
 -------
 
