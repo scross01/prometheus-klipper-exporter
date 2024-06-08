@@ -12,7 +12,7 @@ import (
 type MoonrakerHistoryResponse struct {
 	Result struct {
 		JobTotals struct {
-			Jobs         int64   `json:"total_jobs"`
+			Jobs         float64 `json:"total_jobs"`
 			TotalTime    float64 `json:"total_time"`
 			PrintTime    float64 `json:"total_print_time"`
 			FilamentUsed float64 `json:"total_filament_used"`
