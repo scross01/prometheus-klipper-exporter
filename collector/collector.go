@@ -3,6 +3,7 @@ package collector
 import (
 	"context"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -32,6 +33,13 @@ var prometheusMetricNameInvalidCharactersRegex = regexp.MustCompile(`[^a-zA-Z0-9
 func getValidLabelName(str string) string {
 	// convert hyphens to underscores and strip out all other invalid characters
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
+}
+
+func b2f(cond bool) float64 {
+	if cond {
+		return 1.0
+	}
+	return 0.0
 }
 
 // Collect implements Prometheus.Collector.
@@ -532,6 +540,23 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				v.Value,
 				pinName)
 		}
+	}
+
+	if slices.Contains(c.modules, "spoolman") {
+		log.Infof("Collecting spoolman status for %s", c.target)
+		result, _ := c.fetchSpoolmanStatus(c.target, c.apiKey)
+
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_spoolman_status", "Klipper spoolman connected status", nil, nil),
+			prometheus.GaugeValue,
+			b2f(result.Result.SpoolmanConnected))
+
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_spoolman_current_spool", "Klipper current spool", []string{"spool_id"}, nil),
+			prometheus.GaugeValue,
+			1.0,
+			strconv.Itoa(result.Result.SpoolId))
+
 	}
 }
 
