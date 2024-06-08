@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+v0.10.3
+-------
+
+- Fix unmarshalling of total_jobs value in job history. Thanks to @jangrewe #27
+- changed Dockerfile to use ENTRYPOINT instead of CMD
+
+
 v0.10.2
 -------
 
