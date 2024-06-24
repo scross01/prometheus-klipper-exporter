@@ -34,6 +34,14 @@ func getValidLabelName(str string) string {
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
 }
 
+// A boolean cannot be directly converted to a number
+func boolToFloat64(boolean bool) (value float64) {
+	if boolean {
+		value = 1
+	}
+	return value
+}
+
 // Collect implements Prometheus.Collector.
 func (c Collector) Collect(ch chan<- prometheus.Metric) {
 
@@ -567,6 +575,24 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				prometheus.GaugeValue,
 				fv.Rpm,
 				fanName)
+		}
+
+		// filament_*_sensor
+		filamentSensorLabels := []string{"sensor"}
+		filamentSensorDetected := prometheus.NewDesc("klipper_filament_sensor_detected", "Whether filament presence is detected by the sensor", filamentSensorLabels, nil)
+		filamentSensorEnabled := prometheus.NewDesc("klipper_filament_sensor_enabled", "Whether the filament sensor is enabled or not", filamentSensorLabels, nil)
+		for k, v := range result.Result.Status.FilamentSensors {
+			sensorName := getValidLabelName(k)
+			ch <- prometheus.MustNewConstMetric(
+				filamentSensorDetected,
+				prometheus.GaugeValue,
+				boolToFloat64(v.Detected),
+				sensorName)
+			ch <- prometheus.MustNewConstMetric(
+				filamentSensorEnabled,
+				prometheus.GaugeValue,
+				boolToFloat64(v.Enabled),
+				sensorName)
 		}
 	}
 }
