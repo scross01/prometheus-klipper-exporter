@@ -330,7 +330,7 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 			log.Error(err)
 			return nil, err
 		}
-		log.Infof("Found custom sensors: %+v %+v %+v %+v %+v", ts, tf, op, gf, cf)
+		log.Infof("Found custom sensors: %+v %+v %+v %+v %+v %+v", ts, tf, op, gf, cf, fs)
 		customTemperatureSensors[klipperHost] = *ts
 		customTemperatureFans[klipperHost] = *tf
 		customOutputPins[klipperHost] = *op
