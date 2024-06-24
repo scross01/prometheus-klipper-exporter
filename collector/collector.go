@@ -532,6 +532,24 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				v.Value,
 				pinName)
 		}
+
+		// fan_generic
+		genericFanLabels := []string{"fan"}
+		genericFanSpeed := prometheus.NewDesc("klipper_generic_fan_speed", "The speed of the generic fan", genericFanLabels, nil)
+		genericFanRpm := prometheus.NewDesc("klipper_generic_fan_rpm", "The RPM of the generic fan", genericFanLabels, nil)
+		for fk, fv := range result.Result.Status.GenericFans {
+			fanName := getValidLabelName(fk)
+			ch <- prometheus.MustNewConstMetric(
+				genericFanSpeed,
+				prometheus.GaugeValue,
+				fv.Speed,
+				fanName)
+			ch <- prometheus.MustNewConstMetric(
+				genericFanRpm,
+				prometheus.GaugeValue,
+				fv.Rpm,
+				fanName)
+		}
 	}
 }
 
