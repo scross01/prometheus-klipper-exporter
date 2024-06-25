@@ -227,6 +227,9 @@ Command line options
   `Warning`, `Error`, `Fatal` and `Panic`. Default level is `Info` which will
   log anything that is info level or above (warning, error, fatal, panic).
 
+  Logging level can also be set using the `LOGGING_LEVEL` environment variable. The
+  command line option takes precedence over the environment setting.
+
 `-moonraker.apikey <string>`
 
   Set the API Key to authenticate with the Klipper APIs.

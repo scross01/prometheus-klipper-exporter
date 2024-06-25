@@ -63,6 +63,11 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	if loggingLevelEnv, loggingLevelEnvSet := os.LookupEnv("LOGGING_LEVEL"); loggingLevelEnvSet {
+		*loggingLevel = loggingLevelEnv
+	}
+
 	flag.Parse()
 
 	level, err := log.ParseLevel(strings.ToLower(*loggingLevel))
