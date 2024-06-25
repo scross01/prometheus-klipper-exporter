@@ -18,9 +18,6 @@ var (
 	loggingLevel  = flag.String("logging.level", "Info", "Logging output level. Set to one of Trace, Debug, Info, Warning, Error, Fatal, or Panic")
 	klipperApiKey = flag.String("moonraker.apikey", "", "API Key to authenticate with the Klipper APIs.")
 	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
-	// TODO deprecated, to be removed.
-	debug   = flag.Bool("debug", false, "(Deprecated) Enable debug logging. Use -logging.level instead.")
-	verbose = flag.Bool("verbose", false, "(Deprecated) Enable verbose trace level logging. Use -logging.level instead.")
 )
 
 func handler(w http.ResponseWriter, r *http.Request) {
@@ -75,16 +72,6 @@ func main() {
 		log.Fatalf("Invalid logging level '%s'", *loggingLevel)
 	}
 	log.SetLevel(level)
-
-	// TODO remove when -debug and -verbose options are removed
-	if *debug {
-		log.Warn("-debug option is deprecated, change to using '-logging.level debug'")
-		log.SetLevel(log.DebugLevel)
-	}
-	if *verbose {
-		log.Warn("-verbose option is deprecated, change to using '-logging.level trace'")
-		log.SetLevel(log.TraceLevel)
-	}
 
 	http.Handle("/metrics", promhttp.Handler())
 	http.HandleFunc("/probe", func(w http.ResponseWriter, r *http.Request) {

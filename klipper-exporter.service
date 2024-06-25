@@ -10,7 +10,7 @@ StartLimitIntervalSec=5
 User=pi
 WorkingDirectory=/home/pi/klipper-exporter
 EnvironmentFile=/home/pi/klipper-exporter/prometheus-klipper-exporter.env
-ExecStart=/home/pi/klipper-exporter/prometheus-klipper-exporter
+ExecStart=/home/pi/klipper-exporter/prometheus-klipper-exporter -logging.level Warning
 Restart=always
 RestartSec=1s
 

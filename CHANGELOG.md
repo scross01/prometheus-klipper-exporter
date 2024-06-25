@@ -1,12 +1,19 @@
 Change Log
 ==========
 
+v0.11.0
+-------
+
+- Add support for filament sensors, controller fan, and generic fans. Thanks to @nmaggioni #28
+- Get logging level from `LOGGING_LEVEL` env var if present. Thanks to @nmaggioni #29
+- (Breaking change) Removed deprecated `-debug` and `-verbose` command line options.
+  Use `-logging.level` option instead.
+
 v0.10.3
 -------
 
 - Fix unmarshalling of total_jobs value in job history. Thanks to @jangrewe #27
 - changed Dockerfile to use ENTRYPOINT instead of CMD
-
 
 v0.10.2
 -------
