@@ -34,6 +34,14 @@ func getValidLabelName(str string) string {
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
 }
 
+// A boolean cannot be directly converted to a number
+func boolToFloat64(boolean bool) (value float64) {
+	if boolean {
+		value = 1
+	}
+	return value
+}
+
 // Collect implements Prometheus.Collector.
 func (c Collector) Collect(ch chan<- prometheus.Metric) {
 
@@ -531,6 +539,60 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				prometheus.GaugeValue,
 				v.Value,
 				pinName)
+		}
+
+		// fan_generic
+		genericFanLabels := []string{"fan"}
+		genericFanSpeed := prometheus.NewDesc("klipper_generic_fan_speed", "The speed of the generic fan", genericFanLabels, nil)
+		genericFanRpm := prometheus.NewDesc("klipper_generic_fan_rpm", "The RPM of the generic fan", genericFanLabels, nil)
+		for fk, fv := range result.Result.Status.GenericFans {
+			fanName := getValidLabelName(fk)
+			ch <- prometheus.MustNewConstMetric(
+				genericFanSpeed,
+				prometheus.GaugeValue,
+				fv.Speed,
+				fanName)
+			ch <- prometheus.MustNewConstMetric(
+				genericFanRpm,
+				prometheus.GaugeValue,
+				fv.Rpm,
+				fanName)
+		}
+
+		// controller_fan
+		controllerFanLabels := []string{"fan"}
+		controllerFanSpeed := prometheus.NewDesc("klipper_controller_fan_speed", "The speed of the controller fan", controllerFanLabels, nil)
+		controllerFanRpm := prometheus.NewDesc("klipper_controller_fan_rpm", "The RPM of the controller fan", controllerFanLabels, nil)
+		for fk, fv := range result.Result.Status.ControllerFans {
+			fanName := getValidLabelName(fk)
+			ch <- prometheus.MustNewConstMetric(
+				controllerFanSpeed,
+				prometheus.GaugeValue,
+				fv.Speed,
+				fanName)
+			ch <- prometheus.MustNewConstMetric(
+				controllerFanRpm,
+				prometheus.GaugeValue,
+				fv.Rpm,
+				fanName)
+		}
+
+		// filament_*_sensor
+		filamentSensorLabels := []string{"sensor"}
+		filamentSensorDetected := prometheus.NewDesc("klipper_filament_sensor_detected", "Whether filament presence is detected by the sensor", filamentSensorLabels, nil)
+		filamentSensorEnabled := prometheus.NewDesc("klipper_filament_sensor_enabled", "Whether the filament sensor is enabled or not", filamentSensorLabels, nil)
+		for k, v := range result.Result.Status.FilamentSensors {
+			sensorName := getValidLabelName(k)
+			ch <- prometheus.MustNewConstMetric(
+				filamentSensorDetected,
+				prometheus.GaugeValue,
+				boolToFloat64(v.Detected),
+				sensorName)
+			ch <- prometheus.MustNewConstMetric(
+				filamentSensorEnabled,
+				prometheus.GaugeValue,
+				boolToFloat64(v.Enabled),
+				sensorName)
 		}
 	}
 }
