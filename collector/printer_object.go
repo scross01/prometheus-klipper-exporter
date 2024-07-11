@@ -5,11 +5,13 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"net/http"
+	"reflect"
 	"regexp"
 	"strings"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/mitchellh/mapstructure"
 )
@@ -378,22 +380,19 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("unable to create HTTP request for %s. %s", url, err)
 	}
 	if apiKey != "" {
 		req.Header.Set("X-API-KEY", apiKey)
 	}
 	res, err := client.Do(req)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("unable to complete HTTP client request. %s", err)
 	}
 	defer res.Body.Close()
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("unable to read data from HTTP response. %s", err)
 	}
 
 	log.Tracef("%+v", string(data))
@@ -402,8 +401,7 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		log.Error(err)
-		return nil, err
+		return nil, fmt.Errorf("unable to unmarshal response data to %s. %s", reflect.TypeOf(response), err)
 	}
 	log.Tracef("%+v", response)
 
