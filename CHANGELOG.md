@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.11.1
+-------
+
+- Refactor error handling to address #31
+
 v0.11.0
 -------
 
