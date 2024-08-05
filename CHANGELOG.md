@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.11.2
+-------
+
+- Fix regression in v0.11.1. Error in one collector module should not stop other collectors from attepting to run.
+
 v0.11.1
 -------
 
@@ -123,7 +128,7 @@ v0.3.0
 v0.2.0
 ------
 
-- Adds some system metrics from /machine/system_info 
+- Adds some system metrics from /machine/system_info
 - Adds some Disk Storage mertics from /server/files/directory
 - Add Job Queue metric from /server/job_queue/status queue length
 - Added build targets for different platforms

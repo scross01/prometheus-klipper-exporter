@@ -171,20 +171,20 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerDirectoryInfo(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
+		} else {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
+				prometheus.GaugeValue,
+				float64(result.Result.DiskUsage.Total))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_disk_usage_used", "Klipper used disk space.", nil, nil),
+				prometheus.GaugeValue,
+				float64(result.Result.DiskUsage.Used))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_disk_usage_available", "Klipper available disk space.", nil, nil),
+				prometheus.GaugeValue,
+				float64(result.Result.DiskUsage.Free))
 		}
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.DiskUsage.Total))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_disk_usage_used", "Klipper used disk space.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.DiskUsage.Used))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_disk_usage_available", "Klipper available disk space.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.DiskUsage.Free))
 	}
 
 	// Job Queue
@@ -193,12 +193,12 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerJobQueue(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
+		} else {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
+				prometheus.GaugeValue,
+				float64(len(result.Result.QueuedJobs)))
 		}
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
-			prometheus.GaugeValue,
-			float64(len(result.Result.QueuedJobs)))
 	}
 
 	// Job History
@@ -207,32 +207,32 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerHistory(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
+		} else {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_total_jobs", "Klipper number of total jobs.", nil, nil),
+				prometheus.GaugeValue,
+				float64(result.Result.JobTotals.Jobs))
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_total_time", "Klipper total time.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.JobTotals.TotalTime)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_total_print_time", "Klipper total print time.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.JobTotals.PrintTime)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_total_filament_used", "Klipper total meters of filament used.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.JobTotals.FilamentUsed)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_longest_job", "Klipper total longest job.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.JobTotals.LongestJob)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_longest_print", "Klipper total longest print.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.JobTotals.LongestPrint)
 		}
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_total_jobs", "Klipper number of total jobs.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.JobTotals.Jobs))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_total_time", "Klipper total time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.JobTotals.TotalTime)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_total_print_time", "Klipper total print time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.JobTotals.PrintTime)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_total_filament_used", "Klipper total meters of filament used.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.JobTotals.FilamentUsed)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_longest_job", "Klipper total longest job.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.JobTotals.LongestJob)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_longest_print", "Klipper total longest print.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.JobTotals.LongestPrint)
 	}
 
 	// Current Print from Job History
@@ -241,25 +241,25 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerHistoryCurrent(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
-		}
-		if len(result.Result.Jobs) >= 1 {
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
-				prometheus.GaugeValue,
-				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
-				prometheus.GaugeValue,
-				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
-				prometheus.GaugeValue,
-				c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
-				prometheus.GaugeValue,
-				c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
+		} else {
+			if len(result.Result.Jobs) >= 1 {
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
+					prometheus.GaugeValue,
+					c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
+					prometheus.GaugeValue,
+					c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
+					prometheus.GaugeValue,
+					c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
+					prometheus.GaugeValue,
+					c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
+			}
 		}
 	}
 
@@ -269,12 +269,12 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerSystemInfo(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
+		} else {
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
+				prometheus.GaugeValue,
+				float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 		}
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 	}
 
 	// Temperature Store
@@ -284,19 +284,18 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchTemperatureData(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
-		}
-
-		for k, v := range result.Result {
-			item := strings.ReplaceAll(k, " ", "_")
-			attributes := v.(map[string]interface{})
-			for k1, v1 := range attributes {
-				values := v1.([]interface{})
-				label := strings.ReplaceAll(k1[0:len(k1)-1], " ", "_")
-				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_"+item+"_"+label, "Klipper "+k+" "+label, nil, nil),
-					prometheus.GaugeValue,
-					values[len(values)-1].(float64))
+		} else {
+			for k, v := range result.Result {
+				item := strings.ReplaceAll(k, " ", "_")
+				attributes := v.(map[string]interface{})
+				for k1, v1 := range attributes {
+					values := v1.([]interface{})
+					label := strings.ReplaceAll(k1[0:len(k1)-1], " ", "_")
+					ch <- prometheus.MustNewConstMetric(
+						prometheus.NewDesc("klipper_"+item+"_"+label, "Klipper "+k+" "+label, nil, nil),
+						prometheus.GaugeValue,
+						values[len(values)-1].(float64))
+				}
 			}
 		}
 	}
@@ -307,320 +306,320 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		result, err := c.fetchMoonrakerPrinterObjects(c.target, c.apiKey)
 		if err != nil {
 			log.Error(err)
-			return
-		}
+		} else {
 
-		// gcode_move
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_speed_factor", "Klipper gcode speed factor.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.SpeedFactor)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_speed", "Klipper gcode speed.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.Speed)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_gcode_extrude_factor", "Klipper gcode extrude factor.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.GcodeMove.ExtrudeFactor)
+			// gcode_move
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_speed_factor", "Klipper gcode speed factor.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.SpeedFactor)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_speed", "Klipper gcode speed.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.Speed)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_gcode_extrude_factor", "Klipper gcode extrude factor.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.GcodeMove.ExtrudeFactor)
 
-		// gcode position
-		if len(result.Result.Status.GcodeMove.GcodePosition) >= 4 {
+			// gcode position
+			if len(result.Result.Status.GcodeMove.GcodePosition) >= 4 {
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
+					prometheus.GaugeValue,
+					result.Result.Status.GcodeMove.GcodePosition[0])
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode position Y axis.", nil, nil),
+					prometheus.GaugeValue,
+					result.Result.Status.GcodeMove.GcodePosition[1])
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode position Z axis.", nil, nil),
+					prometheus.GaugeValue,
+					result.Result.Status.GcodeMove.GcodePosition[2])
+				ch <- prometheus.MustNewConstMetric(
+					prometheus.NewDesc("klipper_gcode_position_e", "Klipper gcode position for extruder.", nil, nil),
+					prometheus.GaugeValue,
+					result.Result.Status.GcodeMove.GcodePosition[3])
+			}
+			// mcu
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
+				prometheus.NewDesc("klipper_mcu_awake", "Klipper mcu awake.", nil, nil),
 				prometheus.GaugeValue,
-				result.Result.Status.GcodeMove.GcodePosition[0])
+				result.Result.Status.Mcu.LastStats.McuAwake)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_gcode_position_y", "Klipper gcode position Y axis.", nil, nil),
+				prometheus.NewDesc("klipper_mcu_write_bytes", "Klipper mcu write bytes.", nil, nil),
 				prometheus.GaugeValue,
-				result.Result.Status.GcodeMove.GcodePosition[1])
+				result.Result.Status.Mcu.LastStats.BytesWrite)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_gcode_position_z", "Klipper gcode position Z axis.", nil, nil),
+				prometheus.NewDesc("klipper_mcu_read_bytes", "Klipper mcu read bytes.", nil, nil),
 				prometheus.GaugeValue,
-				result.Result.Status.GcodeMove.GcodePosition[2])
+				result.Result.Status.Mcu.LastStats.BytesRead)
 			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_gcode_position_e", "Klipper gcode position for extruder.", nil, nil),
+				prometheus.NewDesc("klipper_mcu_retransmit_bytes", "Klipper mcu retransmit bytes.", nil, nil),
 				prometheus.GaugeValue,
-				result.Result.Status.GcodeMove.GcodePosition[3])
-		}
-		// mcu
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_awake", "Klipper mcu awake.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.McuAwake)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_write_bytes", "Klipper mcu write bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.BytesWrite)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_read_bytes", "Klipper mcu read bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.BytesRead)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_retransmit_bytes", "Klipper mcu retransmit bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.BytesRetransmit)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_invalid_bytes", "Klipper mcu invalid bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.BytesInvalid)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_send_seq", "Klipper mcu send sequence.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.SendSeq)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_receive_seq", "Klipper mcu receive sequence.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.ReceiveSeq)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_retransmit_seq", "Klipper mcu retransmit sequence.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.RetransmitSeq)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_srtt", "Klipper mcu smoothed round trip time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.Srtt)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_rttvar", "Klipper mcu round trip time variance.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.Rttvar)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_rto", "Klipper mcu retransmission timeouts.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.Rto)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_ready_bytes", "Klipper mcu ready bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.ReadyBytes)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_stalled_bytes", "Klipper mcu stalled bytes.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.StalledBytes)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mcu_clock_frequency", "Klipper mcu clock frequency.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Mcu.LastStats.Freq)
+				result.Result.Status.Mcu.LastStats.BytesRetransmit)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_invalid_bytes", "Klipper mcu invalid bytes.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.BytesInvalid)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_send_seq", "Klipper mcu send sequence.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.SendSeq)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_receive_seq", "Klipper mcu receive sequence.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.ReceiveSeq)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_retransmit_seq", "Klipper mcu retransmit sequence.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.RetransmitSeq)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_srtt", "Klipper mcu smoothed round trip time.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.Srtt)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_rttvar", "Klipper mcu round trip time variance.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.Rttvar)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_rto", "Klipper mcu retransmission timeouts.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.Rto)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_ready_bytes", "Klipper mcu ready bytes.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.ReadyBytes)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_stalled_bytes", "Klipper mcu stalled bytes.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.StalledBytes)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_clock_frequency", "Klipper mcu clock frequency.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.Freq)
 
-		// toolhead
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_print_time", "Klipper toolhead print time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.PrintTime)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_estimated_print_time", "Klipper estimated print time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.EstimatedPrintTime)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_max_velocity", "Klipper toolhead max velocity.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.MaxVelocity)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_max_accel", "Klipper toolhead max acceleration.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.MaxAccel)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_max_accel_to_decel", "Klipper toolhead max acceleration to deceleration.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.MaxAccelToDecel)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_toolhead_square_corner_velocity", "Klipper toolhead square corner velocity.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Toolhead.SquareCornerVelocity)
-
-		// extruder
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_extruder_temperature", "Klipper extruder temperature.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Extruder.Temperature)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_extruder_target", "Klipper extruder target.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Extruder.Target)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_extruder_power", "Klipper extruder power.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Extruder.Power)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_extruder_pressure_advance", "Klipper extruder pressure advance.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Extruder.PressureAdvance)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_extruder_smooth_time", "Klipper extruder smooth time.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Extruder.SmoothTime)
-
-		// heater_bed
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_heater_bed_temperature", "Klipper heater bed temperature.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.HeaterBed.Temperature)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_heater_bed_target", "Klipper heater bed target.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.HeaterBed.Target)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_heater_bed_power", "Klipper heater bed power.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.HeaterBed.Power)
-
-		// fan
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_fan_speed", "Klipper fan speed.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Fan.Speed)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_fan_rpm", "Klipper fan rpm.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.Status.Fan.Rpm)
-
-		// idle_timeout
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_printing_time", "The amount of time the printer has been in the Printing state.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.IdleTimeout.PrintingTime)
-
-		// virtual_sdcard
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_file_progress", "The print progress reported as a percentage of the file read.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.VirtualSdCard.Progress)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_file_position", "The current file position in bytes.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.VirtualSdCard.FilePosition)
-
-		// print_stats
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_total_duration", "The total time (in seconds) elapsed since a print has started.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.PrintStats.TotalDuration)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_print_duration", "The total time spent printing (in seconds).", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.PrintStats.PrintDuration)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_filament_used", "The amount of filament used during the current print (in mm)..", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.PrintStats.FilamentUsed)
-
-		// display_status
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_print_gcode_progress", "The percentage of print progress, as reported by M73.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.Status.DisplayStatus.Progress)
-
-		// temperature_sensor
-		temperatureSensorLabels := []string{"sensor"}
-		temperatureSensor := prometheus.NewDesc("klipper_temperature_sensor_temperature", "The temperature of the temperature sensor", temperatureSensorLabels, nil)
-		temperatureSensorMinTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_min_temp", "The measured minimum temperature of the temperature sensor", temperatureSensorLabels, nil)
-		temperatureSensorMaxTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_max_temp", "The measured maximum temperature of the temperature sensor", temperatureSensorLabels, nil)
-		for sk, sv := range result.Result.Status.TemperatureSensors {
-			sensorName := getValidLabelName(sk)
+			// toolhead
 			ch <- prometheus.MustNewConstMetric(
-				temperatureSensor,
+				prometheus.NewDesc("klipper_toolhead_print_time", "Klipper toolhead print time.", nil, nil),
 				prometheus.GaugeValue,
-				sv.Temperature,
-				sensorName)
+				result.Result.Status.Toolhead.PrintTime)
 			ch <- prometheus.MustNewConstMetric(
-				temperatureSensorMinTemp,
+				prometheus.NewDesc("klipper_toolhead_estimated_print_time", "Klipper estimated print time.", nil, nil),
 				prometheus.GaugeValue,
-				sv.MeasuredMinTemp,
-				sensorName)
+				result.Result.Status.Toolhead.EstimatedPrintTime)
 			ch <- prometheus.MustNewConstMetric(
-				temperatureSensorMaxTemp,
+				prometheus.NewDesc("klipper_toolhead_max_velocity", "Klipper toolhead max velocity.", nil, nil),
 				prometheus.GaugeValue,
-				sv.MeasuredMaxTemp,
-				sensorName)
-		}
+				result.Result.Status.Toolhead.MaxVelocity)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_toolhead_max_accel", "Klipper toolhead max acceleration.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Toolhead.MaxAccel)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_toolhead_max_accel_to_decel", "Klipper toolhead max acceleration to deceleration.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Toolhead.MaxAccelToDecel)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_toolhead_square_corner_velocity", "Klipper toolhead square corner velocity.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Toolhead.SquareCornerVelocity)
 
-		// temperature_fan
-		fanLabels := []string{"fan"}
-		fanSpeed := prometheus.NewDesc("klipper_temperature_fan_speed", "The speed of the temperature fan", fanLabels, nil)
-		fanTemperature := prometheus.NewDesc("klipper_temperature_fan_temperature", "The temperature of the temperature fan", fanLabels, nil)
-		fanTarget := prometheus.NewDesc("klipper_temperature_fan_target", "The target temperature for the temperature fan", fanLabels, nil)
-		for fk, fv := range result.Result.Status.TemperatureFans {
-			fanName := getValidLabelName(fk)
+			// extruder
 			ch <- prometheus.MustNewConstMetric(
-				fanSpeed,
+				prometheus.NewDesc("klipper_extruder_temperature", "Klipper extruder temperature.", nil, nil),
 				prometheus.GaugeValue,
-				fv.Speed,
-				fanName)
+				result.Result.Status.Extruder.Temperature)
 			ch <- prometheus.MustNewConstMetric(
-				fanTemperature,
+				prometheus.NewDesc("klipper_extruder_target", "Klipper extruder target.", nil, nil),
 				prometheus.GaugeValue,
-				fv.Temperature,
-				fanName)
+				result.Result.Status.Extruder.Target)
 			ch <- prometheus.MustNewConstMetric(
-				fanTarget,
+				prometheus.NewDesc("klipper_extruder_power", "Klipper extruder power.", nil, nil),
 				prometheus.GaugeValue,
-				fv.Target,
-				fanName)
-		}
+				result.Result.Status.Extruder.Power)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_extruder_pressure_advance", "Klipper extruder pressure advance.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Extruder.PressureAdvance)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_extruder_smooth_time", "Klipper extruder smooth time.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Extruder.SmoothTime)
 
-		// output_pin
-		pinLabels := []string{"pin"}
-		pinValue := prometheus.NewDesc("klipper_output_pin_value", "The value of the output pin", pinLabels, nil)
-		for k, v := range result.Result.Status.OutputPins {
-			pinName := getValidLabelName(k)
+			// heater_bed
 			ch <- prometheus.MustNewConstMetric(
-				pinValue,
+				prometheus.NewDesc("klipper_heater_bed_temperature", "Klipper heater bed temperature.", nil, nil),
 				prometheus.GaugeValue,
-				v.Value,
-				pinName)
-		}
+				result.Result.Status.HeaterBed.Temperature)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_heater_bed_target", "Klipper heater bed target.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.HeaterBed.Target)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_heater_bed_power", "Klipper heater bed power.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.HeaterBed.Power)
 
-		// fan_generic
-		genericFanLabels := []string{"fan"}
-		genericFanSpeed := prometheus.NewDesc("klipper_generic_fan_speed", "The speed of the generic fan", genericFanLabels, nil)
-		genericFanRpm := prometheus.NewDesc("klipper_generic_fan_rpm", "The RPM of the generic fan", genericFanLabels, nil)
-		for fk, fv := range result.Result.Status.GenericFans {
-			fanName := getValidLabelName(fk)
+			// fan
 			ch <- prometheus.MustNewConstMetric(
-				genericFanSpeed,
+				prometheus.NewDesc("klipper_fan_speed", "Klipper fan speed.", nil, nil),
 				prometheus.GaugeValue,
-				fv.Speed,
-				fanName)
+				result.Result.Status.Fan.Speed)
 			ch <- prometheus.MustNewConstMetric(
-				genericFanRpm,
+				prometheus.NewDesc("klipper_fan_rpm", "Klipper fan rpm.", nil, nil),
 				prometheus.GaugeValue,
-				fv.Rpm,
-				fanName)
-		}
+				result.Result.Status.Fan.Rpm)
 
-		// controller_fan
-		controllerFanLabels := []string{"fan"}
-		controllerFanSpeed := prometheus.NewDesc("klipper_controller_fan_speed", "The speed of the controller fan", controllerFanLabels, nil)
-		controllerFanRpm := prometheus.NewDesc("klipper_controller_fan_rpm", "The RPM of the controller fan", controllerFanLabels, nil)
-		for fk, fv := range result.Result.Status.ControllerFans {
-			fanName := getValidLabelName(fk)
+			// idle_timeout
 			ch <- prometheus.MustNewConstMetric(
-				controllerFanSpeed,
-				prometheus.GaugeValue,
-				fv.Speed,
-				fanName)
-			ch <- prometheus.MustNewConstMetric(
-				controllerFanRpm,
-				prometheus.GaugeValue,
-				fv.Rpm,
-				fanName)
-		}
+				prometheus.NewDesc("klipper_printing_time", "The amount of time the printer has been in the Printing state.", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.IdleTimeout.PrintingTime)
 
-		// filament_*_sensor
-		filamentSensorLabels := []string{"sensor"}
-		filamentSensorDetected := prometheus.NewDesc("klipper_filament_sensor_detected", "Whether filament presence is detected by the sensor", filamentSensorLabels, nil)
-		filamentSensorEnabled := prometheus.NewDesc("klipper_filament_sensor_enabled", "Whether the filament sensor is enabled or not", filamentSensorLabels, nil)
-		for k, v := range result.Result.Status.FilamentSensors {
-			sensorName := getValidLabelName(k)
+			// virtual_sdcard
 			ch <- prometheus.MustNewConstMetric(
-				filamentSensorDetected,
-				prometheus.GaugeValue,
-				boolToFloat64(v.Detected),
-				sensorName)
+				prometheus.NewDesc("klipper_print_file_progress", "The print progress reported as a percentage of the file read.", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.VirtualSdCard.Progress)
 			ch <- prometheus.MustNewConstMetric(
-				filamentSensorEnabled,
-				prometheus.GaugeValue,
-				boolToFloat64(v.Enabled),
-				sensorName)
+				prometheus.NewDesc("klipper_print_file_position", "The current file position in bytes.", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.VirtualSdCard.FilePosition)
+
+			// print_stats
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_print_total_duration", "The total time (in seconds) elapsed since a print has started.", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.PrintStats.TotalDuration)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_print_print_duration", "The total time spent printing (in seconds).", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.PrintStats.PrintDuration)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_print_filament_used", "The amount of filament used during the current print (in mm)..", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.PrintStats.FilamentUsed)
+
+			// display_status
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_print_gcode_progress", "The percentage of print progress, as reported by M73.", nil, nil),
+				prometheus.CounterValue,
+				result.Result.Status.DisplayStatus.Progress)
+
+			// temperature_sensor
+			temperatureSensorLabels := []string{"sensor"}
+			temperatureSensor := prometheus.NewDesc("klipper_temperature_sensor_temperature", "The temperature of the temperature sensor", temperatureSensorLabels, nil)
+			temperatureSensorMinTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_min_temp", "The measured minimum temperature of the temperature sensor", temperatureSensorLabels, nil)
+			temperatureSensorMaxTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_max_temp", "The measured maximum temperature of the temperature sensor", temperatureSensorLabels, nil)
+			for sk, sv := range result.Result.Status.TemperatureSensors {
+				sensorName := getValidLabelName(sk)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureSensor,
+					prometheus.GaugeValue,
+					sv.Temperature,
+					sensorName)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureSensorMinTemp,
+					prometheus.GaugeValue,
+					sv.MeasuredMinTemp,
+					sensorName)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureSensorMaxTemp,
+					prometheus.GaugeValue,
+					sv.MeasuredMaxTemp,
+					sensorName)
+			}
+
+			// temperature_fan
+			fanLabels := []string{"fan"}
+			fanSpeed := prometheus.NewDesc("klipper_temperature_fan_speed", "The speed of the temperature fan", fanLabels, nil)
+			fanTemperature := prometheus.NewDesc("klipper_temperature_fan_temperature", "The temperature of the temperature fan", fanLabels, nil)
+			fanTarget := prometheus.NewDesc("klipper_temperature_fan_target", "The target temperature for the temperature fan", fanLabels, nil)
+			for fk, fv := range result.Result.Status.TemperatureFans {
+				fanName := getValidLabelName(fk)
+				ch <- prometheus.MustNewConstMetric(
+					fanSpeed,
+					prometheus.GaugeValue,
+					fv.Speed,
+					fanName)
+				ch <- prometheus.MustNewConstMetric(
+					fanTemperature,
+					prometheus.GaugeValue,
+					fv.Temperature,
+					fanName)
+				ch <- prometheus.MustNewConstMetric(
+					fanTarget,
+					prometheus.GaugeValue,
+					fv.Target,
+					fanName)
+			}
+
+			// output_pin
+			pinLabels := []string{"pin"}
+			pinValue := prometheus.NewDesc("klipper_output_pin_value", "The value of the output pin", pinLabels, nil)
+			for k, v := range result.Result.Status.OutputPins {
+				pinName := getValidLabelName(k)
+				ch <- prometheus.MustNewConstMetric(
+					pinValue,
+					prometheus.GaugeValue,
+					v.Value,
+					pinName)
+			}
+
+			// fan_generic
+			genericFanLabels := []string{"fan"}
+			genericFanSpeed := prometheus.NewDesc("klipper_generic_fan_speed", "The speed of the generic fan", genericFanLabels, nil)
+			genericFanRpm := prometheus.NewDesc("klipper_generic_fan_rpm", "The RPM of the generic fan", genericFanLabels, nil)
+			for fk, fv := range result.Result.Status.GenericFans {
+				fanName := getValidLabelName(fk)
+				ch <- prometheus.MustNewConstMetric(
+					genericFanSpeed,
+					prometheus.GaugeValue,
+					fv.Speed,
+					fanName)
+				ch <- prometheus.MustNewConstMetric(
+					genericFanRpm,
+					prometheus.GaugeValue,
+					fv.Rpm,
+					fanName)
+			}
+
+			// controller_fan
+			controllerFanLabels := []string{"fan"}
+			controllerFanSpeed := prometheus.NewDesc("klipper_controller_fan_speed", "The speed of the controller fan", controllerFanLabels, nil)
+			controllerFanRpm := prometheus.NewDesc("klipper_controller_fan_rpm", "The RPM of the controller fan", controllerFanLabels, nil)
+			for fk, fv := range result.Result.Status.ControllerFans {
+				fanName := getValidLabelName(fk)
+				ch <- prometheus.MustNewConstMetric(
+					controllerFanSpeed,
+					prometheus.GaugeValue,
+					fv.Speed,
+					fanName)
+				ch <- prometheus.MustNewConstMetric(
+					controllerFanRpm,
+					prometheus.GaugeValue,
+					fv.Rpm,
+					fanName)
+			}
+
+			// filament_*_sensor
+			filamentSensorLabels := []string{"sensor"}
+			filamentSensorDetected := prometheus.NewDesc("klipper_filament_sensor_detected", "Whether filament presence is detected by the sensor", filamentSensorLabels, nil)
+			filamentSensorEnabled := prometheus.NewDesc("klipper_filament_sensor_enabled", "Whether the filament sensor is enabled or not", filamentSensorLabels, nil)
+			for k, v := range result.Result.Status.FilamentSensors {
+				sensorName := getValidLabelName(k)
+				ch <- prometheus.MustNewConstMetric(
+					filamentSensorDetected,
+					prometheus.GaugeValue,
+					boolToFloat64(v.Detected),
+					sensorName)
+				ch <- prometheus.MustNewConstMetric(
+					filamentSensorEnabled,
+					prometheus.GaugeValue,
+					boolToFloat64(v.Enabled),
+					sensorName)
+			}
 		}
 	}
 }
