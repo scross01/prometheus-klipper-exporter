@@ -16,7 +16,7 @@ graph LR;
         Grafana-->Prometheus
         Prometheus-->klipper-exporter[klipper-exporter:9101]
     end
-    klipper-exporter-->klipper([Klipper<br/>klipper.local:7125])
+    klipper-exporter-->klipper([Klipper<br/>klipper-host:7125])
 ```
 
 The [`docker-compose.yml`](./docker-compose.yml) stack defines three containers.
@@ -33,7 +33,7 @@ the klipper host.
 ```yml
     ...
     static_configs:
-      - targets: [ 'klipper.local:7125' ]
+      - targets: [ 'klipper-host:7125' ]
     ...
 ```
 
@@ -118,7 +118,7 @@ to the below message it is because the container is unable to resolve local
 network hostnames.
 
 ```text
-klipper-exporter  | time="2022-10-14T10:03:25Z" level=error msg="Get \"http://klipper.home.lan:7125/machine/proc_stats\": dial tcp: lookup klipper.local on 127.0.0.11:53: no such host"
+klipper-exporter  | time="2022-10-14T10:03:25Z" level=error msg="Get \"http://klipper.home.lan:7125/machine/proc_stats\": dial tcp: lookup klipper.home.lan on 127.0.0.11:53: no such host"
 ```
 
 Modify the `docker-compose.yml` to add the `dns` entry for the `klipper-exporter`

@@ -4,7 +4,7 @@ scrape_configs:
     scrape_interval: 5s
     metrics_path: /probe
     static_configs:
-      - targets: [ 'klipper:7125' ] # the klipper host
+      - targets: [ 'klipper-host:7125' ] # the klipper host
     params:
       modules: [ 
         'process_stats',
@@ -14,6 +14,7 @@ scrape_configs:
         'directory_info',
         'printer_objects',
         'history',
+        'spoolman',
       ]
     # Enable API Key authentication.
     # Only set one of `credentials` or `credentials_file`

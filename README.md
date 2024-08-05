@@ -29,7 +29,7 @@ scrape_configs:
     scrape_interval: 5s
     metrics_path: /probe
     static_configs:
-      - targets: [ 'klipper.local:7125' ]
+      - targets: [ 'klipper-host:7125' ]
     params:
       modules: [
         "process_stats",
@@ -46,19 +46,19 @@ scrape_configs:
       - source_labels: [__param_target]
         target_label: instance
       - target_label: __address__
-        replacement: klipper-exporter.local:9101
+        replacement: klipper-exporter:9101
 
   # optional exporter metrics
   - job_name: "klipper-exporter"
     scrape_interval: 5s
     metrics_path: /metrics
     static_configs:
-      - targets: [ 'klipper-exporter.local:9101' ]
+      - targets: [ 'klipper-exporter:9101' ]
 ```
 
 The exporter can be run on the host running Klipper, or on a separate machine.
-Replace `klipper.local` with the hostname or IP address of the Klipper host,
-and replace `klipper-exporter.local` with the hostname or IP address of the host
+Replace `klipper-host` with the hostname or IP address of the Klipper host,
+and replace `klipper-exporter` with the hostname or IP address of the host
 runnging `prometheus-klipper-exporter`.
 
 To monitor multiple Klipper instances add multiple entries to the
@@ -67,7 +67,7 @@ To monitor multiple Klipper instances add multiple entries to the
 ```yaml
     ...
     static_configs:
-      - targets: [ 'klipper1.local:7125', 'klipper2.local:7125 ]
+      - targets: [ 'klipper-host-1:7125', 'klipper-host-2:7125 ]
     ...
 ```
 
@@ -90,14 +90,14 @@ ensure that the process restarts on system restart.
 Example installation on Raspberry Pi, using systemd to run the exporter.
 
 ```sh
-$ ssh pi@klipper.local
+$ ssh pi@klipper-host
 [klipper]$ mkdir /home/pi/klipper-exporter
 [klipper]$ exit
 
-$ scp prometheus-klipper-exporter pi@klipper.local:/home/pi/klipper-exporter
-$ scp klipper-exporter.service pi@klipper.local:/home/pi/
+$ scp prometheus-klipper-exporter pi@klipper-host:/home/pi/klipper-exporter
+$ scp klipper-exporter.service pi@klipper-host:/home/pi/
 
-$ ssh pi@klipper.local
+$ ssh pi@klipper-host
 [klipper]$ sudo mv klipper-exporter.service /etc/systemd/system/
 [klipper]$ sudo systemctl daemon-reload
 [klipper]$ sudo systemctl enable klipper-exporter.service
@@ -159,7 +159,7 @@ configuration section.
 
 [authorization]
 trusted_clients:
-  klipper-exporter.local
+  klipper-exporter
   ...
 ```
 

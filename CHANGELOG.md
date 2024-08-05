@@ -5,6 +5,7 @@ v0.11.2
 -------
 
 - Fix regression in v0.11.1. Error in one collector module should not stop other collectors from attepting to run.
+- Removed `.local` hostname in example config as container based setup doesn't work with mDNS.
 
 v0.11.1
 -------
