@@ -347,6 +347,14 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				prometheus.GaugeValue,
 				result.Result.Status.Mcu.LastStats.McuAwake)
 			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_task_avg", "Klipper mcu task average.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.McuTaskAvg)
+			ch <- prometheus.MustNewConstMetric(
+				prometheus.NewDesc("klipper_mcu_task_stddev", "Klipper mcu task standard deviation.", nil, nil),
+				prometheus.GaugeValue,
+				result.Result.Status.Mcu.LastStats.McuTaskStddev)
+			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc("klipper_mcu_write_bytes", "Klipper mcu write bytes.", nil, nil),
 				prometheus.GaugeValue,
 				result.Result.Status.Mcu.LastStats.BytesWrite)

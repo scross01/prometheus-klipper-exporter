@@ -44,9 +44,9 @@ type PrinterObjectStatus struct {
 
 type PrinterObjectMcu struct {
 	LastStats struct {
-		McuAwake float64 `json:"mcu_awake"`
-		// McuTaskAvg float64 `json:"mcu_task_avg"` // value returned in the format 1.5e-05
-		// McuTaskStddev float64 `json:"mcu_task_stddev"` // value returned in the formate 1e-05
+		McuAwake        float64 `json:"mcu_awake"`
+		McuTaskAvg      float64 `json:"mcu_task_avg"`
+		McuTaskStddev   float64 `json:"mcu_task_stddev"`
 		BytesWrite      float64 `json:"bytes_write"`
 		BytesRead       float64 `json:"bytes_read"`
 		BytesRetransmit float64 `json:"bytes_retransmit"`
