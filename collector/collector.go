@@ -58,20 +58,26 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 
 		// Process Stats
 		if slices.Contains(c.modules, "process_stats") {
-			memUnits := result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].MemUnits
-			if memUnits != "kB" {
-				log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
+			moonrakerStatsCount := len(result.Result.MoonrakerStats)
+			if moonrakerStatsCount == 0 {
+				log.Warn("Empty moonraker_stats in Process Stats response, skipping Memory and CPU usage stats")
 			} else {
+				memUnits := result.Result.MoonrakerStats[moonrakerStatsCount-1].MemUnits
+				if memUnits != "kB" {
+					log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
+				} else {
+					ch <- prometheus.MustNewConstMetric(
+						prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
+						prometheus.GaugeValue,
+						float64(result.Result.MoonrakerStats[moonrakerStatsCount-1].Memory))
+				}
+
 				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
+					prometheus.NewDesc("klipper_moonraker_cpu_usage", "Moonraker CPU usage.", nil, nil),
 					prometheus.GaugeValue,
-					float64(result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].Memory))
+					result.Result.MoonrakerStats[moonrakerStatsCount-1].CpuUsage)
 			}
 
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_moonraker_cpu_usage", "Moonraker CPU usage.", nil, nil),
-				prometheus.GaugeValue,
-				result.Result.MoonrakerStats[len(result.Result.MoonrakerStats)-1].CpuUsage)
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc("klipper_moonraker_websocket_connections", "Moonraker Websocket connection count.", nil, nil),
 				prometheus.GaugeValue,
@@ -242,7 +248,9 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		if err != nil {
 			log.Error(err)
 		} else {
-			if len(result.Result.Jobs) >= 1 {
+			if len(result.Result.Jobs) < 1 {
+				log.Info("No active print in Current Print repsonse, skipping current print metrics")
+			} else {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
 					prometheus.GaugeValue,
@@ -323,7 +331,9 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 				result.Result.Status.GcodeMove.ExtrudeFactor)
 
 			// gcode position
-			if len(result.Result.Status.GcodeMove.GcodePosition) >= 4 {
+			if len(result.Result.Status.GcodeMove.GcodePosition) < 4 {
+				log.Warn("Unexpected number of Gcode Position values, skipping gcode position metrics")
+			} else {
 				ch <- prometheus.MustNewConstMetric(
 					prometheus.NewDesc("klipper_gcode_position_x", "Klipper gcode position X axis.", nil, nil),
 					prometheus.GaugeValue,
