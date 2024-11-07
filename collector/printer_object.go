@@ -432,6 +432,10 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 
 	log.Tracef("%+v", string(data))
 
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d %s", res.StatusCode, res.Status)
+	}
+
 	var response PrinterObjectResponse
 
 	err = json.Unmarshal(data, &response)

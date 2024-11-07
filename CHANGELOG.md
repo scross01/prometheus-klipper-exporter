@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+v0.12.0
+-------
+
+- Add support for multiple mcu's. Thanks to @Wulfsta #40.
+- Improved error logging for indexed results to address issues #34 and #35
+
 v0.11.2
 -------
 
