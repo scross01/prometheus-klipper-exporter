@@ -1,6 +1,12 @@
 Change Log
 ==========
 
+In progress
+-----------
+
+- Add support for `temperature_probe` metrics. Address issue #41
+
+
 v0.12.0
 -------
 

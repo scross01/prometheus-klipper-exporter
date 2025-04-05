@@ -610,6 +610,36 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					fanName)
 			}
 
+			// temperature_probe
+			temperatureProbeLabels := []string{"sensor"}
+			temperatureProbe := prometheus.NewDesc("klipper_temperature_probe_temperature", "The temperature of the temperature probe", temperatureProbeLabels, nil)
+			temperatureProbeMinTemp := prometheus.NewDesc("klipper_temperature_probe_measured_min_temp", "The measured minimum temperature of the temperature probe", temperatureProbeLabels, nil)
+			temperatureProbeMaxTemp := prometheus.NewDesc("klipper_temperature_probe_measured_max_temp", "The measured maximum temperature of the temperature probe", temperatureProbeLabels, nil)
+			temperatureProbeEstimatedExpansion := prometheus.NewDesc("klipper_temperature_probe_estimated_expansion", "The estimated of the temperature probe", temperatureProbeLabels, nil)
+			for sk, sv := range result.Result.Status.TemperatureProbes {
+				probeName := getValidLabelName(sk)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureProbe,
+					prometheus.GaugeValue,
+					sv.Temperature,
+					probeName)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureProbeMinTemp,
+					prometheus.GaugeValue,
+					sv.MeasuredMinTemp,
+					probeName)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureProbeMaxTemp,
+					prometheus.GaugeValue,
+					sv.MeasuredMaxTemp,
+					probeName)
+				ch <- prometheus.MustNewConstMetric(
+					temperatureProbeEstimatedExpansion,
+					prometheus.GaugeValue,
+					sv.EstimatedExpansion,
+					probeName)
+			}
+
 			// output_pin
 			pinLabels := []string{"pin"}
 			pinValue := prometheus.NewDesc("klipper_output_pin_value", "The value of the output pin", pinLabels, nil)

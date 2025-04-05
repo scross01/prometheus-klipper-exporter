@@ -1,9 +1,7 @@
 Prometheus Exporter for Klipper
 ===============================
 
-Initial implmentation of a Prometheus exporter for Klipper to capture operational
-metrics. This is a very rough first implementation and subject to potentially
-significant changes.
+Prometheus exporter for Klipper to capture operational metrics. This is a very rough first implementation and subject to potentially significant changes.
 
 Implementation is based on the [Multi-Target Exporter Pattern](https://prometheus.io/docs/guides/multi-target-exporter/)
 to enabled a single exporter to collect metrics from multiple Klipper instances.
@@ -133,15 +131,33 @@ You can configure different sets of metrics to be collected by including the
 If the modules params are omitted then only the default metrics are collected. Each
 group of metrics is queried from a different Moonraker API endpoint.
 
-| module | default | metrics |
-|--------|---------|---------|
-| `process_stats` | x | `klipper_moonraker_cpu_usage`<br/>`klipper_moonraker_memory_kb`<br/>`klipper_moonraker_websocket_connections`<br/>`klipper_system_cpu`<br/>`klipper_system_cpu_temp`<br/>`klipper_system_memory_available`<br/>`klipper_system_memory_total`<br/>`klipper_system_memory_used`<br/>`klipper_system_uptime`<br/> |
-| `network_stats` |   | `klipper_network_tx_bandwidth{interface="`*interface*`"}`<br/>`klipper_network_rx_bytes{interface="`*interface*`"}`<br/>`klipper_network_tx_bytes{interface="`*interface*`"}`<br/>`klipper_network_rx_drop{interface="`*interface*`"}`<br/>`klipper_network_tx_drop{interface="`*interface*`"}`<br/>`klipper_network_rx_errs{interface="`*interface*`"}`<br/>`klipper_network_tx_errs{interface="`*interface*`"}`<br/>`klipper_network_rx_packets{interface="`*interface*`"}`<br/>`klipper_network_tx_packets{interface="`*interface*`"}`<br/> |
-| `job_queue` | x | `klipper_job_queue_length` |
-| `system_info` | x | `klipper_system_cpu_count` |
-| `directory_info` | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
-| `printer_objects` | | `klipper_controller_fan_rpm{fan="`*fan*`"}`<br/>`klipper_controller_fan_speed={fan="`*fan*`"}`<br/>`klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature`<br/>`klipper_fan_rpm`<br/>`klipper_fan_speed`<br/>`klipper_filament_sensor_detected{sensor="`*sensor*`"}`<br/>`klipper_filament_sensor_enabled{sensor="`*sensor*`"}`<br/>`klipper_gcode_extrude_factor`<br/>`klipper_gcode_position_e`<br/>`klipper_gcode_position_x`<br/>`klipper_gcode_position_y`<br/>`klipper_gcode_position_z`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed`<br/>`klipper_generic_fan_rpm{fan="`*fan*`"}`<br/>`klipper_generic_fan_speed{fan="`*fan*`"}`<br/>`klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature`<br/>`klipper_mcu_awake{mcu="`*mcu*`"}`<br/>`klipper_mcu_task_avg{mcu="`*mcu*`"}`<br/>`klipper_mcu_task_stddev{mcu="`*mcu*`"}`<br/>`klipper_mcu_clock_frequency{mcu="`*mcu*`"}`<br/>`klipper_mcu_invalid_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_read_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_ready_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_receive_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_retransmit_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_retransmit_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_rto`<br/>`klipper_mcu_rttvar{mcu="`*mcu*`"}`<br/>`klipper_mcu_send_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_stalled_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_srtt{mcu="`*mcu*`"}`<br/>`klipper_mcu_write_bytes{mcu="`*mcu*`"}`<br/>`klipper_output_pin_value{pin="`*pin*`"}`<br/>`klipper_printing_time`<br/>`klipper_print_filament_used`<br/>`klipper_print_file_position`<br/>`klipper_print_file_progress`<br/>`klipper_print_gcode_progress`<br/>`klipper_print_total_duration`<br/>`klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}`<br/>`klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
-| `history` | | `klipper_current_print_first_layer_height`<br/>`klipper_current_print_layer_height`<br/>`klipper_current_print_object_height`<br/>`klipper_current_print_total_duration`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>`klipper_total_filament_used`<br/>`klipper_total_jobs`<br/>`klipper_total_print_time`<br/>`klipper_total_time` |
+| module | object | default | metrics |
+|--------|--------|---------|---------|
+| `process_stats` | | x | `klipper_moonraker_cpu_usage`<br/>`klipper_moonraker_memory_kb`<br/>`klipper_moonraker_websocket_connections`<br/>`klipper_system_cpu`<br/>`klipper_system_cpu_temp`<br/>`klipper_system_memory_available`<br/>`klipper_system_memory_total`<br/>`klipper_system_memory_used`<br/>`klipper_system_uptime`<br/> |
+| `job_queue` | | x | `klipper_job_queue_length` |
+| `system_info` | | x | `klipper_system_cpu_count` |
+| `printer_objects` | `controller_fan` | | `klipper_controller_fan_rpm{fan="`*fan*`"}`<br/>`klipper_controller_fan_speed={fan="`*fan*`"}` | 
+| `printer_objects` | `display_status` | | `klipper_print_gcode_progress` |
+| `printer_objects` | `extruder` | | `klipper_extruder_power`<br/>`klipper_extruder_pressure_advance`<br/>`klipper_extruder_smooth_time`<br/>`klipper_extruder_target`<br/>`klipper_extruder_temperature` |
+| `printer_objects` | `fan` | | `klipper_fan_rpm`<br/>`klipper_fan_speed` |
+| `printer_objects` | `filament_sensor` | | `klipper_filament_sensor_detected{probe="`*probe*`"}`<br/>`klipper_filament_sensor_enabled{probe="`*probe*`"}` |
+| `printer_objects` | `gcode` | | `klipper_gcode_extrude_factor`<br/>`klipper_gcode_position_e`<br/>`klipper_gcode_position_x`<br/>`klipper_gcode_position_y`<br/>`klipper_gcode_position_z`<br/>`klipper_gcode_speed_factor`<br/>`klipper_gcode_speed` |
+| `printer_objects` | `generic_fan` | | `klipper_generic_fan_rpm{fan="`*fan*`"}`<br/>`klipper_generic_fan_speed{fan="`*fan*`"}` |
+| `printer_objects` | `heater_bed` | | `klipper_heater_bed_power`<br/>`klipper_heater_bed_target`<br/>`klipper_heater_bed_temperature` |
+| `printer_objects` | `idle_timeout` | | `klipper_printing_time` |
+| `printer_objects` | `mcu` | | `klipper_mcu_awake{mcu="`*mcu*`"}`<br/>`klipper_mcu_task_avg{mcu="`*mcu*`"}`<br/>`klipper_mcu_task_stddev{mcu="`*mcu*`"}`<br/>`klipper_mcu_clock_frequency{mcu="`*mcu*`"}`<br/>`klipper_mcu_invalid_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_read_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_ready_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_receive_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_retransmit_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_retransmit_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_rto`<br/>`klipper_mcu_rttvar{mcu="`*mcu*`"}`<br/>`klipper_mcu_send_seq{mcu="`*mcu*`"}`<br/>`klipper_mcu_stalled_bytes{mcu="`*mcu*`"}`<br/>`klipper_mcu_srtt{mcu="`*mcu*`"}`<br/>`klipper_mcu_write_bytes{mcu="`*mcu*`"}` |
+| `printer_objects` | `output_pin` | | `klipper_output_pin_value{pin="`*pin*`"}` |
+| `printer_objects` | `print_stats` | | `klipper_print_filament_used`<br/>`klipper_print_total_duration` |
+| `printer_objects` | `temperature_fan` | | `klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}` |
+| `printer_objects` | `temperature_probe` | | `klipper_temperature_probe_temperature{probe="`*probe*`"}`<br/>`klipper_temperature_probe_measured_max_temp{probe="`*probe*`"}`<br/>`klipper_temperature_probe_measured_min_temp{probe="`*probe*`"}`<br/>`klipper_temperature_probe_estimated_expansion{probe="`*probe*`"}` |
+| `printer_objects` | `temperature_sensor` | | `klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_estimated_expansion{sensor="`*sensor*`"}` |
+| `printer_objects` | `toolhead` | | `klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
+| `printer_objects` | `virtual_sdcard` | | `klipper_print_file_position`<br/>`klipper_print_file_progress` |
+| `directory_info` | | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
+| `network_stats` | |   | `klipper_network_tx_bandwidth{interface="`*interface*`"}`<br/>`klipper_network_rx_bytes{interface="`*interface*`"}`<br/>`klipper_network_tx_bytes{interface="`*interface*`"}`<br/>`klipper_network_rx_drop{interface="`*interface*`"}`<br/>`klipper_network_tx_drop{interface="`*interface*`"}`<br/>`klipper_network_rx_errs{interface="`*interface*`"}`<br/>`klipper_network_tx_errs{interface="`*interface*`"}`<br/>`klipper_network_rx_packets{interface="`*interface*`"}`<br/>`klipper_network_tx_packets{interface="`*interface*`"}`<br/> |
+| `history` | | |  `klipper_current_print_first_layer_height`<br/>`klipper_current_print_layer_height`<br/>`klipper_current_print_object_height`<br/>`klipper_current_print_total_duration`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>`klipper_total_filament_used`<br/>`klipper_total_jobs`<br/>`klipper_total_print_time`<br/>`klipper_total_time` |
+
+
 
 Authentication
 --------------
@@ -276,4 +292,4 @@ These changes affect the following metrics groups
 For example:
 
 - `klipper_network_`**<code>wlan0</code>**`_rx_bytes` becomes `klipper_network_rx_bytes{interface="`**<code>wlan0</code>**`"}`
-- `klipper_temperature_sensor_`**<code>mtu</code>**`_temperature` becomes `klipper_temperature_sensor_temperature{sensor="`**<code>mtu</code>**`"}`
+- `klipper_temperature_sensor_`**<code>mtu</code>**`_temperature` becomes `klipper_temperature_sensor_temperature{probe="`**<code>mtu</code>**`"}`
