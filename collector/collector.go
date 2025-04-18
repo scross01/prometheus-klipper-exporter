@@ -675,6 +675,30 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					boolToFloat64(v.Enabled),
 					sensorName)
 			}
+
+            // heater_generic
+			genericHeaterLabels := []string{"heater"}
+			genericHeaterTemperature := prometheus.NewDesc("klipper_generic_heater_temperature", "The temperature of the generic heater", genericHeaterLabels, nil)
+			genericHeaterTarget := prometheus.NewDesc("klipper_generic_heater_target", "The target temperature of the generic heater", genericHeaterLabels, nil)
+			genericHeaterPower := prometheus.NewDesc("klipper_generic_heater_power", "The output power of the generic heater", genericHeaterLabels, nil)
+			for name, heater := range result.Result.Status.GenericHeaters {
+				heaterName := getValidLabelName(name)
+				ch <- prometheus.MustNewConstMetric(
+					genericHeaterTemperature,
+					prometheus.GaugeValue,
+					heater.Temperature,
+					heaterName)
+			    ch <- prometheus.MustNewConstMetric(
+					genericHeaterTarget,
+					prometheus.GaugeValue,
+					heater.Target,
+					heaterName)
+				ch <- prometheus.MustNewConstMetric(
+					genericHeaterPower,
+					prometheus.GaugeValue,
+					heater.Power,
+					heaterName)
+			}
 		}
 	}
 }
