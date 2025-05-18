@@ -1,16 +1,16 @@
 Change Log
 ==========
 
-In progress
------------
+v0.13.0
+---------
 
 - Add support for `temperature_probe` metrics. Address issue #41
-
+- Add support for `heater_generic` metrics. Thanks to @DavidvtWout #42
 
 v0.12.0
 -------
 
-- Add support for multiple mcu's. Thanks to @Wulfsta #40.
+- Add support for multiple mcu's. Thanks to @Wulfsta #40
 - Improved error logging for indexed results to address issues #34 and #35
 
 v0.11.2
