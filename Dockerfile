@@ -1,5 +1,5 @@
 # build stage
-FROM golang:latest as builder
+FROM golang:latest AS builder
 LABEL maintainer="Stephen Cross <scross01@gmail.com>"
 WORKDIR /app
 COPY go.mod go.sum ./
