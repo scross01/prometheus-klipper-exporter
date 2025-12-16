@@ -42,6 +42,7 @@ type PrinterObjectStatus struct {
 	ControllerFans     map[string]PrinterObjectFan
 	FilamentSensors    map[string]PrinterObjectFilamentSensor
 	GenericHeaters     map[string]PrinterObjectHeater
+	TmcSensors         map[string]PrinterObjectTmc
 }
 
 type PrinterObjectMcu struct {
@@ -175,6 +176,11 @@ type PrinterObjectFilamentSensor struct {
 	Enabled  bool `mapstructure:"enabled"`
 }
 
+type PrinterObjectTmc struct {
+	RunCurrent  float64  `mapstructure:"run_current"`
+	Temperature *float64 `mapstructure:"temperature"`
+}
+
 type _PrinterObjectStatus PrinterObjectStatus
 
 func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
@@ -198,6 +204,7 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 		controllerFans := make(map[string]PrinterObjectFan)
 		filamentSensors := make(map[string]PrinterObjectFilamentSensor)
 		genericHeaters := make(map[string]PrinterObjectHeater)
+		tmcSensors := make(map[string]PrinterObjectTmc)
 		for k, v := range m {
 			// find mcus
 			mcuMatch := mcuRegex.FindStringSubmatch(k)
@@ -259,6 +266,11 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 				mapstructure.Decode(v, &value)
 				genericHeaters[key] = value
 			}
+			if strings.HasPrefix(k, "tmc") {
+				value := PrinterObjectTmc{}
+				mapstructure.Decode(v, &value)
+				tmcSensors[k] = value
+			}
 		}
 		f.Mcus = microcontrollers
 		f.TemperatureSensors = temperatureSensors
@@ -268,6 +280,7 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 		f.ControllerFans = controllerFans
 		f.FilamentSensors = filamentSensors
 		f.GenericHeaters = genericHeaters
+		f.TmcSensors = tmcSensors
 	}
 	return err
 }
@@ -290,19 +303,20 @@ var (
 	customControllerFans     map[string][]string   = make(map[string][]string)
 	customFilamentSensors    map[string][][]string = make(map[string][][]string)
 	customGenericHeaters     map[string][]string   = make(map[string][]string)
+	customTmcSensors         map[string][]string   = make(map[string][]string)
 )
 
 // fetchCustomSensors queries klipper for the complete list and printer objects and
 // returns the subset of `temperature_sensor`, `temperature_fan`, `output_pin`,
 // `fan_generic`, `controller_fan`, and `filament_*_sensor` objects that have custom names.
-func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, error) {
+func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, *[]string, error) {
 	var url = "http://" + klipperHost + "/printer/objects/list"
 
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 	if apiKey != "" {
 		req.Header.Set("X-API-KEY", apiKey)
@@ -310,13 +324,13 @@ func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	res, err := client.Do(req)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 	defer res.Body.Close()
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	var response PrinterObjectsList
@@ -324,7 +338,7 @@ func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	microcontrollers := []string{}
@@ -336,6 +350,7 @@ func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	controllerFans := []string{}
 	filamentSensors := [][]string{}
 	genericHeaters := []string{}
+	tmcSensors := []string{}
 	for o := range response.Result.Objects {
 		// find mcus
 		mcuMatch := mcuRegex.FindStringSubmatch(response.Result.Objects[o])
@@ -384,9 +399,14 @@ func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 		if strings.HasPrefix(response.Result.Objects[o], "heater_generic ") {
 			genericHeaters = append(genericHeaters, strings.Replace(response.Result.Objects[o], "heater_generic ", "", 1))
 		}
+		// find tmc sensors
+		if strings.HasPrefix(response.Result.Objects[o], "tmc") {
+			// We need full name as the stepper type is part of the name
+			tmcSensors = append(tmcSensors, response.Result.Objects[o])
+		}
 	}
 
-	return &microcontrollers, &temperatureSensors, &temperatureFans, &temperatureProbes, &outputPins, &genericFans, &controllerFans, &filamentSensors, &genericHeaters, nil
+	return &microcontrollers, &temperatureSensors, &temperatureFans, &temperatureProbes, &outputPins, &genericFans, &controllerFans, &filamentSensors, &genericHeaters, &tmcSensors, nil
 }
 
 func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey string) (*PrinterObjectResponse, error) {
@@ -396,7 +416,7 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	if _, ok := customTemperatureSensors[klipperHost]; ok {
 		// already have custom sensors, skip
 	} else {
-		mcus, ts, tf, tp, op, gf, cf, fs, gh, err := c.fetchCustomSensors(klipperHost, apiKey)
+		mcus, ts, tf, tp, op, gf, cf, fs, gh, tmc, err := c.fetchCustomSensors(klipperHost, apiKey)
 		if err != nil {
 			log.Error(err)
 			return nil, err
@@ -411,6 +431,7 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 		customControllerFans[klipperHost] = *cf
 		customFilamentSensors[klipperHost] = *fs
 		customGenericHeaters[klipperHost] = *gh
+		customTmcSensors[klipperHost] = *tmc
 	}
 
 	mcuQuery := ""
@@ -443,6 +464,9 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 	}
 	for gh := range customGenericHeaters[klipperHost] {
 		customSensorsQuery += "&heater_generic%20" + customGenericHeaters[klipperHost][gh]
+	}
+	for tmc := range customTmcSensors[klipperHost] {
+		customSensorsQuery += "&" + strings.ReplaceAll(customTmcSensors[klipperHost][tmc], " ", "%20")
 	}
 
 	var url = "http://" +
