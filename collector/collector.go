@@ -454,6 +454,11 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					sensorName)
 			}
 
+			// MMU (Multi-Material Unit) - Happy Hare - only if present
+			if slices.Contains(c.modules, "mmu") {
+				c.CollectMMU(ch)
+			}
+
 			// toolhead
 			ch <- prometheus.MustNewConstMetric(
 				prometheus.NewDesc("klipper_toolhead_print_time", "Klipper toolhead print time.", nil, nil),
@@ -706,7 +711,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					sensorName)
 			}
 
-            // heater_generic
+			// heater_generic
 			genericHeaterLabels := []string{"heater"}
 			genericHeaterTemperature := prometheus.NewDesc("klipper_generic_heater_temperature", "The temperature of the generic heater", genericHeaterLabels, nil)
 			genericHeaterTarget := prometheus.NewDesc("klipper_generic_heater_target", "The target temperature of the generic heater", genericHeaterLabels, nil)
@@ -718,7 +723,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.GaugeValue,
 					heater.Temperature,
 					heaterName)
-			    ch <- prometheus.MustNewConstMetric(
+				ch <- prometheus.MustNewConstMetric(
 					genericHeaterTarget,
 					prometheus.GaugeValue,
 					heater.Target,
