@@ -70,6 +70,27 @@ To monitor multiple Klipper instances add multiple entries to the
     ...
 ```
 
+If you have have multiple printers manaaged by the same Klipper host then you
+can use relabeling to differentiate between them. The following example
+extracts the klipper host name and port as the `__param_target`, and the
+printer name following the `@` as the `printer` label.
+
+```yaml
+    static_configs:
+      - targets: [ 'klipper-host-1:7125@Ender-3-V2', 'klipper-host-1:7125@Ender-3-Pro']
+    ...
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.*)@.*'
+        replacement: $1
+        target_label: __param_target
+      - source_labels: [__address__]
+        regex: '.*@(.*)'
+        replacement: $1
+        target_label: printer
+    ...
+```
+
 Build
 -----
 
