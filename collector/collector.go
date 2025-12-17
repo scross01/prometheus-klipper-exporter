@@ -734,6 +734,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 			tmcSensorLabels := []string{"sensor"}
 			tmcTemperatureSensor := prometheus.NewDesc("klipper_tmc_sensor_temperature", "The temperature of the tmc driver", tmcSensorLabels, nil)
 			tmcRunCurrentSensor := prometheus.NewDesc("klipper_tmc_sensor_run_current", "The run current of the tmc driver", tmcSensorLabels, nil)
+			tmcEnabledSensor := prometheus.NewDesc("klipper_tmc_sensor_enabled", "Whether the tmc driver is enabled or not", tmcSensorLabels, nil)
 
 			for sk, sv := range result.Result.Status.TmcSensors {
 				sensorName := getValidLabelName(strings.ReplaceAll(sk, " ", "_"))
@@ -748,6 +749,12 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					tmcRunCurrentSensor,
 					prometheus.GaugeValue,
 					sv.RunCurrent,
+					sensorName)
+
+				ch <- prometheus.MustNewConstMetric(
+					tmcEnabledSensor,
+					prometheus.GaugeValue,
+					boolToFloat64(sv.DrvStatus != nil),
 					sensorName)
 			}
 		}

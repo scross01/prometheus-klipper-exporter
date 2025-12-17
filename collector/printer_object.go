@@ -176,9 +176,14 @@ type PrinterObjectFilamentSensor struct {
 	Enabled  bool `mapstructure:"enabled"`
 }
 
+type PrinterObjectTmcDrvStatus struct {
+	// Empty struct because we only use it to check if tmc driver is enabled
+}
+
 type PrinterObjectTmc struct {
-	RunCurrent  float64  `mapstructure:"run_current"`
-	Temperature *float64 `mapstructure:"temperature"`
+	RunCurrent  float64                    `mapstructure:"run_current"`
+	Temperature *float64                   `mapstructure:"temperature"`
+	DrvStatus   *PrinterObjectTmcDrvStatus `mapstructure:"drv_status"`
 }
 
 type _PrinterObjectStatus PrinterObjectStatus
