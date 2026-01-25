@@ -27,6 +27,9 @@ build-windows:
 build-docker:
 	docker build -t klipper-exporter .
 
+build-podman:
+	podman build . --tag klipper-exporter:latest
+
 clean:
 	rm -rf build/release-$(VERSION)/*
 
