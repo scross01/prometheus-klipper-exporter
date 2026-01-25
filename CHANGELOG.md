@@ -1,8 +1,10 @@
 Change Log
 ==========
 
+- Add support for `tmz_sensor` metrics for monitoring tmc stepper drivers like tmc2240. Thanks to @martijnvanduijneveldt #45
+
 v0.13.0
----------
+-------
 
 - Add support for `temperature_probe` metrics. Address issue #41
 - Add support for `heater_generic` metrics. Thanks to @DavidvtWout #42

@@ -152,12 +152,12 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `printer_objects` | `temperature_fan` | | `klipper_temperature_fan_speed{fan="`*fan*`"}`<br/>`klipper_temperature_fan_temperature{fan="`*fan*`"}`<br/>`klipper_temperature_fan_target{fan="`*fan*`"}` |
 | `printer_objects` | `temperature_probe` | | `klipper_temperature_probe_temperature{probe="`*probe*`"}`<br/>`klipper_temperature_probe_measured_max_temp{probe="`*probe*`"}`<br/>`klipper_temperature_probe_measured_min_temp{probe="`*probe*`"}`<br/>`klipper_temperature_probe_estimated_expansion{probe="`*probe*`"}` |
 | `printer_objects` | `temperature_sensor` | | `klipper_temperature_sensor_temperature{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_max_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_measured_min_temp{sensor="`*sensor*`"}`<br/>`klipper_temperature_sensor_estimated_expansion{sensor="`*sensor*`"}` |
+| `printer_objects` | `tmc_sensor` | | `klipper_tmc_sensor_enabled{sensor="`*sensor*`"}`<br/>`klipper_tmc_sensor_run_current{sensor="`*sensor*`"}`<br/>`klipper_tmc_sensor_temperature{sensor="`*sensor*`"}`<br/> |
 | `printer_objects` | `toolhead` | | `klipper_toolhead_estimated_print_time`<br/>`klipper_toolhead_max_accel_to_decel`<br/>`klipper_toolhead_max_accel`<br/>`klipper_toolhead_max_velocity`<br/>`klipper_toolhead_print_time`<br/>`klipper_toolhead_square_corner_velocity` |
 | `printer_objects` | `virtual_sdcard` | | `klipper_print_file_position`<br/>`klipper_print_file_progress` |
 | `directory_info` | | | `klipper_disk_usage_available`<br/>`klipper_disk_usage_total`<br/>`klipper_disk_usage_used` |
 | `network_stats` | |   | `klipper_network_tx_bandwidth{interface="`*interface*`"}`<br/>`klipper_network_rx_bytes{interface="`*interface*`"}`<br/>`klipper_network_tx_bytes{interface="`*interface*`"}`<br/>`klipper_network_rx_drop{interface="`*interface*`"}`<br/>`klipper_network_tx_drop{interface="`*interface*`"}`<br/>`klipper_network_rx_errs{interface="`*interface*`"}`<br/>`klipper_network_tx_errs{interface="`*interface*`"}`<br/>`klipper_network_rx_packets{interface="`*interface*`"}`<br/>`klipper_network_tx_packets{interface="`*interface*`"}`<br/> |
 | `history` | | |  `klipper_current_print_first_layer_height`<br/>`klipper_current_print_layer_height`<br/>`klipper_current_print_object_height`<br/>`klipper_current_print_total_duration`<br/>`klipper_longest_job`<br/>`klipper_longest_print`<br/>`klipper_total_filament_used`<br/>`klipper_total_jobs`<br/>`klipper_total_print_time`<br/>`klipper_total_time` |
-
 
 
 Authentication
