@@ -3,3 +3,5 @@ TODO.md
 .DS_Store
 /.idea/
 .roo/
+
+test/printer_data/

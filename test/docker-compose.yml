@@ -17,6 +17,8 @@ services:
       - 9090
     ports:
       - 9090:9090
+    networks:
+      - dev_net
     restart: unless-stopped
       
   grafana:
@@ -34,20 +36,51 @@ services:
       GF_SECURITY_ALLOW_EMBEDDING: 'true'
     ports:
       - "3000:3000/tcp"
+    networks:
+      - dev_net
 
   klipper-exporter:
     hostname: klipper-exporter
     image: klipper-exporter:latest
     container_name: klipper-exporter
     restart: unless-stopped
+    networks:
+      - dev_net
     expose:
       - 9101
     command:
       - '-logging.level=Trace'
 
+  klipper:
+    container_name: klipper
+    image: ghcr.io/mainsail-crew/virtual-klipper-printer:latest
+    volumes:
+      - ./printer_data:/home/printer/printer_data:delegated,Z
+    ports:
+      - "7125:7125"
+      # - "8110:8080"  # virtual camera not required
+    networks:
+      - dev_net
+    tmpfs:
+      - /tmp:noexec
+      - /home/printer/printer_data/comms:noexec
 
+  mainsail:
+    container_name: mainsail
+    image: ghcr.io/mainsail-crew/mainsail
+    volumes: 
+      - ./config.json:/usr/share/nginx/html/config.json
+    ports:
+      - "8080:80"
+    networks:
+      - dev_net
+    
 volumes:
   prometheus-data:
     external: false
   grafana-data:
     external: false
+
+networks:
+  dev_net:
+    driver: bridge
