@@ -8,6 +8,7 @@ v0.14.0
 - Add support for `mmu` multi material unit metrics (Happy Hare). Thanks to @Alph4d0g #44
 - Add local test environment with prometheus, grafana docker containers.
 - Removed previously deprecated `temperature` metrics.
+- Bumped supported Go lang version for 1.25
 
 v0.13.0
 -------

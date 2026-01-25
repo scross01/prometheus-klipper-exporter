@@ -40,7 +40,7 @@ fmt:
 run:
 	go run .	
 
-install:
+install-rpi:
 	scp build/release-$(VERSION)/prometheus-klipper-exporter-rpi-armv7-$(VERSION) pi@klipper.home.lan:klipper-exporter/
 	ssh pi@klipper.home.lan "rm klipper-exporter/prometheus-klipper-exporter && ln -s prometheus-klipper-exporter-rpi-armv7-$(VERSION) klipper-exporter/prometheus-klipper-exporter"
 	ssh pi@klipper.home.lan "sudo systemctl restart klipper-exporter.service"
