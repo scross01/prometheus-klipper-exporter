@@ -316,36 +316,21 @@ func (c Collector) CollectMMU(ch chan<- prometheus.Metric) {
 		float64(mmu.Gate))
 
 	// === Print State ===
-	printStates := []string{"printing", "pause_locked", "paused", "complete", "cancelled", "error", "ready", "standby", "initialized"}
-	printStateDesc := prometheus.NewDesc("klipper_mmu_print_state", "MMU print state", []string{"state"}, nil)
-	for _, state := range printStates {
-		value := 0.0
-		if mmu.PrintState == state {
-			value = 1.0
-		}
-		ch <- prometheus.MustNewConstMetric(printStateDesc, prometheus.GaugeValue, value, state)
+	if mmu.PrintState != "" {
+		printStateDesc := prometheus.NewDesc("klipper_mmu_print_state_info", "MMU print state", []string{"state"}, nil)
+		ch <- prometheus.MustNewConstMetric(printStateDesc, prometheus.GaugeValue, 1.0, mmu.PrintState)
 	}
 
 	// === Action State ===
-	actions := []string{"Idle", "Loading", "Unloading", "Forming Tip", "Heating", "Loading Ext", "Exiting Ext", "Checking", "Homing", "Selecting"}
-	actionDesc := prometheus.NewDesc("klipper_mmu_action", "MMU current action", []string{"action"}, nil)
-	for _, action := range actions {
-		value := 0.0
-		if mmu.Action == action {
-			value = 1.0
-		}
-		ch <- prometheus.MustNewConstMetric(actionDesc, prometheus.GaugeValue, value, action)
+	if mmu.Action != "" {
+		actionDesc := prometheus.NewDesc("klipper_mmu_action_info", "MMU current action", []string{"action"}, nil)
+		ch <- prometheus.MustNewConstMetric(actionDesc, prometheus.GaugeValue, 1.0, mmu.Action)
 	}
 
 	// === Operation State ===
-	operations := []string{"toolchange", "load", "unload", "runout", "pause", "cancel", "complete", ""}
-	operationDesc := prometheus.NewDesc("klipper_mmu_operation", "MMU current operation", []string{"operation"}, nil)
-	for _, op := range operations {
-		value := 0.0
-		if mmu.Operation == op {
-			value = 1.0
-		}
-		ch <- prometheus.MustNewConstMetric(operationDesc, prometheus.GaugeValue, value, op)
+	if mmu.Operation != "" {
+		operationDesc := prometheus.NewDesc("klipper_mmu_operation_info", "MMU current operation", []string{"operation"}, nil)
+		ch <- prometheus.MustNewConstMetric(operationDesc, prometheus.GaugeValue, 1.0, mmu.Operation)
 	}
 
 	// === Filament State ===
@@ -418,25 +403,15 @@ func (c Collector) CollectMMU(ch chan<- prometheus.Metric) {
 		boolToFloat64(mmu.SyncDrive))
 
 	// Sync feedback state
-	syncStates := []string{"compressed", "expanded", "neutral", "disabled"}
-	syncStateDesc := prometheus.NewDesc("klipper_mmu_sync_feedback_state", "Sync feedback state", []string{"state"}, nil)
-	for _, state := range syncStates {
-		value := 0.0
-		if mmu.SyncFeedbackState == state {
-			value = 1.0
-		}
-		ch <- prometheus.MustNewConstMetric(syncStateDesc, prometheus.GaugeValue, value, state)
+	if mmu.SyncFeedbackState != "" {
+		syncStateDesc := prometheus.NewDesc("klipper_mmu_sync_feedback_state_info", "Sync feedback state", []string{"state"}, nil)
+		ch <- prometheus.MustNewConstMetric(syncStateDesc, prometheus.GaugeValue, 1.0, mmu.SyncFeedbackState)
 	}
 
 	// === Servo Position ===
-	servoPositions := []string{"Up", "Down", "Move", "Unknown"}
-	servoDesc := prometheus.NewDesc("klipper_mmu_servo_position", "Servo position", []string{"position"}, nil)
-	for _, pos := range servoPositions {
-		value := 0.0
-		if mmu.Servo == pos {
-			value = 1.0
-		}
-		ch <- prometheus.MustNewConstMetric(servoDesc, prometheus.GaugeValue, value, pos)
+	if mmu.Servo != "" {
+		servoDesc := prometheus.NewDesc("klipper_mmu_servo_position_info", "Servo position", []string{"position"}, nil)
+		ch <- prometheus.MustNewConstMetric(servoDesc, prometheus.GaugeValue, 1.0, mmu.Servo)
 	}
 
 	// === Bowden Progress ===
