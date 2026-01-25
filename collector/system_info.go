@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -54,4 +55,19 @@ func (c Collector) fetchMoonrakerSystemInfo(klipperHost string, apiKey string) (
 	}
 
 	return &response, nil
+}
+
+func (c Collector) collectSystemInfo(ch chan<- prometheus.Metric) {
+	log.Infof("Collecting system_info for %s", c.target)
+
+	result, err := c.fetchMoonrakerSystemInfo(c.target, c.apiKey)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
+		prometheus.GaugeValue,
+		float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 }

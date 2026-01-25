@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -53,4 +54,19 @@ func (c Collector) fetchMoonrakerJobQueue(klipperHost string, apiKey string) (*M
 	}
 
 	return &response, nil
+}
+
+func (c Collector) collectJobQueue(ch chan<- prometheus.Metric) {
+	log.Infof("Collecting job_queue for %s", c.target)
+
+	result, err := c.fetchMoonrakerJobQueue(c.target, c.apiKey)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
+		prometheus.GaugeValue,
+		float64(len(result.Result.QueuedJobs)))
 }

@@ -266,8 +266,7 @@ func (c Collector) fetchMMUPreGateSensors(klipperHost string, apiKey string, num
 	return detected, enabled, nil
 }
 
-// CollectMMU collects all MMU metrics
-func (c Collector) CollectMMU(ch chan<- prometheus.Metric) {
+func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	log.Infof("Collecting mmu for %s", c.target)
 
 	result, err := c.fetchMMUData(c.target, c.apiKey)

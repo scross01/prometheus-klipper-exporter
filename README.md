@@ -264,7 +264,13 @@ Command line options
 ⚠️ History of breaking changes
 -----------------------------
 
-### Upgrafing to v0.11.0
+### Upgrading to v0.14.0
+
+`v0.14.0` removes the deprecated `tempurature` module option which contained a
+subset of the metrics reported by the `printer_objects`. If you where using the
+`tempurature` module then switch the configuration to use `printer_objects` instead.
+
+### Upgrading to v0.11.0
 
 `v0.11.0` removes the deprecated `-debug` and `-verbose` command line options.
 Use the `-logging.level` option or `LOGGING_LEVEL` environment setting instead.

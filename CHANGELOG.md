@@ -1,9 +1,13 @@
 Change Log
 ==========
 
+v0.14.0
+-------
+
 - Add support for `tmz_sensor` metrics for monitoring tmc stepper drivers like tmc2240. Thanks to @martijnvanduijneveldt #45
 - Add support for `mmu` multi material unit metrics (Happy Hare). Thanks to @Alph4d0g #44
 - Add local test environment with prometheus, grafana docker containers.
+- Removed previously deprecated `temperature` metrics.
 
 v0.13.0
 -------

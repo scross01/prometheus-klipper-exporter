@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"reflect"
 
+	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -52,4 +53,28 @@ func (c Collector) fetchMoonrakerDirectoryInfo(klipperHost string, apiKey string
 	}
 
 	return &response, nil
+}
+
+// collectDirectoryInfo
+func (c Collector) collectDirectoryInfo(ch chan<- prometheus.Metric) {
+	log.Infof("Collecting directory_info for %s", c.target)
+
+	result, err := c.fetchMoonrakerDirectoryInfo(c.target, c.apiKey)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
+		prometheus.GaugeValue,
+		float64(result.Result.DiskUsage.Total))
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc("klipper_disk_usage_used", "Klipper used disk space.", nil, nil),
+		prometheus.GaugeValue,
+		float64(result.Result.DiskUsage.Used))
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc("klipper_disk_usage_available", "Klipper available disk space.", nil, nil),
+		prometheus.GaugeValue,
+		float64(result.Result.DiskUsage.Free))
 }
