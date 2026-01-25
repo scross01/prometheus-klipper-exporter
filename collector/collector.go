@@ -706,7 +706,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					sensorName)
 			}
 
-            // heater_generic
+			// heater_generic
 			genericHeaterLabels := []string{"heater"}
 			genericHeaterTemperature := prometheus.NewDesc("klipper_generic_heater_temperature", "The temperature of the generic heater", genericHeaterLabels, nil)
 			genericHeaterTarget := prometheus.NewDesc("klipper_generic_heater_target", "The target temperature of the generic heater", genericHeaterLabels, nil)
@@ -718,7 +718,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.GaugeValue,
 					heater.Temperature,
 					heaterName)
-			    ch <- prometheus.MustNewConstMetric(
+				ch <- prometheus.MustNewConstMetric(
 					genericHeaterTarget,
 					prometheus.GaugeValue,
 					heater.Target,
@@ -728,6 +728,34 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 					prometheus.GaugeValue,
 					heater.Power,
 					heaterName)
+			}
+
+			// tmc sensors
+			tmcSensorLabels := []string{"sensor"}
+			tmcTemperatureSensor := prometheus.NewDesc("klipper_tmc_sensor_temperature", "The temperature of the tmc driver", tmcSensorLabels, nil)
+			tmcRunCurrentSensor := prometheus.NewDesc("klipper_tmc_sensor_run_current", "The run current of the tmc driver", tmcSensorLabels, nil)
+			tmcEnabledSensor := prometheus.NewDesc("klipper_tmc_sensor_enabled", "Whether the tmc driver is enabled or not", tmcSensorLabels, nil)
+
+			for sk, sv := range result.Result.Status.TmcSensors {
+				sensorName := getValidLabelName(strings.ReplaceAll(sk, " ", "_"))
+				if sv.Temperature != nil {
+					ch <- prometheus.MustNewConstMetric(
+						tmcTemperatureSensor,
+						prometheus.GaugeValue,
+						*sv.Temperature,
+						sensorName)
+				}
+				ch <- prometheus.MustNewConstMetric(
+					tmcRunCurrentSensor,
+					prometheus.GaugeValue,
+					sv.RunCurrent,
+					sensorName)
+
+				ch <- prometheus.MustNewConstMetric(
+					tmcEnabledSensor,
+					prometheus.GaugeValue,
+					boolToFloat64(sv.DrvStatus != nil),
+					sensorName)
 			}
 		}
 	}
