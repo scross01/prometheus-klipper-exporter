@@ -591,7 +591,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	mcuStalledBytes := prometheus.NewDesc("klipper_mcu_stalled_bytes", "Klipper mcu stalled bytes.", mcuLabels, nil)
 	mcuClockFrequency := prometheus.NewDesc("klipper_mcu_clock_frequency", "Klipper mcu clock frequency.", mcuLabels, nil)
 	for mk, mv := range result.Result.Status.Mcus {
-		sensorName := getValidLabelName(mk)
+		sensorName := GetValidLabelName(mk)
 		ch <- prometheus.MustNewConstMetric(
 			mcuAwake,
 			prometheus.GaugeValue,
@@ -788,7 +788,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	temperatureSensorMinTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_min_temp", "The measured minimum temperature of the temperature sensor", temperatureSensorLabels, nil)
 	temperatureSensorMaxTemp := prometheus.NewDesc("klipper_temperature_sensor_measured_max_temp", "The measured maximum temperature of the temperature sensor", temperatureSensorLabels, nil)
 	for sk, sv := range result.Result.Status.TemperatureSensors {
-		sensorName := getValidLabelName(sk)
+		sensorName := GetValidLabelName(sk)
 		ch <- prometheus.MustNewConstMetric(
 			temperatureSensor,
 			prometheus.GaugeValue,
@@ -812,7 +812,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	fanTemperature := prometheus.NewDesc("klipper_temperature_fan_temperature", "The temperature of the temperature fan", fanLabels, nil)
 	fanTarget := prometheus.NewDesc("klipper_temperature_fan_target", "The target temperature for the temperature fan", fanLabels, nil)
 	for fk, fv := range result.Result.Status.TemperatureFans {
-		fanName := getValidLabelName(fk)
+		fanName := GetValidLabelName(fk)
 		ch <- prometheus.MustNewConstMetric(
 			fanSpeed,
 			prometheus.GaugeValue,
@@ -837,7 +837,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	temperatureProbeMaxTemp := prometheus.NewDesc("klipper_temperature_probe_measured_max_temp", "The measured maximum temperature of the temperature probe", temperatureProbeLabels, nil)
 	temperatureProbeEstimatedExpansion := prometheus.NewDesc("klipper_temperature_probe_estimated_expansion", "The estimated of the temperature probe", temperatureProbeLabels, nil)
 	for sk, sv := range result.Result.Status.TemperatureProbes {
-		probeName := getValidLabelName(sk)
+		probeName := GetValidLabelName(sk)
 		ch <- prometheus.MustNewConstMetric(
 			temperatureProbe,
 			prometheus.GaugeValue,
@@ -864,7 +864,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	pinLabels := []string{"pin"}
 	pinValue := prometheus.NewDesc("klipper_output_pin_value", "The value of the output pin", pinLabels, nil)
 	for k, v := range result.Result.Status.OutputPins {
-		pinName := getValidLabelName(k)
+		pinName := GetValidLabelName(k)
 		ch <- prometheus.MustNewConstMetric(
 			pinValue,
 			prometheus.GaugeValue,
@@ -877,7 +877,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	genericFanSpeed := prometheus.NewDesc("klipper_generic_fan_speed", "The speed of the generic fan", genericFanLabels, nil)
 	genericFanRpm := prometheus.NewDesc("klipper_generic_fan_rpm", "The RPM of the generic fan", genericFanLabels, nil)
 	for fk, fv := range result.Result.Status.GenericFans {
-		fanName := getValidLabelName(fk)
+		fanName := GetValidLabelName(fk)
 		ch <- prometheus.MustNewConstMetric(
 			genericFanSpeed,
 			prometheus.GaugeValue,
@@ -895,7 +895,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	controllerFanSpeed := prometheus.NewDesc("klipper_controller_fan_speed", "The speed of the controller fan", controllerFanLabels, nil)
 	controllerFanRpm := prometheus.NewDesc("klipper_controller_fan_rpm", "The RPM of the controller fan", controllerFanLabels, nil)
 	for fk, fv := range result.Result.Status.ControllerFans {
-		fanName := getValidLabelName(fk)
+		fanName := GetValidLabelName(fk)
 		ch <- prometheus.MustNewConstMetric(
 			controllerFanSpeed,
 			prometheus.GaugeValue,
@@ -913,7 +913,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	filamentSensorDetected := prometheus.NewDesc("klipper_filament_sensor_detected", "Whether filament presence is detected by the sensor", filamentSensorLabels, nil)
 	filamentSensorEnabled := prometheus.NewDesc("klipper_filament_sensor_enabled", "Whether the filament sensor is enabled or not", filamentSensorLabels, nil)
 	for k, v := range result.Result.Status.FilamentSensors {
-		sensorName := getValidLabelName(k)
+		sensorName := GetValidLabelName(k)
 		ch <- prometheus.MustNewConstMetric(
 			filamentSensorDetected,
 			prometheus.GaugeValue,
@@ -932,7 +932,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	genericHeaterTarget := prometheus.NewDesc("klipper_generic_heater_target", "The target temperature of the generic heater", genericHeaterLabels, nil)
 	genericHeaterPower := prometheus.NewDesc("klipper_generic_heater_power", "The output power of the generic heater", genericHeaterLabels, nil)
 	for name, heater := range result.Result.Status.GenericHeaters {
-		heaterName := getValidLabelName(name)
+		heaterName := GetValidLabelName(name)
 		ch <- prometheus.MustNewConstMetric(
 			genericHeaterTemperature,
 			prometheus.GaugeValue,
@@ -957,7 +957,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	tmcEnabledSensor := prometheus.NewDesc("klipper_tmc_sensor_enabled", "Whether the tmc driver is enabled or not", tmcSensorLabels, nil)
 
 	for sk, sv := range result.Result.Status.TmcSensors {
-		sensorName := getValidLabelName(strings.ReplaceAll(sk, " ", "_"))
+		sensorName := GetValidLabelName(strings.ReplaceAll(sk, " ", "_"))
 		if sv.Temperature != nil {
 			ch <- prometheus.MustNewConstMetric(
 				tmcTemperatureSensor,

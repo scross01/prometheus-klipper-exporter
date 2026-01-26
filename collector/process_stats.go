@@ -165,7 +165,7 @@ func (c Collector) collectProcessAndNetworkStats(ch chan<- prometheus.Metric) bo
 		txDrop := prometheus.NewDesc("klipper_network_tx_drop", "Klipper network transmitted dropped packets.", networkLabels, nil)
 		bandwidth := prometheus.NewDesc("klipper_network_bandwidth", "Klipper network bandwidth.", networkLabels, nil)
 		for key, element := range result.Result.Network {
-			interfaceName := getValidLabelName(key)
+			interfaceName := GetValidLabelName(key)
 			ch <- prometheus.MustNewConstMetric(
 				rxBytes,
 				prometheus.CounterValue,

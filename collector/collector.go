@@ -29,7 +29,9 @@ func (c Collector) Describe(ch chan<- *prometheus.Desc) {
 // Regex to match all invalid characters
 var prometheusMetricNameInvalidCharactersRegex = regexp.MustCompile(`[^a-zA-Z0-9_]+`)
 
-func getValidLabelName(str string) string {
+// GetValidLabelName sanitizes a string to be used as a Prometheus label name
+// It converts hyphens to underscores and removes all other invalid characters
+func GetValidLabelName(str string) string {
 	// convert hyphens to underscores and strip out all other invalid characters
 	return prometheusMetricNameInvalidCharactersRegex.ReplaceAllString(strings.Replace(str, "-", "_", -1), "")
 }
