@@ -15,7 +15,7 @@ import (
 
 // Command line configuration options
 var (
-	loggingLevel  = flag.String("logging.level", "Info", "Logging output level. Set to one of Trace, Debug, Info, Warning, Error, Fatal, or Panic")
+	loggingLevel  = flag.String("logging.level", "info", "Logging output level. Set to one of trace, debug, info, warning, error, fatal, or panic")
 	klipperApiKey = flag.String("moonraker.apikey", "", "API Key to authenticate with the Klipper APIs.")
 	listenAddress = flag.String("web.listen-address", ":9101", "Address on which to expose metrics and web interface.")
 )
@@ -67,7 +67,7 @@ func main() {
 
 	flag.Parse()
 
-	level, err := log.ParseLevel(strings.ToLower(*loggingLevel))
+	level, err := log.ParseLevel(*loggingLevel)
 	if err != nil {
 		log.Fatalf("Invalid logging level '%s'", *loggingLevel)
 	}
