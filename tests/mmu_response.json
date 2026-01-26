@@ -1,0 +1,416 @@
+{
+  "result": {
+    "eventtime": 100239.852833172,
+    "status": {
+      "mmu": {
+        "enabled": true,
+        "num_gates": 8,
+        "is_homed": true,
+        "is_locked": true,
+        "is_paused": true,
+        "is_in_print": true,
+        "print_state": "pause_locked",
+        "unit": 0,
+        "tool": 3,
+        "gate": 0,
+        "active_filament": {
+          "filament_name": "ABS Matt Pastelltürkis ",
+          "material": "ABS",
+          "color": "7AADACFF",
+          "spool_id": 5,
+          "temperature": 275
+        },
+        "num_toolchanges": 32,
+        "last_tool": 1,
+        "next_tool": -1,
+        "toolchange_purge_volume": 0.0,
+        "last_toolchange": "> T3",
+        "runout": false,
+        "operation": "toolchange",
+        "filament": "Loaded",
+        "filament_position": 1120.183438184412,
+        "filament_pos": 10,
+        "filament_direction": 1,
+        "pending_spool_id": -1,
+        "ttg_map": [
+          1,
+          2,
+          3,
+          0,
+          4,
+          5,
+          6,
+          7
+        ],
+        "endless_spool_groups": [
+          0,
+          3,
+          2,
+          1,
+          4,
+          5,
+          6,
+          7
+        ],
+        "gate_status": [
+          2,
+          2,
+          2,
+          2,
+          0,
+          0,
+          0,
+          0
+        ],
+        "gate_filament_name": [
+          "ABS Matt Pastelltürkis ",
+          "ABS Matt Pastellviolett RAL 4009",
+          "ABS Matt Weissgrün RAL",
+          "ABS Matt Pastellrosa",
+          "Unknown",
+          "Unknown",
+          "Unknown",
+          "Unknown"
+        ],
+        "gate_material": [
+          "ABS",
+          "ABS",
+          "ABS",
+          "ABS",
+          "Unknown",
+          "Unknown",
+          "Unknown",
+          "Unknown"
+        ],
+        "gate_color": [
+          "7AADACFF",
+          "9D8692FF",
+          "B9CEACFF",
+          "EFB9C0FF",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "gate_temperature": [
+          275,
+          275,
+          275,
+          275,
+          260,
+          260,
+          260,
+          260
+        ],
+        "gate_spool_id": [
+          5,
+          4,
+          15,
+          14,
+          -1,
+          -1,
+          -1,
+          -1
+        ],
+        "gate_speed_override": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "gate_color_rgb": [
+          [
+            0.478,
+            0.678,
+            0.675
+          ],
+          [
+            0.616,
+            0.525,
+            0.573
+          ],
+          [
+            0.725,
+            0.808,
+            0.675
+          ],
+          [
+            0.937,
+            0.725,
+            0.753
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "slicer_color_rgb": [
+          [
+            0.478,
+            0.678,
+            0.675
+          ],
+          [
+            0.616,
+            0.525,
+            0.573
+          ],
+          [
+            0.725,
+            0.808,
+            0.675
+          ],
+          [
+            0.937,
+            0.725,
+            0.753
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            0.0
+          ]
+        ],
+        "tool_extrusion_multipliers": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "tool_speed_multipliers": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "slicer_tool_map": {
+          "tools": {
+            "0": {
+              "color": "9d8692",
+              "material": "ABS",
+              "temp": 270,
+              "name": "CR-3D ABS Matt Weissgrün",
+              "in_use": true
+            },
+            "1": {
+              "color": "b9ceac",
+              "material": "ABS",
+              "temp": 270,
+              "name": "CR-3D ABS Matt Weissgrün",
+              "in_use": true
+            },
+            "2": {
+              "color": "efb9c0",
+              "material": "ABS",
+              "temp": 270,
+              "name": "CR-3D ABS Matt Weissgrün",
+              "in_use": true
+            },
+            "3": {
+              "color": "7aadac",
+              "material": "ABS",
+              "temp": 270,
+              "name": "CR-3D ABS Matt Weissgrün",
+              "in_use": true
+            }
+          },
+          "referenced_tools": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "initial_tool": 2,
+          "purge_volumes": [
+            [
+              0,
+              215.0,
+              219.0,
+              124.0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              60.0,
+              0,
+              91.0,
+              60.0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              60.0,
+              75.0,
+              0,
+              102.0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              67.0,
+              180.0,
+              227.0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ]
+          ],
+          "total_toolchanges": 76,
+          "skip_automap": false
+        },
+        "action": "Idle",
+        "has_bypass": true,
+        "sync_drive": false,
+        "sync_feedback_state": "disabled",
+        "sync_feedback_enabled": 1,
+        "clog_detection": 2,
+        "clog_detection_enabled": 2,
+        "endless_spool": 1,
+        "endless_spool_enabled": 1,
+        "print_start_detection": 1,
+        "reason_for_pause": "Unload sequence failed because:\nFailed to unload gate because did not clear the encoder after moving 120.0mm.\nOccured when changing tool: T1 > T3",
+        "extruder_filament_remaining": 0.0,
+        "spoolman_support": "push",
+        "bowden_progress": -1,
+        "espooler_active": "",
+        "servo": "Up",
+        "sensors": {
+          "mmu_pre_gate": true,
+          "filament_compression": false,
+          "filament_tension": false,
+          "extruder": true,
+          "toolhead": true
+        },
+        "encoder": {
+          "encoder_pos": 1159.9,
+          "detection_length": 12.8,
+          "min_headroom": 12.8,
+          "headroom": 17.8,
+          "desired_headroom": 5.0,
+          "detection_mode": 2,
+          "enabled": false,
+          "flow_rate": 0
+        }
+      },
+      "mmu_encoder mmu_encoder": {
+        "encoder_pos": 1159.9,
+        "detection_length": 12.8,
+        "min_headroom": 12.8,
+        "headroom": 17.8,
+        "desired_headroom": 5.0,
+        "detection_mode": 2,
+        "enabled": false,
+        "flow_rate": 0
+      },
+      "mmu_machine": {
+        "unit_0": {
+          "name": "ERCF",
+          "vendor": "ERCF",
+          "version": "2.5",
+          "num_gates": 8,
+          "first_gate": 0,
+          "selector_type": "LinearSelector",
+          "variable_rotation_distances": true,
+          "variable_bowden_lengths": false,
+          "require_bowden_move": true,
+          "filament_always_gripped": false,
+          "has_bypass": true,
+          "multi_gear": false,
+          "environment_sensor": ""
+        },
+        "num_units": 1
+      }
+    }
+  }
+}
