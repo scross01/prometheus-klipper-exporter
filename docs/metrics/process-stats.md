@@ -19,6 +19,8 @@ metrics from the Klipper host.
 | `klipper_system_memory_total` | Gauge | Total system memory |
 | `klipper_system_memory_used` | Gauge | Used system memory |
 | `klipper_system_uptime` | Counter | System uptime in seconds |
+| `klipper_system_throttled_bits` | Gauge | Throttled state bitmask from the Raspberry Pi firmware |
+| `klipper_system_throttled_flag_info` | Gauge=1 | Active throttled state flags with `flag` label |
 
 ## Example PromQL
 
@@ -31,4 +33,10 @@ klipper_system_cpu_temp
 
 # System uptime in days
 klipper_system_uptime / 86400
+
+# Throttled state (non-zero means throttling occurred)
+klipper_system_throttled_bits
+
+# Active throttling flags (e.g., under-voltage, frequency capped)
+klipper_system_throttled_flag_info
 ```

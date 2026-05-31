@@ -6,6 +6,8 @@ v0.15.0
 
 - Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
 - Add `klipper_webhooks_state_info`, `klipper_pause_resume_is_paused`, `klipper_idle_timeout_state_info`, and `klipper_sdcard_active` metrics to `printer_objects` module
+- Add `klipper_system_throttled_bits` and `klipper_system_throttled_flag_info` metrics to `process_stats` module
+- Add `klipper_job_queue_state_info` metric to `job_queue` module
 - Add VitePress documentation site with metrics reference, guides, and local search
 - Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON
 - Fix missing `temperature_probe` query loop in `printer_objects` collector

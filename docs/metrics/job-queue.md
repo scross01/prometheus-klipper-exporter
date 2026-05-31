@@ -10,6 +10,7 @@ Collects the current job queue length from Moonraker.
 | Metric | Type | Description |
 |--------|------|-------------|
 | `klipper_job_queue_length` | Gauge | Number of jobs currently in the queue |
+| `klipper_job_queue_state_info` | Gauge=1 | Queue state (`ready`, `loading`, `starting`, `paused`) with `state` label |
 
 ## Example PromQL
 
@@ -19,4 +20,7 @@ klipper_job_queue_length
 
 # Alert if queue is growing
 rate(klipper_job_queue_length[5m]) > 0
+
+# Current queue state
+klipper_job_queue_state_info
 ```

@@ -17,6 +17,7 @@ type MoonrakerProcessStatsQueryResponse struct {
 		SystemMemory         MoonrakerSystemMemory            `json:"system_memory"`
 		SystemUptime         float64                          `json:"system_uptime"`
 		WebsocketConnections int                              `json:"websocket_connectsions"`
+		ThrottledState      MoonrakerThrottledState           `json:"throttled_state"`
 	} `json:"result"`
 }
 
@@ -53,6 +54,11 @@ type MoonrakerSystemMemory struct {
 	Used      int `json:"used"`
 }
 
+type MoonrakerThrottledState struct {
+	Bits  float64  `json:"bits"`
+	Flags []string `json:"flags"`
+}
+
 func (c Collector) collectProcessAndNetworkStats(ch chan<- prometheus.Metric) bool {
 	log.Infof("Collecting process_stats for %s", c.target)
 
@@ -85,6 +91,11 @@ func (c Collector) collectProcessAndNetworkStats(ch chan<- prometheus.Metric) bo
 		c.emitGauge(ch, "klipper_system_memory_available", "Klipper system available memory.", float64(result.Result.SystemMemory.Available))
 		c.emitGauge(ch, "klipper_system_memory_used", "Klipper system used memory.", float64(result.Result.SystemMemory.Used))
 		c.emitCounter(ch, "klipper_system_uptime", "Klipper system uptime.", result.Result.SystemUptime)
+
+		c.emitGauge(ch, "klipper_system_throttled_bits", "Klipper system throttled state bitmask.", result.Result.ThrottledState.Bits)
+		for _, flag := range result.Result.ThrottledState.Flags {
+			emitStateInfoMetric(ch, "klipper_system_throttled_flag_info", "Klipper system throttled state flag.", "flag", flag)
+		}
 	}
 
 	// Network Stats

@@ -78,7 +78,7 @@ image.
 ### Starting the Environment
 
 ```sh
-docker compose up -d   # from test/ directory
+docker compose up -d --build  # from test/ directory
 ```
 
 ### Services

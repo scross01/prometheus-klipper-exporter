@@ -28,4 +28,5 @@ func (c Collector) collectJobQueue(ch chan<- prometheus.Metric) {
 	}
 
 	c.emitGauge(ch, "klipper_job_queue_length", "Klipper job queue length.", float64(len(result.Result.QueuedJobs)))
+	emitStateInfoMetric(ch, "klipper_job_queue_state_info", "The current state of the job queue.", "state", result.Result.QueueState)
 }
