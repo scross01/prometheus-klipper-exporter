@@ -70,22 +70,10 @@ func (c Collector) collectActivePrint(ch chan<- prometheus.Metric) {
 	if len(result.Result.Jobs) < 1 {
 		log.Info("No active print in Current Print repsonse, skipping current print metrics")
 	} else {
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_object_height", "Klipper current print object height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_first_layer_height", "Klipper current print first layer height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_layer_height", "Klipper current print layer height", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_current_print_total_duration", "Klipper current print total duration", nil, nil),
-			prometheus.GaugeValue,
-			c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
+		c.emitGauge(ch, "klipper_current_print_object_height", "Klipper current print object height", c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.ObjectHeight))
+		c.emitGauge(ch, "klipper_current_print_first_layer_height", "Klipper current print first layer height", c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.FirstLayerHeight))
+		c.emitGauge(ch, "klipper_current_print_layer_height", "Klipper current print layer height", c.checkConditionStatusPrint(result, result.Result.Jobs[0].Metadata.LayerHeight))
+		c.emitGauge(ch, "klipper_current_print_total_duration", "Klipper current print total duration", c.checkConditionStatusPrint(result, result.Result.Jobs[0].TotalDuration))
 	}
 }
 
@@ -97,28 +85,10 @@ func (c Collector) collectHistory(ch chan<- prometheus.Metric) {
 		log.Error(err)
 		return
 	}
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_total_jobs", "Klipper number of total jobs.", nil, nil),
-		prometheus.GaugeValue,
-		float64(result.Result.JobTotals.Jobs))
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_total_time", "Klipper total time.", nil, nil),
-		prometheus.GaugeValue,
-		result.Result.JobTotals.TotalTime)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_total_print_time", "Klipper total print time.", nil, nil),
-		prometheus.GaugeValue,
-		result.Result.JobTotals.PrintTime)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_total_filament_used", "Klipper total meters of filament used.", nil, nil),
-		prometheus.GaugeValue,
-		result.Result.JobTotals.FilamentUsed)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_longest_job", "Klipper total longest job.", nil, nil),
-		prometheus.GaugeValue,
-		result.Result.JobTotals.LongestJob)
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_longest_print", "Klipper total longest print.", nil, nil),
-		prometheus.GaugeValue,
-		result.Result.JobTotals.LongestPrint)
+	c.emitGauge(ch, "klipper_total_jobs", "Klipper number of total jobs.", float64(result.Result.JobTotals.Jobs))
+	c.emitGauge(ch, "klipper_total_time", "Klipper total time.", result.Result.JobTotals.TotalTime)
+	c.emitGauge(ch, "klipper_total_print_time", "Klipper total print time.", result.Result.JobTotals.PrintTime)
+	c.emitGauge(ch, "klipper_total_filament_used", "Klipper total meters of filament used.", result.Result.JobTotals.FilamentUsed)
+	c.emitGauge(ch, "klipper_longest_job", "Klipper total longest job.", result.Result.JobTotals.LongestJob)
+	c.emitGauge(ch, "klipper_longest_print", "Klipper total longest print.", result.Result.JobTotals.LongestPrint)
 }

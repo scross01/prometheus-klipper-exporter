@@ -221,40 +221,13 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	machine := result.Result.Status.MMUMachine
 
 	// === Basic State Metrics ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_enabled", "MMU enabled state", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(mmu.Enabled))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_homed", "MMU homed state", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(mmu.IsHomed))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_num_gates", "Number of MMU gates", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.NumGates))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_has_bypass", "MMU has bypass gate", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(mmu.HasBypass))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_current_unit", "Current MMU unit", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.Unit))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_current_tool", "Current tool (-1=unknown, -2=bypass)", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.Tool))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_current_gate", "Current gate", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.Gate))
+	c.emitGauge(ch, "klipper_mmu_enabled", "MMU enabled state", boolToFloat64(mmu.Enabled))
+	c.emitGauge(ch, "klipper_mmu_homed", "MMU homed state", boolToFloat64(mmu.IsHomed))
+	c.emitGauge(ch, "klipper_mmu_num_gates", "Number of MMU gates", float64(mmu.NumGates))
+	c.emitGauge(ch, "klipper_mmu_has_bypass", "MMU has bypass gate", boolToFloat64(mmu.HasBypass))
+	c.emitGauge(ch, "klipper_mmu_current_unit", "Current MMU unit", float64(mmu.Unit))
+	c.emitGauge(ch, "klipper_mmu_current_tool", "Current tool (-1=unknown, -2=bypass)", float64(mmu.Tool))
+	c.emitGauge(ch, "klipper_mmu_current_gate", "Current gate", float64(mmu.Gate))
 
 	// === Print State ===
 	emitStateInfoMetric(ch, "klipper_mmu_print_state_info", "MMU print state", "state", mmu.PrintState)
@@ -270,69 +243,26 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	if mmu.Filament == "Loaded" {
 		filamentLoaded = 1.0
 	}
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_filament_loaded", "Filament loaded state", nil, nil),
-		prometheus.GaugeValue,
-		filamentLoaded)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_filament_position_mm", "Filament position in mm", nil, nil),
-		prometheus.GaugeValue,
-		mmu.FilamentPosition)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_filament_pos_state", "Filament position state machine value", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.FilamentPos))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_filament_direction", "Filament direction (1=load, -1=unload)", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.FilamentDirection))
+	c.emitGauge(ch, "klipper_mmu_filament_loaded", "Filament loaded state", filamentLoaded)
+	c.emitGauge(ch, "klipper_mmu_filament_position_mm", "Filament position in mm", mmu.FilamentPosition)
+	c.emitGauge(ch, "klipper_mmu_filament_pos_state", "Filament position state machine value", float64(mmu.FilamentPos))
+	c.emitGauge(ch, "klipper_mmu_filament_direction", "Filament direction (1=load, -1=unload)", float64(mmu.FilamentDirection))
 
 	// === Toolchange Metrics ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_toolchanges_total", "Total toolchanges in current print", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.NumToolchanges))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_last_tool", "Last tool used", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.LastTool))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_next_tool", "Next tool during toolchange", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.NextTool))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_toolchange_purge_volume_mm3", "Suggested purge volume in mm³", nil, nil),
-		prometheus.GaugeValue,
-		mmu.ToolchangePurgeVolume)
+	c.emitGauge(ch, "klipper_mmu_toolchanges_total", "Total toolchanges in current print", float64(mmu.NumToolchanges))
+	c.emitGauge(ch, "klipper_mmu_last_tool", "Last tool used", float64(mmu.LastTool))
+	c.emitGauge(ch, "klipper_mmu_next_tool", "Next tool during toolchange", float64(mmu.NextTool))
+	c.emitGauge(ch, "klipper_mmu_toolchange_purge_volume_mm3", "Suggested purge volume in mm³", mmu.ToolchangePurgeVolume)
 
 	// === Runout ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_runout", "Runout detected", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(mmu.Runout))
+	c.emitGauge(ch, "klipper_mmu_runout", "Runout detected", boolToFloat64(mmu.Runout))
 
 	// === Detection Settings ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_clog_detection_mode", "Clog detection mode (0=off, 1=manual, 2=auto)", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.ClogDetectionEnabled))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_endless_spool_enabled", "Endless spool enabled (0=off, 1=enabled, 2=pre-gate)", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.EndlessSpoolEnabled))
+	c.emitGauge(ch, "klipper_mmu_clog_detection_mode", "Clog detection mode (0=off, 1=manual, 2=auto)", float64(mmu.ClogDetectionEnabled))
+	c.emitGauge(ch, "klipper_mmu_endless_spool_enabled", "Endless spool enabled (0=off, 1=enabled, 2=pre-gate)", float64(mmu.EndlessSpoolEnabled))
 
 	// === Sync Drive ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_sync_drive_enabled", "Gear stepper synced to extruder", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(mmu.SyncDrive))
+	c.emitGauge(ch, "klipper_mmu_sync_drive_enabled", "Gear stepper synced to extruder", boolToFloat64(mmu.SyncDrive))
 
 	// Sync feedback state
 	emitStateInfoMetric(ch, "klipper_mmu_sync_feedback_state_info", "Sync feedback state", "state", mmu.SyncFeedbackState)
@@ -341,47 +271,17 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	emitStateInfoMetric(ch, "klipper_mmu_servo_position_info", "Servo position", "position", mmu.Servo)
 
 	// === Bowden Progress ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_bowden_progress_percent", "Bowden move progress (-1 if not active)", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.BowdenProgress))
+	c.emitGauge(ch, "klipper_mmu_bowden_progress_percent", "Bowden move progress (-1 if not active)", float64(mmu.BowdenProgress))
 
 	// === Encoder Metrics ===
 	encoder := mmu.Encoder
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_position_mm", "Encoder position in mm", nil, nil),
-		prometheus.GaugeValue,
-		encoder.EncoderPos)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_detection_length_mm", "Clog detection length in mm", nil, nil),
-		prometheus.GaugeValue,
-		encoder.DetectionLength)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_headroom_mm", "Current clog detection headroom in mm", nil, nil),
-		prometheus.GaugeValue,
-		encoder.Headroom)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_min_headroom_mm", "Minimum headroom recorded in mm", nil, nil),
-		prometheus.GaugeValue,
-		encoder.MinHeadroom)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_desired_headroom_mm", "Desired headroom in mm", nil, nil),
-		prometheus.GaugeValue,
-		encoder.DesiredHeadroom)
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_flow_rate_percent", "Encoder flow rate percent", nil, nil),
-		prometheus.GaugeValue,
-		float64(encoder.FlowRate))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_encoder_enabled", "Encoder enabled for clog detection", nil, nil),
-		prometheus.GaugeValue,
-		boolToFloat64(encoder.Enabled))
+	c.emitGauge(ch, "klipper_mmu_encoder_position_mm", "Encoder position in mm", encoder.EncoderPos)
+	c.emitGauge(ch, "klipper_mmu_encoder_detection_length_mm", "Clog detection length in mm", encoder.DetectionLength)
+	c.emitGauge(ch, "klipper_mmu_encoder_headroom_mm", "Current clog detection headroom in mm", encoder.Headroom)
+	c.emitGauge(ch, "klipper_mmu_encoder_min_headroom_mm", "Minimum headroom recorded in mm", encoder.MinHeadroom)
+	c.emitGauge(ch, "klipper_mmu_encoder_desired_headroom_mm", "Desired headroom in mm", encoder.DesiredHeadroom)
+	c.emitGauge(ch, "klipper_mmu_encoder_flow_rate_percent", "Encoder flow rate percent", float64(encoder.FlowRate))
+	c.emitGauge(ch, "klipper_mmu_encoder_enabled", "Encoder enabled for clog detection", boolToFloat64(encoder.Enabled))
 
 	// === Per-Gate Metrics ===
 	gateLabels := []string{"gate"}
@@ -466,15 +366,8 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	}
 
 	// === Slicer Tool Map Info ===
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_slicer_total_toolchanges", "Total toolchanges expected from slicer", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.SlicerToolMap.TotalToolchanges))
-
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_slicer_initial_tool", "Initial tool from slicer", nil, nil),
-		prometheus.GaugeValue,
-		float64(mmu.SlicerToolMap.InitialTool))
+	c.emitGauge(ch, "klipper_mmu_slicer_total_toolchanges", "Total toolchanges expected from slicer", float64(mmu.SlicerToolMap.TotalToolchanges))
+	c.emitGauge(ch, "klipper_mmu_slicer_initial_tool", "Initial tool from slicer", float64(mmu.SlicerToolMap.InitialTool))
 
 	// === Machine Info ===
 	machineInfoLabels := []string{"name", "vendor", "version", "selector_type"}
@@ -488,10 +381,7 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 		machine.Unit0.Version,
 		machine.Unit0.SelectorType)
 
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_mmu_num_units", "Number of MMU units", nil, nil),
-		prometheus.GaugeValue,
-		float64(machine.NumUnits))
+	c.emitGauge(ch, "klipper_mmu_num_units", "Number of MMU units", float64(machine.NumUnits))
 
 	// === Active Filament Info ===
 	if mmu.ActiveFilament.FilamentName != "" {
@@ -505,14 +395,7 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 			mmu.ActiveFilament.Material,
 			mmu.ActiveFilament.Color)
 
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mmu_active_filament_temperature", "Active filament temperature", nil, nil),
-			prometheus.GaugeValue,
-			float64(mmu.ActiveFilament.Temperature))
-
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_mmu_active_filament_spool_id", "Active filament Spoolman spool ID", nil, nil),
-			prometheus.GaugeValue,
-			float64(mmu.ActiveFilament.SpoolId))
+		c.emitGauge(ch, "klipper_mmu_active_filament_temperature", "Active filament temperature", float64(mmu.ActiveFilament.Temperature))
+		c.emitGauge(ch, "klipper_mmu_active_filament_spool_id", "Active filament Spoolman spool ID", float64(mmu.ActiveFilament.SpoolId))
 	}
 }

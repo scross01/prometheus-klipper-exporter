@@ -48,6 +48,22 @@ func boolToFloat64(boolean bool) (value float64) {
 	return value
 }
 
+// emitGauge is a convenience helper for emitting an unlabeled Gauge metric.
+func (c Collector) emitGauge(ch chan<- prometheus.Metric, name, desc string, value float64) {
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc(name, desc, nil, nil),
+		prometheus.GaugeValue,
+		value)
+}
+
+// emitCounter is a convenience helper for emitting an unlabeled Counter metric.
+func (c Collector) emitCounter(ch chan<- prometheus.Metric, name, desc string, value float64) {
+	ch <- prometheus.MustNewConstMetric(
+		prometheus.NewDesc(name, desc, nil, nil),
+		prometheus.CounterValue,
+		value)
+}
+
 // emitStateInfoMetric conditionally emits an info-style metric (Gauge=1) with a
 // single label carrying the state value, only when the state is non-empty.
 func emitStateInfoMetric(ch chan<- prometheus.Metric, metricName, description, labelName, stateValue string) {

@@ -72,46 +72,19 @@ func (c Collector) collectProcessAndNetworkStats(ch chan<- prometheus.Metric) bo
 			if memUnits != "kB" {
 				log.Errorf("Unexpected units %s for Moonraker memory usage", memUnits)
 			} else {
-				ch <- prometheus.MustNewConstMetric(
-					prometheus.NewDesc("klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", nil, nil),
-					prometheus.GaugeValue,
-					float64(result.Result.MoonrakerStats[moonrakerStatsCount-1].Memory))
+				c.emitGauge(ch, "klipper_moonraker_memory_kb", "Moonraker memory usage in Kb.", float64(result.Result.MoonrakerStats[moonrakerStatsCount-1].Memory))
 			}
 
-			ch <- prometheus.MustNewConstMetric(
-				prometheus.NewDesc("klipper_moonraker_cpu_usage", "Moonraker CPU usage.", nil, nil),
-				prometheus.GaugeValue,
-				result.Result.MoonrakerStats[moonrakerStatsCount-1].CpuUsage)
+			c.emitGauge(ch, "klipper_moonraker_cpu_usage", "Moonraker CPU usage.", result.Result.MoonrakerStats[moonrakerStatsCount-1].CpuUsage)
 		}
 
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_moonraker_websocket_connections", "Moonraker Websocket connection count.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.WebsocketConnections))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_cpu_temp", "Klipper system CPU temperature in celsius.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.CpuTemp)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_cpu", "Klipper system CPU usage.", nil, nil),
-			prometheus.GaugeValue,
-			result.Result.SystemCpuUsage.Cpu)
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_memory_total", "Klipper system total memory.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.SystemMemory.Total))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_memory_available", "Klipper system available memory.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.SystemMemory.Available))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_memory_used", "Klipper system used memory.", nil, nil),
-			prometheus.GaugeValue,
-			float64(result.Result.SystemMemory.Used))
-		ch <- prometheus.MustNewConstMetric(
-			prometheus.NewDesc("klipper_system_uptime", "Klipper system uptime.", nil, nil),
-			prometheus.CounterValue,
-			result.Result.SystemUptime)
+		c.emitGauge(ch, "klipper_moonraker_websocket_connections", "Moonraker Websocket connection count.", float64(result.Result.WebsocketConnections))
+		c.emitGauge(ch, "klipper_system_cpu_temp", "Klipper system CPU temperature in celsius.", result.Result.CpuTemp)
+		c.emitGauge(ch, "klipper_system_cpu", "Klipper system CPU usage.", result.Result.SystemCpuUsage.Cpu)
+		c.emitGauge(ch, "klipper_system_memory_total", "Klipper system total memory.", float64(result.Result.SystemMemory.Total))
+		c.emitGauge(ch, "klipper_system_memory_available", "Klipper system available memory.", float64(result.Result.SystemMemory.Available))
+		c.emitGauge(ch, "klipper_system_memory_used", "Klipper system used memory.", float64(result.Result.SystemMemory.Used))
+		c.emitCounter(ch, "klipper_system_uptime", "Klipper system uptime.", result.Result.SystemUptime)
 	}
 
 	// Network Stats

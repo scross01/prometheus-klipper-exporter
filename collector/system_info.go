@@ -28,8 +28,5 @@ func (c Collector) collectSystemInfo(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_system_cpu_count", "Klipper system CPU count.", nil, nil),
-		prometheus.GaugeValue,
-		float64(result.Result.SystemInfo.CpuInfo.CpuCount))
+	c.emitGauge(ch, "klipper_system_cpu_count", "Klipper system CPU count.", float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 }

@@ -27,16 +27,7 @@ func (c Collector) collectDirectoryInfo(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_disk_usage_total", "Klipper total disk space.", nil, nil),
-		prometheus.GaugeValue,
-		float64(result.Result.DiskUsage.Total))
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_disk_usage_used", "Klipper used disk space.", nil, nil),
-		prometheus.GaugeValue,
-		float64(result.Result.DiskUsage.Used))
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_disk_usage_available", "Klipper available disk space.", nil, nil),
-		prometheus.GaugeValue,
-		float64(result.Result.DiskUsage.Free))
+	c.emitGauge(ch, "klipper_disk_usage_total", "Klipper total disk space.", float64(result.Result.DiskUsage.Total))
+	c.emitGauge(ch, "klipper_disk_usage_used", "Klipper used disk space.", float64(result.Result.DiskUsage.Used))
+	c.emitGauge(ch, "klipper_disk_usage_available", "Klipper available disk space.", float64(result.Result.DiskUsage.Free))
 }

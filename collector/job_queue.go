@@ -27,8 +27,5 @@ func (c Collector) collectJobQueue(ch chan<- prometheus.Metric) {
 		return
 	}
 
-	ch <- prometheus.MustNewConstMetric(
-		prometheus.NewDesc("klipper_job_queue_length", "Klipper job queue length.", nil, nil),
-		prometheus.GaugeValue,
-		float64(len(result.Result.QueuedJobs)))
+	c.emitGauge(ch, "klipper_job_queue_length", "Klipper job queue length.", float64(len(result.Result.QueuedJobs)))
 }
