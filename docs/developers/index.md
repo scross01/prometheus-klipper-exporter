@@ -72,9 +72,17 @@ Test files live in `tests/` and follow standard Go testing patterns.
 
 ## Virtual Printer Test Environment
 
-The `test/` directory contains a Docker Compose-based test environment using
-the [virtual-klipper-printer](https://github.com/mainsail-crew/virtual-klipper-printer)
-image.
+The `test/` directory contains a Docker Compose-based test environment. It
+supports two virtual printer images that you can choose between in
+`test/docker-compose.yml`:
+
+| Option | Image | Description |
+|--------|-------|-------------|
+| **A** _(default)_ | `ghcr.io/pedrolamas/docker-klipper-simulavr` | Full MCU simulation via `simulavr`. Supports `SIMULAVR_PACING_RATE` to prevent "Timer too close" errors. Config path: `/printer/printer_data` |
+| **B** | `ghcr.io/mainsail-crew/virtual-klipper-printer` | Lighter API-level simulation. No MCU simulation. Config path: `/home/printer/printer_data` |
+
+To switch between them, uncomment your preferred option and comment out the
+other in `test/docker-compose.yml`.
 
 ### Starting the Environment
 
@@ -90,6 +98,20 @@ docker compose up -d --build  # from test/ directory
 | Mainsail | `http://localhost:8080` |
 | Prometheus | `http://localhost:9090` |
 | Grafana | `http://localhost:3000` |
+
+### Tuning `SIMULAVR_PACING_RATE`
+
+When using Option A (`docker-klipper-simulavr`), the `SIMULAVR_PACING_RATE`
+environment variable controls how fast the simulated MCU runs. If you see
+`MCU 'mcu' shutdown: Timer too close` in the container logs:
+
+1. **Reduce** the value in `test/docker-compose.yml` (e.g. `0.1` → `0.05` → `0.01`)
+2. Restart the container: `docker compose restart virtual-klipper`
+3. A lower value gives the host CPU more headroom by slowing the simulation
+4. Values above `0.2` are not recommended — they can starve the simulator and
+   make the timer issue worse
+5. The default of `0.1` works on most modern hardware; adjust based on your
+   system's CPU load
 
 ### Virtual Printer Configuration
 
@@ -135,7 +157,7 @@ params:
     - power_devices
 ```
 
-All metrics from these modules are available at `http://localhost:9101/probe?target=klipper:7125`.
+All metrics from these modules are available at `http://localhost:9101/probe?target=virtual-klipper:7125`.
 
 ### Grafana Dashboards
 
@@ -152,7 +174,7 @@ loaded from `test/grafana/provisioning/dashboards/`. They are available at
 | **Klipper MMU** | Multi-Material Unit | Gate/tool state, encoder data, filament status, toolchange tracking |
 
 The dashboards use `job` and `instance` template variables. For the test
-environment select `job=klipper` and `instance=klipper:7125`.
+environment select `job=klipper` and `instance=virtual-klipper:7125`.
 
 Each dashboard can also be imported manually into another Grafana instance from
 the JSON files in `test/grafana/provisioning/dashboards/`. The JSON uses a
@@ -174,14 +196,17 @@ When adding a new Klipper config section to exercise exporter code:
 
 **MCU `Timer too close` shutdown in simulavr**
 
-The `simulavr` MCU emulator in the virtual-klipper-printer Docker image
-consistently triggers `MCU shutdown: Timer too close` ~7 seconds after Klippy
-reaches the `ready` state. This is triggered by Moonraker's `objects/query`
-request and is a pre-existing bug in the upstream Docker image — it is **not**
-caused by any printer config section or addon file. The `custom_features.cfg`
-addon (`temperature_probe`, `heater_generic`) is safe to enable.
+When using Option A (`docker-klipper-simulavr`), the `simulavr` MCU emulator
+can trigger `MCU shutdown: Timer too close` if the host is under load. This is
+mitigated by setting `SIMULAVR_PACING_RATE` to a lower value — see the
+[Tuning section](#tuning-simulavrpacingrate) above.
 
-Symptoms:
+When using Option B (`virtual-klipper-printer`), the MCU shutdown is
+consistently triggered ~7 seconds after Klippy reaches the `ready` state by
+Moonraker's `objects/query` request. The old workaround was to restart the
+full stack repeatedly until a stable cycle occurred.
+
+Symptoms (either option):
 - Klippy cycles through ready → shutdown → auto-restart every ~30-60 seconds
 - Moonraker reports `klippy_state=shutdown` even while Klippy produces Stats
 - The UDS socket (`klippy.sock`) exists but does not respond to API requests
@@ -193,8 +218,8 @@ Impact on development:
   states, so the exporter and dashboards remain functional
 - Printer-object metrics (temperatures, fans, sensors) reflect the last cached
   values, not live readings, during a shutdown cycle
-- If you need longer ready windows for testing, restart the full stack with
-  `docker compose down && docker compose up -d` until a stable cycle occurs
+- Switching to Option A with a properly tuned `SIMULAVR_PACING_RATE` can
+  keep Klippy in `ready` state indefinitely
 
 ## Collector Implementation Guide
 

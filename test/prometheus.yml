@@ -4,7 +4,7 @@ scrape_configs:
     scrape_interval: 5s
     metrics_path: /probe
     static_configs:
-      - targets: [ 'klipper:7125' ] # the klipper host
+      - targets: [ 'virtual-klipper:7125' ] # the virtual klipper host
     params:
       modules: [
         'process_stats',

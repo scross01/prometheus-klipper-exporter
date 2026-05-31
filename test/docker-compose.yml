@@ -54,11 +54,36 @@ services:
     command:
       - '-logging.level=Trace'
 
-  klipper:
-    container_name: klipper
-    image: ghcr.io/mainsail-crew/virtual-klipper-printer:latest
+  # --------------------------------------------------------------------------
+  # Virtual Klipper Printer (choose one)
+  #
+  # Option A: pedrolamas/docker-klipper-simulavr (full MCU simulation with
+  #           SIMULAVR_PACING_RATE to avoid "Timer too close" errors)
+  #           - config path: /printer/printer_data
+  #
+  # Option B: mainsail-crew/virtual-klipper-printer (lighter API simulation)
+  #           - config path: /home/printer/printer_data
+  #
+  # Uncomment your preferred option and comment out the other.
+  # --------------------------------------------------------------------------
+
+  # --- Option A: pedrolamas/docker-klipper-simulavr ---
+  virtual-klipper:
+    container_name: virtual-klipper
+    image: ghcr.io/pedrolamas/docker-klipper-simulavr:latest
+    environment:
+      # SIMULAVR_PACING_RATE controls the speed of the simulated MCU.
+      # Lower values = slower simulation = more CPU headroom.
+      # If you see "MCU 'mcu' shutdown: Timer too close" in the logs,
+      # reduce this value (e.g. 0.05, 0.01). Values above 0.2 are not
+      # recommended as they can starve the simulator of CPU time.
+      - SIMULAVR_PACING_RATE=0.1
     volumes:
-      - ./printer_data:/home/printer/printer_data:delegated,Z
+      - ./printer_data:/printer/printer_data:delegated,Z
+      - type: tmpfs
+        target: /printer/printer_data/comms
+        tmpfs:
+          mode: 0777
     ports:
       - "7125:7125"
       # - "8110:8080"  # virtual camera not required
@@ -66,7 +91,21 @@ services:
       - dev_net
     tmpfs:
       - /tmp:noexec
-      - /home/printer/printer_data/comms:noexec
+
+  # --- Option B: mainsail-crew/virtual-klipper-printer ---
+  # virtual-klipper:
+  #   container_name: virtual-klipper
+  #   image: ghcr.io/mainsail-crew/virtual-klipper-printer:latest
+  #   volumes:
+  #     - ./printer_data:/home/printer/printer_data:delegated,Z
+  #   ports:
+  #     - "7125:7125"
+  #     # - "8110:8080"  # virtual camera not required
+  #   networks:
+  #     - dev_net
+  #   tmpfs:
+  #     - /tmp:noexec
+  #     - /home/printer/printer_data/comms:noexec
 
   mainsail:
     container_name: mainsail

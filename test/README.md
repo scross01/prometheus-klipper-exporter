@@ -22,7 +22,7 @@ Example dashboards are auto-provisioned on startup in a **Klipper** folder:
 - **Klipper Hardware** — MCU stats, fan speeds/RPMs, output pins, TMC drivers
 - **Klipper MMU** — Multi-Material Unit state, gate status, encoder
 
-Select `job=klipper` and `instance=klipper:7125` in the dashboard selectors.
+Select `job=klipper` and `instance=virtual-klipper:7125` in the dashboard selectors.
 
 Troubleshooting
 ---------------
