@@ -41,7 +41,9 @@ services:
 
   klipper-exporter:
     hostname: klipper-exporter
-    image: klipper-exporter:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: klipper-exporter
     restart: unless-stopped
     networks:

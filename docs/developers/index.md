@@ -1,0 +1,210 @@
+# Developers
+
+This page provides detailed information for developers working on the Prometheus
+Klipper Exporter.
+
+## Project Structure
+
+```
+.
+├── main.go                         # HTTP server, routing, CLI flags
+├── collector/
+│   ├── collector.go                # Prometheus Collector interface, shared utilities
+│   ├── process_stats.go            # /machine/proc_stats (CPU/memory)
+│   ├── network_stats.go            # /machine/proc_stats (network interfaces)
+│   ├── system_info.go              # /machine/system_info
+│   ├── job_queue.go                # /server/job_queue/status
+│   ├── directory_info.go           # /server/files/directory
+│   ├── history.go                  # /server/history/totals
+│   ├── printer_object.go           # /printer/objects/query
+│   └── mmu.go                      # /printer/objects/query (MMU objects)
+├── test/
+│   ├── docker-compose.yml          # Local test environment
+│   ├── printer_data/               # Virtual Klipper printer config
+│   ├── prometheus.yml              # Prometheus scrape config for local dev
+│   └── README.md                   # Quick start for test env
+├── docs/                           # VitePress documentation site
+├── example/                        # Docker deployment example
+└── Makefile                        # Build, fmt, test, release targets
+```
+
+### Key Architectural Patterns
+
+- **Multi-Target Exporter**: A single exporter instance scrapes multiple Klipper
+  hosts using the `/probe?target=<host>` endpoint
+- **Collector Interface**: Each module implements `prometheus.Collector`
+  (`Describe()` + `Collect()`)
+- **Module Gating**: Features are enabled via `slices.Contains(c.modules, "name")`
+  guards in `Collect()`
+- **API Key Priority**: Header > CLI flag (`-moonraker.apikey`) > Environment
+  variable (`MOONRAKER_APIKEY`)
+
+## Building and Testing
+
+### Prerequisites
+
+- Go 1.25+
+- Make
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `make build` | Build the exporter binary |
+| `make run` | Run the exporter locally |
+| `make fmt` | Format Go code |
+| `make test` | Run all tests |
+| `make release` | Cross-compile for all platforms |
+
+### Cross-Compilation
+
+The `make release` target builds for Raspberry Pi (ARM), Linux (AMD64), macOS
+(AMD64/ARM64), and Windows (AMD64) using `GOOS`/`GOARCH` environment variables.
+
+### Running Tests
+
+```sh
+make test
+```
+
+Test files live in `tests/` and follow standard Go testing patterns.
+
+## Virtual Printer Test Environment
+
+The `test/` directory contains a Docker Compose-based test environment using
+the [virtual-klipper-printer](https://github.com/mainsail-crew/virtual-klipper-printer)
+image.
+
+### Starting the Environment
+
+```sh
+docker compose up -d   # from test/ directory
+```
+
+### Services
+
+| Service | URL |
+|---------|-----|
+| Klipper/Moonraker | `http://localhost:7125` |
+| Mainsail | `http://localhost:8080` |
+| Prometheus | `http://localhost:9090` |
+| Grafana | `http://localhost:3000` |
+
+### Virtual Printer Configuration
+
+The virtual printer config lives in `test/printer_data/config/`. The
+`printer.cfg` includes addon configs from `test/printer_data/config/addons/`.
+
+#### Pin Assignments
+
+The virtual MCU is an AVR atmega644p with the following available pins:
+
+- **PORTA**: PA0, PA1, PA2, PA3, PA4, PA5, PA6, PA7
+- **PORTB**: PB0, PB1, PB2, PB3, PB4, PB5, PB6, PB7
+- **PORTC**: PC0, PC1, PC2, PC3, PC4, PC5, PC6, PC7
+- **PORTD**: PD0, PD1, PD2, PD3, PD4, PD5, PD6, PD7
+
+#### Addon Configs
+
+| Addon File | Sections Defined | Pins Used |
+|------------|-----------------|-----------|
+| `basic_cartesian_kinematics.cfg` | `stepper_x`, `stepper_y`, `stepper_z`, `extruder` | step/dir pins |
+| `basic_macros.cfg` | G-code macros | — |
+| `single_extruder.cfg` | `extruder` | heater, sensor pins |
+| `heater_bed.cfg` | `heater_bed` | heater, sensor pins |
+| `temp_sensors.cfg` | `temperature_sensor`, `temperature_fan` | PA1, PA4, PD2, PD3 |
+| `miscellaneous.cfg` | `fan`, `heater_fan`, `controller_fan`, `filament_motion_sensor`, `output_pin` | PB4, PB5, PB6, PC0, PC1 |
+| `custom_features.cfg` | `temperature_probe`, `fan_generic`, `heater_generic` | PA2, PA3, PD0, PD1 |
+| `timelapse.cfg` | Moonraker timelapse | — |
+
+#### Prometheus Scrape Config
+
+The test environment's `prometheus.yml` scrapes these modules:
+
+```yaml
+params:
+  modules:
+    - process_stats
+    - network_stats
+    - system_info
+    - job_queue
+    - directory_info
+    - printer_objects
+    - history
+```
+
+All metrics from these modules are available at `http://localhost:9101/probe?target=klipper:7125`.
+
+### Adding New Config Sections
+
+When adding a new Klipper config section to exercise exporter code:
+
+1. **Check pin conflicts**: Ensure the pin isn't already used by another addon.
+   Available pins are listed above.
+2. **Add or modify an addon file**: Create a new `.cfg` in `addons/` or modify
+   an existing one.
+3. **Include it in `printer.cfg`**: Add an `[include addons/your_file.cfg]` line.
+4. **Restart the container**: The virtual printer will reload config on restart.
+
+## Collector Implementation Guide
+
+### Adding a New Module
+
+1. Create a new file in `collector/` with:
+   - A `collect*()` method that fetches data and emits metrics
+   - Helper types for JSON response unmarshalling
+   - A `fetchMoonraker*()` function for the API call
+
+2. Register the module in `collector.go`'s `Collect()` method:
+   ```go
+   if slices.Contains(c.modules, "your_module") {
+       c.collectYourModule(ch, target, apikey)
+   }
+   ```
+
+3. If the module should be enabled by default, add it to the default modules
+   list in `main.go`.
+
+### Metric Naming Conventions
+
+- **Prefix**: `klipper_*`
+- **Case**: snake_case
+- **Suffix conventions**:
+  - `_info` — labeled state gauges for enumerated values (e.g. `klipper_print_state_info{state="printing"}`)
+  - `_total` — counters
+  - `_celsius`, `_mm`, `_seconds` — unit suffixes
+- **Do not** expose arbitrary strings (error messages, filenames) as labels
+
+### Shared Utilities (in `collector.go`)
+
+| Function | Purpose |
+|----------|---------|
+| `GetValidLabelName()` | Converts hyphens to underscores, strips invalid characters |
+| `boolToFloat64()` | Converts `bool` to `0.0`/`1.0` for Prometheus |
+| `emitStateInfoMetric()` | Emits a `_info` metric for string states with known values |
+
+### Error Handling
+
+Log the error with `log.Error(err)` and return early. An error in one module
+should not prevent other modules from collecting.
+
+## Documentation Site
+
+The documentation site uses [VitePress](https://vitepress.dev/) and is deployed
+to GitHub Pages from the `main` branch.
+
+### Previewing Locally
+
+```sh
+cd docs
+npm install
+npm run dev     # hot-reload dev server
+npm run build   # production build
+npm run preview # preview production build
+```
+
+### Adding a Docs Page
+
+1. Create the `.md` file in the appropriate `docs/` subdirectory
+2. Register it in `docs/.vitepress/config.js` in the relevant sidebar section
+3. Verify the build with `npm run build`

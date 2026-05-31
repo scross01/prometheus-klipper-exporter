@@ -6,6 +6,9 @@ v0.15.0
 
 - Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
 - Add VitePress documentation site with metrics reference, guides, and local search
+- Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON
+- Fix missing `temperature_probe` query loop in `printer_objects` collector
+- Enable additional Klipper config sections in virtual test environment (`temperature_sensor`, `temperature_fan`, `temperature_probe`, `fan_generic`, `heater_generic`)
 
 v0.14.0
 -------

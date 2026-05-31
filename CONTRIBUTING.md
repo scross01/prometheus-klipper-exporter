@@ -1,7 +1,7 @@
 Contributing to Prometheus Klipper Exporter
 ==========================================
 
-Thank you for your interest in contributing to the Prometheus Klipper Exporter 
+Thank you for your interest in contributing to the Prometheus Klipper Exporter
 project! This guide will help you understand how to contribute effectively.
 
 Getting Started
@@ -28,6 +28,9 @@ Getting Started
    ```sh
    make build
    ```
+
+For detailed information about the project structure, build commands, test
+environment, and implementation patterns, see the [Developers Guide](docs/developers/).
 
 How to Contribute
 -----------------
@@ -62,7 +65,7 @@ Before reporting an issue, please:
 - Large changes should be discussed in an issue first
 
 Development Guidelines
-----------------------
+---------------------
 
 ### Architecture Overview
 
@@ -73,6 +76,9 @@ The project follows these key architectural patterns:
 - **Module System**: Each collector file handles specific Klipper API endpoints
 - **Documentation Site**: `docs/` is a [VitePress](https://vitepress.dev/) site published to GitHub Pages
 
+For detailed architecture and implementation guidance, refer to the
+[Developers Guide](docs/developers/).
+
 ### Coding Standards
 
 #### Go Code Style
@@ -80,7 +86,6 @@ The project follows these key architectural patterns:
 - Follow standard Go formatting (`go fmt`)
 - Use meaningful variable and function names
 - Keep functions focused and small
-- Add comments for complex logic
 - Follow the existing code patterns and conventions
 
 #### Markdown Style
@@ -90,46 +95,22 @@ The project follows these key architectural patterns:
 - Use ATX headers for subsections (prefixed with `#`)
 - Keep line length reasonable (MD013 rule)
 
-### Key Patterns to Follow
-
-1. **Metric Name Sanitization**: Use `GetValidLabelName()` from collector.go for Prometheus-compatible labels
-2. **Boolean Conversion**: Use `boolToFloat64()` for converting booleans to 0/1 values
-3. **State Fields**: Use `emitStateInfoMetric()` for string state fields with enumerated values (e.g. `klipper_print_state_info{state="..."}`)
-4. **Module Registration**: Add a `slices.Contains(c.modules, "module_name")` guard in `Collect()` and register in `collector.go`
-5. **New Collector Files**: Create a new file in `collector/` with a `collect*()` method, add it to `Collect()` in `collector.go`, and register the module name in `main.go` if it should be a default
-6. **API Response Handling**: Implement `fetchMoonraker*` functions for HTTP requests and JSON parsing
-7. **Error Handling**: Return early on errors but log them first using `log.Error(err)`
-
 ### Naming Conventions
 
 - **Prometheus Metrics**: Use `klipper_*` prefix with snake_case naming
 
-## Testing
-
-### Running Tests
-
-```sh
-# Run all tests
-make test
-
-# Run specific test file
-go test ./tests/label_sanitization_test.go -v
-```
-
-### Writing Tests
-
-- Add tests for any new utility functions
-- Follow existing test patterns in `tests/`
+For full details on metric naming, shared utilities, and module registration
+patterns, see the [Developers Guide](docs/developers/#collector-implementation-guide).
 
 ### Validation
 
 Before submitting your changes:
 
-1. Run all tests to ensure nothing is broken
-2. Verify the code builds without warnings
-3. Check formatting with `make fmt`
+1. Run all tests to ensure nothing is broken: `make test`
+2. Verify the code builds without warnings: `make build`
+3. Check formatting: `make fmt`
 4. If docs were changed, build the site to verify: `cd docs && npm run build`
-5. Test manually if applicable
+5. Test manually using the [virtual printer environment](docs/developers/#virtual-printer-test-environment)
 
 Documentation
 -------------
@@ -144,21 +125,12 @@ The docs live in the `docs/` directory.
 #### Building and previewing locally
 
 ```sh
-# Install dependencies
 cd docs
 npm install
-
-# Start the dev server (hot-reload)
-npm run dev
-
-# Build the static site
-npm run build
-
-# Preview the built site
-npm run preview
+npm run dev     # Start the dev server (hot-reload)
+npm run build   # Build the static site
+npm run preview # Preview the built site
 ```
-
-The build output is written to `docs/.vitepress/dist/`.
 
 #### Project documentation
 
@@ -168,6 +140,8 @@ The build output is written to `docs/.vitepress/dist/`.
 - Register any new metric pages in the sidebar at `docs/.vitepress/config.js`
 - Add examples for new configuration options
 - Follow `.markdownlint.json` rules (`setext_with_atx` headers, reasonable line length)
+
+For documentation contribution details, see the [Developers Guide](docs/developers/#documentation-site).
 
 Community Guidelines
 --------------------

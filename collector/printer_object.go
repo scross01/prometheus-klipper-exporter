@@ -279,6 +279,7 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 		f.Mcus = microcontrollers
 		f.TemperatureSensors = temperatureSensors
 		f.TemperatureFans = temperatureFans
+		f.TemperatureProbes = temperatureProbes
 		f.OutputPins = outputPins
 		f.GenericFans = genericFans
 		f.ControllerFans = controllerFans
@@ -428,6 +429,9 @@ func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error
 	}
 	for tf := range customTemperatureFans[c.target] {
 		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[c.target][tf]
+	}
+	for tp := range customTemperatureProbes[c.target] {
+		customSensorsQuery += "&temperature_probe%20" + customTemperatureProbes[c.target][tp]
 	}
 	for op := range customOutputPins[c.target] {
 		customSensorsQuery += "&output_pin%20" + customOutputPins[c.target][op]

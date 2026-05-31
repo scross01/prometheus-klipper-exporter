@@ -10,6 +10,7 @@ export default withMermaid(defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/' },
       { text: 'Metrics', link: '/metrics/' },
+      { text: 'Developers', link: '/developers/' },
       { text: 'GitHub', link: 'https://github.com/scross01/prometheus-klipper-exporter' },
     ],
 
@@ -38,6 +39,14 @@ export default withMermaid(defineConfig({
             { text: 'History', link: '/metrics/history' },
             { text: 'Printer Objects', link: '/metrics/printer-objects' },
             { text: 'MMU', link: '/metrics/mmu' },
+          ],
+        },
+      ],
+      '/developers/': [
+        {
+          text: 'Developers',
+          items: [
+            { text: 'Overview', link: '/developers/' },
           ],
         },
       ],

@@ -98,6 +98,13 @@ Build
 $ make build
 ```
 
+For detailed build, test, and development setup instructions, see the
+[Developers Guide](docs/developers/).
+
+A [Docker Compose test environment](docs/developers/#virtual-printer-test-environment)
+with a virtual Klipper printer, Prometheus, and Grafana is available in the
+[test/](test/) directory.
+
 Installation
 ------------
 
@@ -165,7 +172,8 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `mmu` | | Happy Hare Multi-Material Unit metrics |
 
 For a complete list of all exported metrics with types, labels, and descriptions,
-see the [Metrics Reference](docs/metrics/index.md).
+see the [Metrics Reference](docs/metrics/index.md). For full documentation on
+configuration, installation, and authentication, see the [Guide](docs/guide/).
 
 Authentication
 --------------

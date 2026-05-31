@@ -1,0 +1,11 @@
+# Runtime / generated files
+.moonraker.uuid
+database/
+logs/
+misc/
+webcam_images/
+comms/
+timelapse/
+gcodes/
+certs/
+config/.moonraker.conf.bkp

@@ -4,8 +4,6 @@ TODO.md
 /.idea/
 .roo/
 
-test/printer_data/
-
 # Build artifacts
 build/
 
