@@ -51,4 +51,5 @@ This file provides guidance to agents when working with code in this repository.
   3. Update the summary table in `docs/metrics/index.md`
   4. If adding Moonraker API endpoint references, link to the official Moonraker docs
   5. Verify the site builds with `cd docs && npm run build`
+  6. If adding, removing, or renaming metrics, also update the corresponding Grafana dashboard(s) in `test/grafana/provisioning/dashboards/` (panel queries, template variables, etc.)
 - **New metric naming**: Follow `klipper_*_info` for labeled state gauges, `klipper_*` with `_total` suffix for counters, include units as suffixes (`_celsius`, `_mm`, `_seconds`)

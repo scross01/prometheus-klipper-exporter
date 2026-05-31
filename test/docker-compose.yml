@@ -28,6 +28,7 @@ services:
     restart: unless-stopped
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
     environment:
       GF_SERVER_ROOT_URL: http://localhost
       GF_SECURITY_ADMIN_PASSWORD: 'password1234!@#$' # change password
