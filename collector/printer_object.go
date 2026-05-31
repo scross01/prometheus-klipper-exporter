@@ -136,12 +136,13 @@ type PrinterObjectVirtualSdCard struct {
 const virtualSdCardQuery = "virtual_sdcard"
 
 type PrinterObjectPrintStats struct {
+	State         string  `json:"state"`
 	TotalDuration float64 `json:"total_duration"`
 	PrintDuration float64 `json:"print_duration"`
 	FilamentUsed  float64 `json:"filament_used"`
 }
 
-const printStatsQuery = "print_stats=total_duration,print_duration,filament_used"
+const printStatsQuery = "print_stats=state,total_duration,print_duration,filament_used"
 
 type PrinterObjectDisplayStatus struct {
 	Progress float64 `json:"progress"`
@@ -775,6 +776,15 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 		prometheus.NewDesc("klipper_print_filament_used", "The amount of filament used during the current print (in mm)..", nil, nil),
 		prometheus.CounterValue,
 		result.Result.Status.PrintStats.FilamentUsed)
+
+	// print state
+	emitStateInfoMetric(ch, "klipper_print_state_info", "The current print state of the printer.", "state", result.Result.Status.PrintStats.State)
+	if result.Result.Status.PrintStats.State != "" {
+		ch <- prometheus.MustNewConstMetric(
+			prometheus.NewDesc("klipper_printing", "Indicates whether the printer is currently printing (1) or not (0).", nil, nil),
+			prometheus.GaugeValue,
+			boolToFloat64(result.Result.Status.PrintStats.State == "printing"))
+	}
 
 	// display_status
 	ch <- prometheus.MustNewConstMetric(

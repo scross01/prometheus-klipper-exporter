@@ -315,22 +315,13 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 		float64(mmu.Gate))
 
 	// === Print State ===
-	if mmu.PrintState != "" {
-		printStateDesc := prometheus.NewDesc("klipper_mmu_print_state_info", "MMU print state", []string{"state"}, nil)
-		ch <- prometheus.MustNewConstMetric(printStateDesc, prometheus.GaugeValue, 1.0, mmu.PrintState)
-	}
+	emitStateInfoMetric(ch, "klipper_mmu_print_state_info", "MMU print state", "state", mmu.PrintState)
 
 	// === Action State ===
-	if mmu.Action != "" {
-		actionDesc := prometheus.NewDesc("klipper_mmu_action_info", "MMU current action", []string{"action"}, nil)
-		ch <- prometheus.MustNewConstMetric(actionDesc, prometheus.GaugeValue, 1.0, mmu.Action)
-	}
+	emitStateInfoMetric(ch, "klipper_mmu_action_info", "MMU current action", "action", mmu.Action)
 
 	// === Operation State ===
-	if mmu.Operation != "" {
-		operationDesc := prometheus.NewDesc("klipper_mmu_operation_info", "MMU current operation", []string{"operation"}, nil)
-		ch <- prometheus.MustNewConstMetric(operationDesc, prometheus.GaugeValue, 1.0, mmu.Operation)
-	}
+	emitStateInfoMetric(ch, "klipper_mmu_operation_info", "MMU current operation", "operation", mmu.Operation)
 
 	// === Filament State ===
 	filamentLoaded := 0.0
@@ -402,16 +393,10 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 		boolToFloat64(mmu.SyncDrive))
 
 	// Sync feedback state
-	if mmu.SyncFeedbackState != "" {
-		syncStateDesc := prometheus.NewDesc("klipper_mmu_sync_feedback_state_info", "Sync feedback state", []string{"state"}, nil)
-		ch <- prometheus.MustNewConstMetric(syncStateDesc, prometheus.GaugeValue, 1.0, mmu.SyncFeedbackState)
-	}
+	emitStateInfoMetric(ch, "klipper_mmu_sync_feedback_state_info", "Sync feedback state", "state", mmu.SyncFeedbackState)
 
 	// === Servo Position ===
-	if mmu.Servo != "" {
-		servoDesc := prometheus.NewDesc("klipper_mmu_servo_position_info", "Servo position", []string{"position"}, nil)
-		ch <- prometheus.MustNewConstMetric(servoDesc, prometheus.GaugeValue, 1.0, mmu.Servo)
-	}
+	emitStateInfoMetric(ch, "klipper_mmu_servo_position_info", "Servo position", "position", mmu.Servo)
 
 	// === Bowden Progress ===
 	ch <- prometheus.MustNewConstMetric(

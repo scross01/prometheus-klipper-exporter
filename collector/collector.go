@@ -44,6 +44,15 @@ func boolToFloat64(boolean bool) (value float64) {
 	return value
 }
 
+// emitStateInfoMetric conditionally emits an info-style metric (Gauge=1) with a
+// single label carrying the state value, only when the state is non-empty.
+func emitStateInfoMetric(ch chan<- prometheus.Metric, metricName, description, labelName, stateValue string) {
+	if stateValue != "" {
+		desc := prometheus.NewDesc(metricName, description, []string{labelName}, nil)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1.0, stateValue)
+	}
+}
+
 // Collect implements Prometheus.Collector.
 func (c Collector) Collect(ch chan<- prometheus.Metric) {
 

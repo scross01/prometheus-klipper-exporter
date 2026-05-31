@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+v0.15.0
+-------
+
+- Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
+
 v0.14.0
 -------
 
