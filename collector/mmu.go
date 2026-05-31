@@ -7,11 +7,7 @@ package collector
 // Unfortunately the MMU metrics are not well documented, so some interpretation is needed.
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"reflect"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -165,45 +161,16 @@ type MMUSlicerToolMap struct {
 }
 
 // Fetch MMU data from Moonraker
-func (c Collector) fetchMMUData(klipperHost string, apiKey string) (*MMUResponse, error) {
-	url := "http://" + klipperHost + "/printer/objects/query?mmu&mmu_encoder%20mmu_encoder&mmu_machine"
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create HTTP request for %s: %w", url, err)
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("unable to complete HTTP request: %w", err)
-	}
-	defer res.Body.Close()
-
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read response body: %w", err)
-	}
-
-	log.Tracef("MMU Response: %s", string(data))
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d %s", res.StatusCode, res.Status)
-	}
-
+func (c Collector) fetchMMUData() (*MMUResponse, error) {
 	var response MMUResponse
-	if err := json.Unmarshal(data, &response); err != nil {
-		return nil, fmt.Errorf("unable to unmarshal response to %s: %w", reflect.TypeOf(response), err)
+	if err := c.fetchFromMoonraker("/printer/objects/query?mmu&mmu_encoder%20mmu_encoder&mmu_machine", &response); err != nil {
+		return nil, err
 	}
-
 	return &response, nil
 }
 
 // Fetch MMU pre-gate sensors
-func (c Collector) fetchMMUPreGateSensors(klipperHost string, apiKey string, numGates int) ([]bool, []bool, error) {
+func (c Collector) fetchMMUPreGateSensors(numGates int) ([]bool, []bool, error) {
 	// Build query for all pre-gate sensors
 	query := ""
 	for i := 0; i < numGates; i++ {
@@ -212,36 +179,11 @@ func (c Collector) fetchMMUPreGateSensors(klipperHost string, apiKey string, num
 		}
 		query += fmt.Sprintf("filament_switch_sensor%%20mmu_pre_gate_%d", i)
 	}
-
-	url := "http://" + klipperHost + "/printer/objects/query?" + query
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, nil, fmt.Errorf("unable to create HTTP request: %w", err)
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, nil, fmt.Errorf("unable to complete HTTP request: %w", err)
-	}
-	defer res.Body.Close()
-
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, nil, fmt.Errorf("unable to read response body: %w", err)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("unexpected status code: %d", res.StatusCode)
-	}
+	urlPath := "/printer/objects/query?" + query
 
 	var result map[string]interface{}
-	if err := json.Unmarshal(data, &result); err != nil {
-		return nil, nil, fmt.Errorf("unable to unmarshal response: %w", err)
+	if err := c.fetchFromMoonraker(urlPath, &result); err != nil {
+		return nil, nil, err
 	}
 
 	detected := make([]bool, numGates)
@@ -269,7 +211,7 @@ func (c Collector) fetchMMUPreGateSensors(klipperHost string, apiKey string, num
 func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	log.Infof("Collecting mmu for %s", c.target)
 
-	result, err := c.fetchMMUData(c.target, c.apiKey)
+	result, err := c.fetchMMUData()
 	if err != nil {
 		log.Errorf("Failed to fetch MMU data: %v", err)
 		return
@@ -509,7 +451,7 @@ func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
 	}
 
 	// === Pre-Gate Sensors ===
-	detected, enabled, err := c.fetchMMUPreGateSensors(c.target, c.apiKey, mmu.NumGates)
+	detected, enabled, err := c.fetchMMUPreGateSensors(mmu.NumGates)
 	if err != nil {
 		log.Warnf("Failed to fetch pre-gate sensors: %v", err)
 	} else {

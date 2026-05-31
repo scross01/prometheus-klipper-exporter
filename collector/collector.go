@@ -2,6 +2,10 @@ package collector
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
 	"regexp"
 	"strings"
 
@@ -51,6 +55,43 @@ func emitStateInfoMetric(ch chan<- prometheus.Metric, metricName, description, l
 		desc := prometheus.NewDesc(metricName, description, []string{labelName}, nil)
 		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1.0, stateValue)
 	}
+}
+
+// fetchFromMoonraker performs an HTTP GET to the Moonraker API, JSON-unmarshals the
+// response, and checks for a 200 status code.
+func (c Collector) fetchFromMoonraker(urlPath string, response interface{}) error {
+	url := "http://" + c.target + urlPath
+	log.Debug("Collecting metrics from " + url)
+
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return fmt.Errorf("unable to create HTTP request for %s: %w", url, err)
+	}
+	if c.apiKey != "" {
+		req.Header.Set("X-API-KEY", c.apiKey)
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("unable to complete HTTP request: %w", err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d %s", res.StatusCode, res.Status)
+	}
+
+	data, err := io.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("unable to read response body: %w", err)
+	}
+
+	if err := json.Unmarshal(data, response); err != nil {
+		return fmt.Errorf("unable to unmarshal response to %T: %w", response, err)
+	}
+
+	return nil
 }
 
 // Collect implements Prometheus.Collector.
@@ -105,7 +146,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 }
 
 // only return metric if current job status is in progress
-func (c Collector) checkConditionStatusPrint(result *MoonrakerHistoryCurrentPrintResponse, value float64) float64 {
+func (c Collector) checkConditionStatusPrint(result MoonrakerHistoryCurrentPrintResponse, value float64) float64 {
 	var valueToReturn float64 = 0
 	if len(result.Result.Jobs) >= 1 && result.Result.Jobs[0].Status == "in_progress" {
 		valueToReturn = value

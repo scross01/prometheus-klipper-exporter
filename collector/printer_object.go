@@ -5,9 +5,6 @@ package collector
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"reflect"
 	"regexp"
 	"strings"
 
@@ -316,34 +313,9 @@ var (
 // fetchCustomSensors queries klipper for the complete list and printer objects and
 // returns the subset of `temperature_sensor`, `temperature_fan`, `output_pin`,
 // `fan_generic`, `controller_fan`, and `filament_*_sensor` objects that have custom names.
-func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, *[]string, error) {
-	var url = "http://" + klipperHost + "/printer/objects/list"
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
-	}
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
-	}
-
+func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, *[]string, error) {
 	var response PrinterObjectsList
-
-	err = json.Unmarshal(data, &response)
-	if err != nil {
+	if err := c.fetchFromMoonraker("/printer/objects/list", &response); err != nil {
 		log.Error(err)
 		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
@@ -416,68 +388,67 @@ func (c Collector) fetchCustomSensors(klipperHost string, apiKey string) (*[]str
 	return &microcontrollers, &temperatureSensors, &temperatureFans, &temperatureProbes, &outputPins, &genericFans, &controllerFans, &filamentSensors, &genericHeaters, &tmcSensors, nil
 }
 
-func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey string) (*PrinterObjectResponse, error) {
+func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error) {
 
 	// Get the list of custom sensors if not already set. This saves fetching the full
 	// list on every poll, but any new sensors will only be added is the exporter is restarted.
-	if _, ok := customTemperatureSensors[klipperHost]; ok {
+	if _, ok := customTemperatureSensors[c.target]; ok {
 		// already have custom sensors, skip
 	} else {
-		mcus, ts, tf, tp, op, gf, cf, fs, gh, tmc, err := c.fetchCustomSensors(klipperHost, apiKey)
+		mcus, ts, tf, tp, op, gf, cf, fs, gh, tmc, err := c.fetchCustomSensors()
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
 		log.Infof("Found custom sensors: %+v %+v %+v %+v %+v %+v %+v %+v %+v", mcus, ts, tf, tp, op, gf, cf, fs, gh)
-		customMicrocontrollers[klipperHost] = *mcus
-		customTemperatureSensors[klipperHost] = *ts
-		customTemperatureFans[klipperHost] = *tf
-		customTemperatureProbes[klipperHost] = *tp
-		customOutputPins[klipperHost] = *op
-		customGenericFans[klipperHost] = *gf
-		customControllerFans[klipperHost] = *cf
-		customFilamentSensors[klipperHost] = *fs
-		customGenericHeaters[klipperHost] = *gh
-		customTmcSensors[klipperHost] = *tmc
+		customMicrocontrollers[c.target] = *mcus
+		customTemperatureSensors[c.target] = *ts
+		customTemperatureFans[c.target] = *tf
+		customTemperatureProbes[c.target] = *tp
+		customOutputPins[c.target] = *op
+		customGenericFans[c.target] = *gf
+		customControllerFans[c.target] = *cf
+		customFilamentSensors[c.target] = *fs
+		customGenericHeaters[c.target] = *gh
+		customTmcSensors[c.target] = *tmc
 	}
 
 	mcuQuery := ""
-	for mcu := range customMicrocontrollers[klipperHost] {
-		if customMicrocontrollers[klipperHost][mcu] == "mcu" {
+	for mcu := range customMicrocontrollers[c.target] {
+		if customMicrocontrollers[c.target][mcu] == "mcu" {
 			mcuQuery += "&mcu=last_stats"
 		} else {
-			mcuQuery += "&mcu%20" + customMicrocontrollers[klipperHost][mcu] + "=last_stats"
+			mcuQuery += "&mcu%20" + customMicrocontrollers[c.target][mcu] + "=last_stats"
 		}
 	}
 
 	customSensorsQuery := ""
-	for ts := range customTemperatureSensors[klipperHost] {
-		customSensorsQuery += "&temperature_sensor%20" + customTemperatureSensors[klipperHost][ts]
+	for ts := range customTemperatureSensors[c.target] {
+		customSensorsQuery += "&temperature_sensor%20" + customTemperatureSensors[c.target][ts]
 	}
-	for tf := range customTemperatureFans[klipperHost] {
-		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[klipperHost][tf]
+	for tf := range customTemperatureFans[c.target] {
+		customSensorsQuery += "&temperature_fan%20" + customTemperatureFans[c.target][tf]
 	}
-	for op := range customOutputPins[klipperHost] {
-		customSensorsQuery += "&output_pin%20" + customOutputPins[klipperHost][op]
+	for op := range customOutputPins[c.target] {
+		customSensorsQuery += "&output_pin%20" + customOutputPins[c.target][op]
 	}
-	for gf := range customGenericFans[klipperHost] {
-		customSensorsQuery += "&fan_generic%20" + customGenericFans[klipperHost][gf]
+	for gf := range customGenericFans[c.target] {
+		customSensorsQuery += "&fan_generic%20" + customGenericFans[c.target][gf]
 	}
-	for cf := range customControllerFans[klipperHost] {
-		customSensorsQuery += "&controller_fan%20" + customControllerFans[klipperHost][cf]
+	for cf := range customControllerFans[c.target] {
+		customSensorsQuery += "&controller_fan%20" + customControllerFans[c.target][cf]
 	}
-	for fs := range customFilamentSensors[klipperHost] {
-		customSensorsQuery += fmt.Sprintf("&%s%%20%s", customFilamentSensors[klipperHost][fs][0], customFilamentSensors[klipperHost][fs][1])
+	for fs := range customFilamentSensors[c.target] {
+		customSensorsQuery += fmt.Sprintf("&%s%%20%s", customFilamentSensors[c.target][fs][0], customFilamentSensors[c.target][fs][1])
 	}
-	for gh := range customGenericHeaters[klipperHost] {
-		customSensorsQuery += "&heater_generic%20" + customGenericHeaters[klipperHost][gh]
+	for gh := range customGenericHeaters[c.target] {
+		customSensorsQuery += "&heater_generic%20" + customGenericHeaters[c.target][gh]
 	}
-	for tmc := range customTmcSensors[klipperHost] {
-		customSensorsQuery += "&" + strings.ReplaceAll(customTmcSensors[klipperHost][tmc], " ", "%20")
+	for tmc := range customTmcSensors[c.target] {
+		customSensorsQuery += "&" + strings.ReplaceAll(customTmcSensors[c.target][tmc], " ", "%20")
 	}
 
-	var url = "http://" +
-		klipperHost + "/printer/objects/query" +
+	urlPath := "/printer/objects/query" +
 		"?" + gcodeMoveQuery +
 		"&" + toolheadQuery +
 		"&" + extruderQuery +
@@ -491,39 +462,10 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 		mcuQuery +
 		customSensorsQuery
 
-	log.Debug("Collecting metrics from " + url)
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create HTTP request for %s. %s", url, err)
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("unable to complete HTTP client request. %s", err)
-	}
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read data from HTTP response. %s", err)
-	}
-
-	log.Tracef("%+v", string(data))
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d %s", res.StatusCode, res.Status)
-	}
-
 	var response PrinterObjectResponse
-
-	err = json.Unmarshal(data, &response)
-	if err != nil {
-		return nil, fmt.Errorf("unable to unmarshal response data to %s. %s", reflect.TypeOf(response), err)
+	if err := c.fetchFromMoonraker(urlPath, &response); err != nil {
+		return nil, err
 	}
-	log.Tracef("%+v", response)
 
 	return &response, nil
 }
@@ -531,7 +473,7 @@ func (c Collector) fetchMoonrakerPrinterObjects(klipperHost string, apiKey strin
 func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	log.Infof("Collecting printer_objects for %s", c.target)
 
-	result, err := c.fetchMoonrakerPrinterObjects(c.target, c.apiKey)
+	result, err := c.fetchMoonrakerPrinterObjects()
 	if err != nil {
 		log.Error(err)
 		return

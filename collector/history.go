@@ -3,12 +3,6 @@ package collector
 // https://moonraker.readthedocs.io/en/latest/web_api/#history-apis
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-	"net/http"
-	"reflect"
-
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
 )
@@ -64,78 +58,11 @@ type MoonrakerHistoryCurrentPrintResponse struct {
 	} `json:"result"`
 }
 
-func (c Collector) fetchMoonrakerHistory(klipperHost string, apiKey string) (*MoonrakerHistoryResponse, error) {
-	var url = "http://" + klipperHost + "/server/history/totals"
-	log.Debug("Collecting metrics from " + url)
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
-	var response MoonrakerHistoryResponse
-
-	err = json.Unmarshal(data, &response)
-	if err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
-	return &response, nil
-}
-func (c Collector) fetchMoonrakerHistoryCurrent(klipperHost string, apiKey string) (*MoonrakerHistoryCurrentPrintResponse, error) {
-	var url = "http://" + klipperHost + "/server/history/list?limit=1&start=0&since=1&order=desc"
-	log.Debug("Collecting metrics from " + url)
-
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("unable to create HTTP request for %s. %s", url, err)
-	}
-	if apiKey != "" {
-		req.Header.Set("X-API-KEY", apiKey)
-	}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("unable to complete HTTP client request. %s", err)
-	}
-	defer res.Body.Close()
-	data, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, fmt.Errorf("unable to read data from HTTP response. %s", err)
-	}
-
-	var response MoonrakerHistoryCurrentPrintResponse
-
-	err = json.Unmarshal(data, &response)
-	if err != nil {
-		return nil, fmt.Errorf("unable to unmarshal response data to %s. %s", reflect.TypeOf(response), err)
-	}
-
-	return &response, nil
-}
-
 func (c Collector) collectActivePrint(ch chan<- prometheus.Metric) {
 	log.Infof("Collecting active print for %s", c.target)
 
-	result, err := c.fetchMoonrakerHistoryCurrent(c.target, c.apiKey)
-	if err != nil {
+	var result MoonrakerHistoryCurrentPrintResponse
+	if err := c.fetchFromMoonraker("/server/history/list?limit=1&start=0&since=1&order=desc", &result); err != nil {
 		log.Error(err)
 		return
 	}
@@ -165,8 +92,8 @@ func (c Collector) collectActivePrint(ch chan<- prometheus.Metric) {
 func (c Collector) collectHistory(ch chan<- prometheus.Metric) {
 	log.Infof("Collecting history for %s", c.target)
 
-	result, err := c.fetchMoonrakerHistory(c.target, c.apiKey)
-	if err != nil {
+	var result MoonrakerHistoryResponse
+	if err := c.fetchFromMoonraker("/server/history/totals", &result); err != nil {
 		log.Error(err)
 		return
 	}
