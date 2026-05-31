@@ -10,6 +10,22 @@ are auto-discovered via [`/printer/objects/list`](https://moonraker.readthedocs.
 
 ---
 
+### `webhooks`
+
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `klipper_webhooks_state_info` | Gauge=1 | `state` | Webhooks server state (`ready`, `startup`, `shutdown`, `error`) |
+
+---
+
+### `pause_resume`
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `klipper_pause_resume_is_paused` | Gauge | Whether the print is paused (1) or not (0) |
+
+---
+
 ### `controller_fan`
 
 Labels: `fan`
@@ -110,9 +126,10 @@ Labels: `heater`
 
 ### `idle_timeout`
 
-| Metric | Type | Description |
-|--------|------|-------------|
-| `klipper_printing_time` | Counter | Time spent in the Printing state |
+| Metric | Type | Labels | Description |
+|--------|------|--------|-------------|
+| `klipper_printing_time` | Counter | — | Time spent in the Printing state |
+| `klipper_idle_timeout_state_info` | Gauge=1 | `state` | Idle timeout state (`Idle`, `Printing`, `Ready`) |
 
 ---
 
@@ -230,6 +247,7 @@ Labels: `sensor`
 |--------|------|-------------|
 | `klipper_print_file_position` | Gauge | Current file position in bytes |
 | `klipper_print_file_progress` | Gauge | File read progress as percentage |
+| `klipper_sdcard_active` | Gauge | Whether the virtual SD card is actively being read (1) or not (0) |
 
 ## Example PromQL
 

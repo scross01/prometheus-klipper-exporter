@@ -21,6 +21,8 @@ type PrinterObjectResponse struct {
 }
 
 type PrinterObjectStatus struct {
+	Webhooks      PrinterObjectWebhooks      `json:"webhooks"`
+	PauseResume   PrinterObjectPauseResume   `json:"pause_resume"`
 	GcodeMove     PrinterObjectGcodeMove     `json:"gcode_move"`
 	Toolhead      PrinterObjectToolhead      `json:"toolhead"`
 	Extruder      PrinterObjectExtruder      `json:"extruder"`
@@ -116,6 +118,18 @@ type PrinterObjectFan struct {
 }
 
 const fanQuery = "fan"
+
+type PrinterObjectWebhooks struct {
+	State string `json:"state"`
+}
+
+const webhooksQuery = "webhooks"
+
+type PrinterObjectPauseResume struct {
+	IsPaused bool `json:"is_paused"`
+}
+
+const pauseResumeQuery = "pause_resume"
 
 type PrinterObjectIdleTimeout struct {
 	State        string  `json:"state"`
@@ -463,6 +477,8 @@ func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error
 		"&" + printStatsQuery +
 		"&" + displayStatusQuery +
 		"&" + heaterQuery +
+		"&" + webhooksQuery +
+		"&" + pauseResumeQuery +
 		mcuQuery +
 		customSensorsQuery
 
@@ -626,10 +642,12 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 
 	// idle_timeout
 	c.emitCounter(ch, "klipper_printing_time", "The amount of time the printer has been in the Printing state.", result.Result.Status.IdleTimeout.PrintingTime)
+	emitStateInfoMetric(ch, "klipper_idle_timeout_state_info", "The current idle timeout state of the printer.", "state", result.Result.Status.IdleTimeout.State)
 
 	// virtual_sdcard
 	c.emitCounter(ch, "klipper_print_file_progress", "The print progress reported as a percentage of the file read.", result.Result.Status.VirtualSdCard.Progress)
 	c.emitCounter(ch, "klipper_print_file_position", "The current file position in bytes.", result.Result.Status.VirtualSdCard.FilePosition)
+	c.emitGauge(ch, "klipper_sdcard_active", "Indicates whether the virtual SD card is actively being read (1) or not (0).", boolToFloat64(result.Result.Status.VirtualSdCard.IsActive))
 
 	// print_stats
 	c.emitCounter(ch, "klipper_print_total_duration", "The total time (in seconds) elapsed since a print has started.", result.Result.Status.PrintStats.TotalDuration)
@@ -641,6 +659,12 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	if result.Result.Status.PrintStats.State != "" {
 		c.emitGauge(ch, "klipper_printing", "Indicates whether the printer is currently printing (1) or not (0).", boolToFloat64(result.Result.Status.PrintStats.State == "printing"))
 	}
+
+	// webhooks
+	emitStateInfoMetric(ch, "klipper_webhooks_state_info", "The current state of the Klipper webhooks server.", "state", result.Result.Status.Webhooks.State)
+
+	// pause_resume
+	c.emitGauge(ch, "klipper_pause_resume_is_paused", "Indicates whether the print is paused (1) or not (0).", boolToFloat64(result.Result.Status.PauseResume.IsPaused))
 
 	// display_status
 	c.emitCounter(ch, "klipper_print_gcode_progress", "The percentage of print progress, as reported by M73.", result.Result.Status.DisplayStatus.Progress)
