@@ -4,6 +4,8 @@ Change Log
 v0.15.0
 -------
 
+- Add `power_devices` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
+- Add panels for power devices to Grafana hardware dashboard
 - Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
 - Add `klipper_webhooks_state_info`, `klipper_pause_resume_is_paused`, `klipper_idle_timeout_state_info`, and `klipper_sdcard_active` metrics to `printer_objects` module
 - Add `klipper_system_throttled_bits` and `klipper_system_throttled_flag_info` metrics to `process_stats` module

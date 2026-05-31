@@ -318,8 +318,8 @@ type PrinterObjectsList struct {
 }
 
 var (
-	filamentSensorRegex      *regexp.Regexp        = regexp.MustCompile("^filament_(switch|motion)_sensor ")
-	mcuRegex                 *regexp.Regexp        = regexp.MustCompile("^mcu(?P<label> [a-zA-Z0-9_]+)?")
+	filamentSensorRegex      *regexp.Regexp = regexp.MustCompile("^filament_(switch|motion)_sensor ")
+	mcuRegex                 *regexp.Regexp = regexp.MustCompile("^mcu(?P<label> [a-zA-Z0-9_]+)?")
 	customSensorsMu          sync.Mutex
 	customMicrocontrollers   map[string][]string   = make(map[string][]string)
 	customTemperatureSensors map[string][]string   = make(map[string][]string)

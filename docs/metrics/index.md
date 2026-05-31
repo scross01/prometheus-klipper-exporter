@@ -10,6 +10,7 @@ Exporter. Each metric module links to a detailed reference page.
 | `server_info` | ✓ | [`/server/info`](../metrics/server-info) | 6 |
 | `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 11 |
 | `network_stats` | | [`/machine/proc_stats`](../metrics/network-stats) | 9 |
+| `power_devices` | ✓ | [`/machine/device_power/devices`](../metrics/power-devices) and [`/machine/device_power/status`](../metrics/power-devices) | 3 |
 | `system_info` | ✓ | [`/machine/system_info`](../metrics/system-info) | 1 |
 | `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
@@ -21,7 +22,7 @@ Exporter. Each metric module links to a detailed reference page.
 ## Default Modules
 
 When no modules are specified in the Prometheus configuration, the following
-default modules are enabled: `server_info`, `process_stats`, `job_queue`, `system_info`, `query_endstops`.
+default modules are enabled: `server_info`, `process_stats`, `job_queue`, `system_info`, `query_endstops`, `power_devices`.
 
 ## All Metrics by Module
 
@@ -71,6 +72,16 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 | `klipper_network_tx_bandwidth` | Gauge | `interface` |
 
 [Full reference →](./network-stats)
+
+### `power_devices`
+
+| Metric | Type | Labels |
+|--------|------|--------|
+| `klipper_power_device_info` | Gauge=1 | `device`, `type` |
+| `klipper_power_device_status` | Gauge | `device` |
+| `klipper_power_device_state_info` | Gauge=1 | `device`, `state` |
+
+[Full reference →](./power-devices)
 
 ### `system_info`
 

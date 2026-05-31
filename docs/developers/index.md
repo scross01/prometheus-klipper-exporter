@@ -17,6 +17,7 @@ Klipper Exporter.
 │   ├── directory_info.go           # /server/files/directory
 │   ├── history.go                  # /server/history/totals
 │   ├── printer_object.go           # /printer/objects/query
+│   ├── power_devices.go            # /machine/device_power (power device status)
 │   └── mmu.go                      # /printer/objects/query (MMU objects)
 ├── test/
 │   ├── docker-compose.yml          # Local test environment
@@ -131,6 +132,7 @@ params:
     - directory_info
     - printer_objects
     - history
+    - power_devices
 ```
 
 All metrics from these modules are available at `http://localhost:9101/probe?target=klipper:7125`.
@@ -146,7 +148,7 @@ loaded from `test/grafana/provisioning/dashboards/`. They are available at
 | **Klipper System** | System health | CPU, memory, uptime, network, disk, job queue, Moonraker process |
 | **Klipper Temperatures** | Temperature monitoring | Extruder, bed, sensors, temperature fans, probes, generic heaters |
 | **Klipper Print Status** | Print progress & history | G-code progress, file position, filament used, timeline, history stats |
-| **Klipper Hardware** | MCU, fans, pins, TMC | MCU task/RTT/I/O, fan speeds/RPMs, output pins, filament sensors, TMC drivers |
+| **Klipper Hardware** | MCU, fans, pins, TMC, power devices | MCU task/RTT/I/O, fan speeds/RPMs, output pins, filament sensors, TMC drivers, power device status |
 | **Klipper MMU** | Multi-Material Unit | Gate/tool state, encoder data, filament status, toolchange tracking |
 
 The dashboards use `job` and `instance` template variables. For the test

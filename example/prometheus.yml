@@ -14,6 +14,7 @@ scrape_configs:
         'directory_info',
         'printer_objects',
         'history',
+        'power_devices',
       ]
     # Enable API Key authentication.
     # Only set one of `credentials` or `credentials_file`

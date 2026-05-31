@@ -169,6 +169,11 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 	if slices.Contains(c.modules, "mmu") {
 		c.collectMMU(ch)
 	}
+
+	// Power Devices
+	if slices.Contains(c.modules, "power_devices") {
+		c.collectPowerDevices(ch)
+	}
 }
 
 // only return metric if current job status is in progress

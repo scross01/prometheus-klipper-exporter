@@ -34,6 +34,7 @@ export default withMermaid(defineConfig({
             { text: 'Server Info', link: '/metrics/server-info' },
             { text: 'Process Stats', link: '/metrics/process-stats' },
             { text: 'Network Stats', link: '/metrics/network-stats' },
+            { text: 'Power Devices', link: '/metrics/power-devices' },
             { text: 'System Info', link: '/metrics/system-info' },
             { text: 'Job Queue', link: '/metrics/job-queue' },
             { text: 'Directory Info', link: '/metrics/directory-info' },
