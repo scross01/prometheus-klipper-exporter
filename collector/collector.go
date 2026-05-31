@@ -160,6 +160,11 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		c.collectPrinterObjects(ch)
 	}
 
+	// Query Endstops
+	if slices.Contains(c.modules, "query_endstops") {
+		c.collectQueryEndstops(ch)
+	}
+
 	// MMU (Multi-Material Unit) - Happy Hare - only if present
 	if slices.Contains(c.modules, "mmu") {
 		c.collectMMU(ch)

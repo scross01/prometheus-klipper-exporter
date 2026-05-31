@@ -112,6 +112,17 @@ Labels: `fan`
 
 ---
 
+### `heater_fan`
+
+Labels: `fan`
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `klipper_heater_fan_rpm` | Gauge | Heater fan RPM |
+| `klipper_heater_fan_speed` | Gauge | Heater fan speed (0–1) |
+
+---
+
 ### `heater_generic`
 
 Labels: `heater`
@@ -179,12 +190,23 @@ Labels: `pin`
 
 ---
 
+### `query_endstops`
+
+Labels: `endstop`
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `klipper_endstop_triggered` | Gauge | Whether an endstop is triggered (1) or not (0) |
+
+---
+
 ### `temperature_fan`
 
 Labels: `fan`
 
 | Metric | Type | Description |
 |--------|------|-------------|
+| `klipper_temperature_fan_rpm` | Gauge | Temperature-controlled fan RPM |
 | `klipper_temperature_fan_speed` | Gauge | Temperature-controlled fan speed (0–1) |
 | `klipper_temperature_fan_temperature` | Gauge | Temperature fan sensor reading |
 | `klipper_temperature_fan_target` | Gauge | Temperature fan target threshold |
@@ -233,11 +255,13 @@ Labels: `sensor`
 | Metric | Type | Description |
 |--------|------|-------------|
 | `klipper_toolhead_estimated_print_time` | Gauge | Estimated total print time (seconds) |
+| `klipper_toolhead_homed_axes_info` | Gauge=1 | A homed axis with `axis` label |
 | `klipper_toolhead_max_accel` | Gauge | Maximum acceleration (mm/s²) |
 | `klipper_toolhead_max_accel_to_decel` | Gauge | Maximum acceleration to deceleration |
 | `klipper_toolhead_max_velocity` | Gauge | Maximum velocity (mm/s) |
 | `klipper_toolhead_print_time` | Gauge | Current print time (seconds) |
 | `klipper_toolhead_square_corner_velocity` | Gauge | Square corner velocity (mm/s) |
+| `klipper_toolhead_stalls_total` | Counter | Total number of toolhead stalls |
 
 ---
 

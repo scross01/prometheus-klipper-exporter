@@ -14,13 +14,14 @@ Exporter. Each metric module links to a detailed reference page.
 | `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
 | `history` | | [`/server/history/totals`](../metrics/history) | 10 |
-| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 80+ |
+| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 86+ |
+| `query_endstops` | ✓ | [`/printer/query_endstops`](../metrics/printer-objects#query_endstops) | 1 |
 | `mmu` | | [`/printer/objects/query`](../metrics/mmu) | 50+ |
 
 ## Default Modules
 
 When no modules are specified in the Prometheus configuration, the following
-default modules are enabled: `server_info`, `process_stats`, `job_queue`, `system_info`.
+default modules are enabled: `server_info`, `process_stats`, `job_queue`, `system_info`, `query_endstops`.
 
 ## All Metrics by Module
 
@@ -127,16 +128,18 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 | `gcode` | `klipper_gcode_extrude_factor`, `klipper_gcode_position_e`, `klipper_gcode_position_x`, `klipper_gcode_position_y`, `klipper_gcode_position_z`, `klipper_gcode_speed_factor`, `klipper_gcode_speed` | |
 | `generic_fan` | `klipper_generic_fan_rpm`, `klipper_generic_fan_speed` | `fan` |
 | `heater_bed` | `klipper_heater_bed_power`, `klipper_heater_bed_target`, `klipper_heater_bed_temperature` | |
+| `heater_fan` | `klipper_heater_fan_rpm`, `klipper_heater_fan_speed` | `fan` |
 | `heater_generic` | `klipper_generic_heater_power`, `klipper_generic_heater_target`, `klipper_generic_heater_temperature` | `heater` |
 | `idle_timeout` | `klipper_printing_time` | |
 | `mcu` | `klipper_mcu_awake`, `klipper_mcu_task_avg`, `klipper_mcu_task_stddev`, `klipper_mcu_clock_frequency`, `klipper_mcu_invalid_bytes`, `klipper_mcu_read_bytes`, `klipper_mcu_ready_bytes`, `klipper_mcu_receive_seq`, `klipper_mcu_retransmit_bytes`, `klipper_mcu_retransmit_seq`, `klipper_mcu_rto`, `klipper_mcu_rttvar`, `klipper_mcu_send_seq`, `klipper_mcu_stalled_bytes`, `klipper_mcu_srtt`, `klipper_mcu_write_bytes` | `mcu` |
 | `output_pin` | `klipper_output_pin_value` | `pin` |
 | `print_stats` | `klipper_print_filament_used`, `klipper_print_total_duration`, `klipper_print_state_info{state="..."}`, `klipper_printing` | |
-| `temperature_fan` | `klipper_temperature_fan_speed`, `klipper_temperature_fan_temperature`, `klipper_temperature_fan_target` | `fan` |
+| `query_endstops` | `klipper_endstop_triggered` | `endstop` |
+| `temperature_fan` | `klipper_temperature_fan_speed`, `klipper_temperature_fan_temperature`, `klipper_temperature_fan_target`, `klipper_temperature_fan_rpm` | `fan` |
 | `temperature_probe` | `klipper_temperature_probe_temperature`, `klipper_temperature_probe_measured_max_temp`, `klipper_temperature_probe_measured_min_temp`, `klipper_temperature_probe_estimated_expansion` | `probe` |
 | `temperature_sensor` | `klipper_temperature_sensor_temperature`, `klipper_temperature_sensor_measured_max_temp`, `klipper_temperature_sensor_measured_min_temp` | `sensor` |
 | `tmc_sensor` | `klipper_tmc_sensor_enabled`, `klipper_tmc_sensor_run_current`, `klipper_tmc_sensor_temperature` | `sensor` |
-| `toolhead` | `klipper_toolhead_estimated_print_time`, `klipper_toolhead_max_accel`, `klipper_toolhead_max_accel_to_decel`, `klipper_toolhead_max_velocity`, `klipper_toolhead_print_time`, `klipper_toolhead_square_corner_velocity` | |
+| `toolhead` | `klipper_toolhead_estimated_print_time`, `klipper_toolhead_homed_axes_info`, `klipper_toolhead_max_accel`, `klipper_toolhead_max_accel_to_decel`, `klipper_toolhead_max_velocity`, `klipper_toolhead_print_time`, `klipper_toolhead_square_corner_velocity`, `klipper_toolhead_stalls_total` | |
 | `virtual_sdcard` | `klipper_print_file_position`, `klipper_print_file_progress` | |
 
 [Full reference →](./printer-objects)
@@ -160,6 +163,14 @@ MMU (Multi-Material Unit) metrics for Happy Hare. 50+ metrics covering:
 | Sync drive | `klipper_mmu_sync_drive_enabled`, `klipper_mmu_sync_feedback_state_info{state="..."}` |
 
 [Full reference →](./mmu)
+
+### `query_endstops`
+
+| Metric | Type | Labels |
+|--------|------|--------|
+| `klipper_endstop_triggered` | Gauge | `endstop` |
+
+[Full reference →](./printer-objects#query_endstops)
 
 ## Prometheus Metric Types
 

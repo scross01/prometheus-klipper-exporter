@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -40,6 +41,7 @@ type PrinterObjectStatus struct {
 	OutputPins         map[string]PrinterObjectOutputPin
 	GenericFans        map[string]PrinterObjectFan
 	ControllerFans     map[string]PrinterObjectFan
+	HeaterFans         map[string]PrinterObjectFan
 	FilamentSensors    map[string]PrinterObjectFilamentSensor
 	GenericHeaters     map[string]PrinterObjectHeater
 	TmcSensors         map[string]PrinterObjectTmc
@@ -82,9 +84,11 @@ type PrinterObjectToolhead struct {
 	MaxAccel             float64 `json:"max_accel"`
 	MaxAccelToDecel      float64 `json:"max_accel_to_decel"`
 	SquareCornerVelocity float64 `json:"square_corner_velocity"`
+	HomedAxes            string  `json:"homed_axes"`
+	Stalls               float64 `json:"stalls"`
 }
 
-const toolheadQuery string = "toolhead=print_time,estimated_print_time,max_velocity,max_accel,max_accel_to_decel,square_corner_velocity"
+const toolheadQuery string = "toolhead=print_time,estimated_print_time,max_velocity,max_accel,max_accel_to_decel,square_corner_velocity,homed_axes,stalls"
 
 type PrinterObjectExtruder struct {
 	Temperature     float64 `json:"temperature"`
@@ -113,8 +117,8 @@ type PrinterObjectHeater struct {
 const heaterQuery = "heaters"
 
 type PrinterObjectFan struct {
-	Speed float64 `json:"speed"`
-	Rpm   float64 `json:"rpm"`
+	Speed float64  `json:"speed"`
+	Rpm   *float64 `json:"rpm"`
 }
 
 const fanQuery = "fan"
@@ -168,9 +172,10 @@ type PrinterObjectTemperatureSensor struct {
 }
 
 type PrinterObjectTemperatureFan struct {
-	Speed       float64 `mapstructure:"speed"`
-	Temperature float64 `mapstructure:"temperature"`
-	Target      float64 `mapstructure:"target"`
+	Speed       float64  `mapstructure:"speed"`
+	Temperature float64  `mapstructure:"temperature"`
+	Target      float64  `mapstructure:"target"`
+	Rpm         *float64 `mapstructure:"rpm"`
 }
 
 type PrinterObjectTemperatureProbe struct {
@@ -201,6 +206,15 @@ type PrinterObjectTmc struct {
 
 type _PrinterObjectStatus PrinterObjectStatus
 
+func parseFanType(prefix string, key string, raw interface{}, target map[string]PrinterObjectFan) {
+	if strings.HasPrefix(key, prefix) {
+		name := strings.Replace(key, prefix+" ", "", 1)
+		var value PrinterObjectFan
+		mapstructure.Decode(raw, &value)
+		target[name] = value
+	}
+}
+
 func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 	status := _PrinterObjectStatus{}
 
@@ -220,6 +234,7 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 		outputPins := make(map[string]PrinterObjectOutputPin)
 		genericFans := make(map[string]PrinterObjectFan)
 		controllerFans := make(map[string]PrinterObjectFan)
+		heaterFans := make(map[string]PrinterObjectFan)
 		filamentSensors := make(map[string]PrinterObjectFilamentSensor)
 		genericHeaters := make(map[string]PrinterObjectHeater)
 		tmcSensors := make(map[string]PrinterObjectTmc)
@@ -260,18 +275,9 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 				mapstructure.Decode(v, &value)
 				outputPins[key] = value
 			}
-			if strings.HasPrefix(k, "fan_generic") {
-				key := strings.Replace(k, "fan_generic ", "", 1)
-				value := PrinterObjectFan{}
-				mapstructure.Decode(v, &value)
-				genericFans[key] = value
-			}
-			if strings.HasPrefix(k, "controller_fan") {
-				key := strings.Replace(k, "controller_fan ", "", 1)
-				value := PrinterObjectFan{}
-				mapstructure.Decode(v, &value)
-				controllerFans[key] = value
-			}
+			parseFanType("fan_generic", k, v, genericFans)
+			parseFanType("controller_fan", k, v, controllerFans)
+			parseFanType("heater_fan", k, v, heaterFans)
 			if filamentSensorRegex.MatchString(k) {
 				key := strings.TrimSpace(filamentSensorRegex.ReplaceAllString(k, ""))
 				value := PrinterObjectFilamentSensor{}
@@ -297,6 +303,7 @@ func (f *PrinterObjectStatus) UnmarshalJSON(bs []byte) (err error) {
 		f.OutputPins = outputPins
 		f.GenericFans = genericFans
 		f.ControllerFans = controllerFans
+		f.HeaterFans = heaterFans
 		f.FilamentSensors = filamentSensors
 		f.GenericHeaters = genericHeaters
 		f.TmcSensors = tmcSensors
@@ -313,6 +320,7 @@ type PrinterObjectsList struct {
 var (
 	filamentSensorRegex      *regexp.Regexp        = regexp.MustCompile("^filament_(switch|motion)_sensor ")
 	mcuRegex                 *regexp.Regexp        = regexp.MustCompile("^mcu(?P<label> [a-zA-Z0-9_]+)?")
+	customSensorsMu          sync.Mutex
 	customMicrocontrollers   map[string][]string   = make(map[string][]string)
 	customTemperatureSensors map[string][]string   = make(map[string][]string)
 	customTemperatureFans    map[string][]string   = make(map[string][]string)
@@ -320,6 +328,7 @@ var (
 	customOutputPins         map[string][]string   = make(map[string][]string)
 	customGenericFans        map[string][]string   = make(map[string][]string)
 	customControllerFans     map[string][]string   = make(map[string][]string)
+	customHeaterFans         map[string][]string   = make(map[string][]string)
 	customFilamentSensors    map[string][][]string = make(map[string][][]string)
 	customGenericHeaters     map[string][]string   = make(map[string][]string)
 	customTmcSensors         map[string][]string   = make(map[string][]string)
@@ -328,11 +337,11 @@ var (
 // fetchCustomSensors queries klipper for the complete list and printer objects and
 // returns the subset of `temperature_sensor`, `temperature_fan`, `output_pin`,
 // `fan_generic`, `controller_fan`, and `filament_*_sensor` objects that have custom names.
-func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, *[]string, error) {
+func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[]string, *[][]string, *[]string, *[]string, error) {
 	var response PrinterObjectsList
 	if err := c.fetchFromMoonraker("/printer/objects/list", &response); err != nil {
 		log.Error(err)
-		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, err
 	}
 
 	microcontrollers := []string{}
@@ -342,6 +351,7 @@ func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]str
 	outputPins := []string{}
 	genericFans := []string{}
 	controllerFans := []string{}
+	heaterFans := []string{}
 	filamentSensors := [][]string{}
 	genericHeaters := []string{}
 	tmcSensors := []string{}
@@ -380,6 +390,10 @@ func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]str
 		if strings.HasPrefix(response.Result.Objects[o], "controller_fan ") {
 			controllerFans = append(controllerFans, strings.Replace(response.Result.Objects[o], "controller_fan ", "", 1))
 		}
+		// find heater_fan
+		if strings.HasPrefix(response.Result.Objects[o], "heater_fan ") {
+			heaterFans = append(heaterFans, strings.Replace(response.Result.Objects[o], "heater_fan ", "", 1))
+		}
 		// find filament_*_sensor
 		if filamentSensorRegex.MatchString((response.Result.Objects[o])) {
 			// The first element of the slice is the type of the sensor ("filament_{switch,motion}_sensor"),
@@ -400,32 +414,42 @@ func (c Collector) fetchCustomSensors() (*[]string, *[]string, *[]string, *[]str
 		}
 	}
 
-	return &microcontrollers, &temperatureSensors, &temperatureFans, &temperatureProbes, &outputPins, &genericFans, &controllerFans, &filamentSensors, &genericHeaters, &tmcSensors, nil
+	return &microcontrollers, &temperatureSensors, &temperatureFans, &temperatureProbes, &outputPins, &genericFans, &controllerFans, &heaterFans, &filamentSensors, &genericHeaters, &tmcSensors, nil
 }
 
 func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error) {
 
 	// Get the list of custom sensors if not already set. This saves fetching the full
 	// list on every poll, but any new sensors will only be added is the exporter is restarted.
-	if _, ok := customTemperatureSensors[c.target]; ok {
-		// already have custom sensors, skip
-	} else {
-		mcus, ts, tf, tp, op, gf, cf, fs, gh, tmc, err := c.fetchCustomSensors()
+	// Double-checked locking: the check and HTTP fetch happen outside the mutex so that
+	// distinct targets can initialize in parallel; only the map writes are serialized.
+	customSensorsMu.Lock()
+	_, ok := customTemperatureSensors[c.target]
+	customSensorsMu.Unlock()
+
+	if !ok {
+		mcus, ts, tf, tp, op, gf, cf, hf, fs, gh, tmc, err := c.fetchCustomSensors()
 		if err != nil {
 			log.Error(err)
 			return nil, err
 		}
-		log.Infof("Found custom sensors: %+v %+v %+v %+v %+v %+v %+v %+v %+v", mcus, ts, tf, tp, op, gf, cf, fs, gh)
-		customMicrocontrollers[c.target] = *mcus
-		customTemperatureSensors[c.target] = *ts
-		customTemperatureFans[c.target] = *tf
-		customTemperatureProbes[c.target] = *tp
-		customOutputPins[c.target] = *op
-		customGenericFans[c.target] = *gf
-		customControllerFans[c.target] = *cf
-		customFilamentSensors[c.target] = *fs
-		customGenericHeaters[c.target] = *gh
-		customTmcSensors[c.target] = *tmc
+		log.Infof("Found custom sensors: %+v %+v %+v %+v %+v %+v %+v %+v %+v %+v", mcus, ts, tf, tp, op, gf, cf, hf, fs, gh)
+
+		customSensorsMu.Lock()
+		if _, ok := customTemperatureSensors[c.target]; !ok {
+			customMicrocontrollers[c.target] = *mcus
+			customTemperatureSensors[c.target] = *ts
+			customTemperatureFans[c.target] = *tf
+			customTemperatureProbes[c.target] = *tp
+			customOutputPins[c.target] = *op
+			customGenericFans[c.target] = *gf
+			customControllerFans[c.target] = *cf
+			customHeaterFans[c.target] = *hf
+			customFilamentSensors[c.target] = *fs
+			customGenericHeaters[c.target] = *gh
+			customTmcSensors[c.target] = *tmc
+		}
+		customSensorsMu.Unlock()
 	}
 
 	mcuQuery := ""
@@ -455,6 +479,9 @@ func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error
 	}
 	for cf := range customControllerFans[c.target] {
 		customSensorsQuery += "&controller_fan%20" + customControllerFans[c.target][cf]
+	}
+	for hf := range customHeaterFans[c.target] {
+		customSensorsQuery += "&heater_fan%20" + customHeaterFans[c.target][hf]
 	}
 	for fs := range customFilamentSensors[c.target] {
 		customSensorsQuery += fmt.Sprintf("&%s%%20%s", customFilamentSensors[c.target][fs][0], customFilamentSensors[c.target][fs][1])
@@ -488,6 +515,37 @@ func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error
 	}
 
 	return &response, nil
+}
+
+type QueryEndstopsResponse struct {
+	Result map[string]string `json:"result"`
+}
+
+func (c Collector) fetchMoonrakerQueryEndstops() (map[string]string, error) {
+	var response QueryEndstopsResponse
+	if err := c.fetchFromMoonraker("/printer/query_endstops", &response); err != nil {
+		return nil, err
+	}
+	return response.Result, nil
+}
+
+func (c Collector) collectQueryEndstops(ch chan<- prometheus.Metric) {
+	log.Infof("Collecting query_endstops for %s", c.target)
+
+	endstops, err := c.fetchMoonrakerQueryEndstops()
+	if err != nil {
+		log.Error(err)
+		return
+	}
+	endstopLabels := []string{"endstop"}
+	endstopDesc := prometheus.NewDesc("klipper_endstop_triggered", "Whether an endstop is triggered (1) or not (0).", endstopLabels, nil)
+	for name, state := range endstops {
+		ch <- prometheus.MustNewConstMetric(
+			endstopDesc,
+			prometheus.GaugeValue,
+			boolToFloat64(state == "TRIGGERED"),
+			GetValidLabelName(name))
+	}
 }
 
 func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
@@ -624,6 +682,12 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	c.emitGauge(ch, "klipper_toolhead_max_accel_to_decel", "Klipper toolhead max acceleration to deceleration.", result.Result.Status.Toolhead.MaxAccelToDecel)
 	c.emitGauge(ch, "klipper_toolhead_square_corner_velocity", "Klipper toolhead square corner velocity.", result.Result.Status.Toolhead.SquareCornerVelocity)
 
+	// toolhead homed axes
+	for _, axis := range result.Result.Status.Toolhead.HomedAxes {
+		emitStateInfoMetric(ch, "klipper_toolhead_homed_axes_info", "A homed axis on the toolhead.", "axis", string(axis))
+	}
+	c.emitCounter(ch, "klipper_toolhead_stalls_total", "Total number of toolhead stalls.", result.Result.Status.Toolhead.Stalls)
+
 	// extruder
 	c.emitGauge(ch, "klipper_extruder_temperature", "Klipper extruder temperature.", result.Result.Status.Extruder.Temperature)
 	c.emitGauge(ch, "klipper_extruder_target", "Klipper extruder target.", result.Result.Status.Extruder.Target)
@@ -638,7 +702,9 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 
 	// fan
 	c.emitGauge(ch, "klipper_fan_speed", "Klipper fan speed.", result.Result.Status.Fan.Speed)
-	c.emitGauge(ch, "klipper_fan_rpm", "Klipper fan rpm.", result.Result.Status.Fan.Rpm)
+	if result.Result.Status.Fan.Rpm != nil {
+		c.emitGauge(ch, "klipper_fan_rpm", "Klipper fan rpm.", *result.Result.Status.Fan.Rpm)
+	}
 
 	// idle_timeout
 	c.emitCounter(ch, "klipper_printing_time", "The amount of time the printer has been in the Printing state.", result.Result.Status.IdleTimeout.PrintingTime)
@@ -698,6 +764,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 	fanSpeed := prometheus.NewDesc("klipper_temperature_fan_speed", "The speed of the temperature fan", fanLabels, nil)
 	fanTemperature := prometheus.NewDesc("klipper_temperature_fan_temperature", "The temperature of the temperature fan", fanLabels, nil)
 	fanTarget := prometheus.NewDesc("klipper_temperature_fan_target", "The target temperature for the temperature fan", fanLabels, nil)
+	fanRpm := prometheus.NewDesc("klipper_temperature_fan_rpm", "The RPM of the temperature fan", fanLabels, nil)
 	for fk, fv := range result.Result.Status.TemperatureFans {
 		fanName := GetValidLabelName(fk)
 		ch <- prometheus.MustNewConstMetric(
@@ -715,6 +782,13 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue,
 			fv.Target,
 			fanName)
+		if fv.Rpm != nil {
+			ch <- prometheus.MustNewConstMetric(
+				fanRpm,
+				prometheus.GaugeValue,
+				*fv.Rpm,
+				fanName)
+		}
 	}
 
 	// temperature_probe
@@ -770,11 +844,13 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue,
 			fv.Speed,
 			fanName)
-		ch <- prometheus.MustNewConstMetric(
-			genericFanRpm,
-			prometheus.GaugeValue,
-			fv.Rpm,
-			fanName)
+		if fv.Rpm != nil {
+			ch <- prometheus.MustNewConstMetric(
+				genericFanRpm,
+				prometheus.GaugeValue,
+				*fv.Rpm,
+				fanName)
+		}
 	}
 
 	// controller_fan
@@ -788,11 +864,33 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 			prometheus.GaugeValue,
 			fv.Speed,
 			fanName)
+		if fv.Rpm != nil {
+			ch <- prometheus.MustNewConstMetric(
+				controllerFanRpm,
+				prometheus.GaugeValue,
+				*fv.Rpm,
+				fanName)
+		}
+	}
+
+	// heater_fan
+	heaterFanLabels := []string{"fan"}
+	heaterFanSpeed := prometheus.NewDesc("klipper_heater_fan_speed", "The speed of the heater fan", heaterFanLabels, nil)
+	heaterFanRpm := prometheus.NewDesc("klipper_heater_fan_rpm", "The RPM of the heater fan", heaterFanLabels, nil)
+	for fk, fv := range result.Result.Status.HeaterFans {
+		fanName := GetValidLabelName(fk)
 		ch <- prometheus.MustNewConstMetric(
-			controllerFanRpm,
+			heaterFanSpeed,
 			prometheus.GaugeValue,
-			fv.Rpm,
+			fv.Speed,
 			fanName)
+		if fv.Rpm != nil {
+			ch <- prometheus.MustNewConstMetric(
+				heaterFanRpm,
+				prometheus.GaugeValue,
+				*fv.Rpm,
+				fanName)
+		}
 	}
 
 	// filament_*_sensor

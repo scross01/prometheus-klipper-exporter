@@ -13,6 +13,11 @@ v0.15.0
 - Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON
 - Fix missing `temperature_probe` query loop in `printer_objects` collector
 - Enable additional Klipper config sections in virtual test environment (`temperature_sensor`, `temperature_fan`, `temperature_probe`, `fan_generic`, `heater_generic`)
+- Add `query_endstops` module with `klipper_endstop_triggered` metric
+- Add `klipper_toolhead_homed_axes_info` and `klipper_toolhead_stalls_total` metrics to `printer_objects` module
+- Add `klipper_temperature_fan_rpm` metric to `printer_objects` module
+- Add `klipper_heater_fan_speed` and `klipper_heater_fan_rpm` metrics for `heater_fan` support in `printer_objects` module
+- Add panels for new metrics to Grafana hardware dashboard
 
 v0.14.0
 -------
