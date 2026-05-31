@@ -5,6 +5,7 @@ v0.15.0
 -------
 
 - Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
+- Add VitePress documentation site with metrics reference, guides, and local search
 
 v0.14.0
 -------

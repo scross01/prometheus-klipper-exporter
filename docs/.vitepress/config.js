@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: 'Prometheus Klipper Exporter',
   description: 'Prometheus exporter for Klipper 3D printer firmware',
   base: '/prometheus-klipper-exporter/',
@@ -42,6 +43,10 @@ export default defineConfig({
       ],
     },
 
+    search: {
+      provider: 'local',
+    },
+
     socialLinks: [
       { icon: 'github', link: 'https://github.com/scross01/prometheus-klipper-exporter' },
     ],
@@ -50,4 +55,4 @@ export default defineConfig({
       message: 'Released under the MIT License.',
     },
   },
-})
+}))
