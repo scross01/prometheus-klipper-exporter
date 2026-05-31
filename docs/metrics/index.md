@@ -7,10 +7,11 @@ Exporter. Each metric module links to a detailed reference page.
 
 | Module | Default | API Endpoint | Metrics |
 |--------|---------|--------------|---------|
-| `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 9 |
+| `server_info` | ✓ | [`/server/info`](../metrics/server-info) | 6 |
+| `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 11 |
 | `network_stats` | | [`/machine/proc_stats`](../metrics/network-stats) | 9 |
 | `system_info` | ✓ | [`/machine/system_info`](../metrics/system-info) | 1 |
-| `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 1 |
+| `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
 | `history` | | [`/server/history/totals`](../metrics/history) | 10 |
 | `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 80+ |
@@ -19,7 +20,7 @@ Exporter. Each metric module links to a detailed reference page.
 ## Default Modules
 
 When no modules are specified in the Prometheus configuration, the following
-default modules are enabled: `process_stats`, `job_queue`, `system_info`.
+default modules are enabled: `server_info`, `process_stats`, `job_queue`, `system_info`.
 
 ## All Metrics by Module
 
@@ -36,8 +37,23 @@ default modules are enabled: `process_stats`, `job_queue`, `system_info`.
 | `klipper_system_memory_total` | Gauge | |
 | `klipper_system_memory_used` | Gauge | |
 | `klipper_system_uptime` | Counter | |
+| `klipper_system_throttled_bits` | Gauge | |
+| `klipper_system_throttled_flag_info` | Gauge=1 | `flag` |
 
 [Full reference →](./process-stats)
+
+### `server_info`
+
+| Metric | Type | Labels |
+|--------|------|--------|
+| `klipper_klippy_connected` | Gauge | |
+| `klipper_klippy_state_info` | Gauge=1 | `state` |
+| `klipper_component_info` | Gauge=1 | `component` |
+| `klipper_component_failed_info` | Gauge=1 | `failed_component` |
+| `klipper_moonraker_version_info` | Gauge=1 | `version` |
+| `klipper_api_version_info` | Gauge=1 | `version` |
+
+[Full reference →](./server-info)
 
 ### `network_stats`
 
@@ -68,6 +84,7 @@ default modules are enabled: `process_stats`, `job_queue`, `system_info`.
 | Metric | Type | Labels |
 |--------|------|--------|
 | `klipper_job_queue_length` | Gauge | |
+| `klipper_job_queue_state_info` | Gauge=1 | `state` |
 
 [Full reference →](./job-queue)
 

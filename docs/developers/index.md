@@ -114,7 +114,7 @@ The virtual MCU is an AVR atmega644p with the following available pins:
 | `heater_bed.cfg` | `heater_bed` | heater, sensor pins |
 | `temp_sensors.cfg` | `temperature_sensor`, `temperature_fan` | PA1, PA4, PD2, PD3 |
 | `miscellaneous.cfg` | `fan`, `heater_fan`, `controller_fan`, `filament_motion_sensor`, `output_pin` | PB4, PB5, PB6, PC0, PC1 |
-| `custom_features.cfg` | `temperature_probe`, `fan_generic`, `heater_generic` | PA2, PA3, PD0, PD1 |
+| `custom_features.cfg` | `temperature_probe`, `heater_generic` | PA0, PA2, PA3 |
 | `timelapse.cfg` | Moonraker timelapse | — |
 
 #### Prometheus Scrape Config
@@ -167,6 +167,32 @@ When adding a new Klipper config section to exercise exporter code:
    an existing one.
 3. **Include it in `printer.cfg`**: Add an `[include addons/your_file.cfg]` line.
 4. **Restart the container**: The virtual printer will reload config on restart.
+
+### Known Issues
+
+**MCU `Timer too close` shutdown in simulavr**
+
+The `simulavr` MCU emulator in the virtual-klipper-printer Docker image
+consistently triggers `MCU shutdown: Timer too close` ~7 seconds after Klippy
+reaches the `ready` state. This is triggered by Moonraker's `objects/query`
+request and is a pre-existing bug in the upstream Docker image — it is **not**
+caused by any printer config section or addon file. The `custom_features.cfg`
+addon (`temperature_probe`, `heater_generic`) is safe to enable.
+
+Symptoms:
+- Klippy cycles through ready → shutdown → auto-restart every ~30-60 seconds
+- Moonraker reports `klippy_state=shutdown` even while Klippy produces Stats
+- The UDS socket (`klippy.sock`) exists but does not respond to API requests
+- Metrics continue to flow through the exporter because Moonraker caches last
+  known values and serves them regardless of Klippy's state
+
+Impact on development:
+- Metrics are served and scraped correctly during both `ready` and `shutdown`
+  states, so the exporter and dashboards remain functional
+- Printer-object metrics (temperatures, fans, sensors) reflect the last cached
+  values, not live readings, during a shutdown cycle
+- If you need longer ready windows for testing, restart the full stack with
+  `docker compose down && docker compose up -d` until a stable cycle occurs
 
 ## Collector Implementation Guide
 

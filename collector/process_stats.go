@@ -17,7 +17,7 @@ type MoonrakerProcessStatsQueryResponse struct {
 		SystemMemory         MoonrakerSystemMemory            `json:"system_memory"`
 		SystemUptime         float64                          `json:"system_uptime"`
 		WebsocketConnections int                              `json:"websocket_connectsions"`
-		ThrottledState      MoonrakerThrottledState           `json:"throttled_state"`
+		ThrottledState       MoonrakerThrottledState          `json:"throttled_state"`
 	} `json:"result"`
 }
 

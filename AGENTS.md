@@ -53,3 +53,4 @@ This file provides guidance to agents when working with code in this repository.
   5. Verify the site builds with `cd docs && npm run build`
   6. If adding, removing, or renaming metrics, also update the corresponding Grafana dashboard(s) in `test/grafana/provisioning/dashboards/` (panel queries, template variables, etc.)
 - **New metric naming**: Follow `klipper_*_info` for labeled state gauges, `klipper_*` with `_total` suffix for counters, include units as suffixes (`_celsius`, `_mm`, `_seconds`)
+- **Virtual printer pin conflicts**: The AVR atmega644p reserves PD0/PD1 for serial/UART — do not use them as GPIO in addon configs. Before assigning a pin, check the table in `docs/developers/index.md` and run `rg "<PIN>" test/printer_data/config/addons/` to verify it's unused by loaded configs.

@@ -31,6 +31,7 @@ export default withMermaid(defineConfig({
           text: 'Metrics Reference',
           items: [
             { text: 'Summary', link: '/metrics/' },
+            { text: 'Server Info', link: '/metrics/server-info' },
             { text: 'Process Stats', link: '/metrics/process-stats' },
             { text: 'Network Stats', link: '/metrics/network-stats' },
             { text: 'System Info', link: '/metrics/system-info' },

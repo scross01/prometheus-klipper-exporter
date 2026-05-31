@@ -6,11 +6,12 @@ scrape_configs:
     static_configs:
       - targets: [ 'klipper:7125' ] # the klipper host
     params:
-      modules: [ 
+      modules: [
         'process_stats',
         'network_stats',
         'system_info',
         'job_queue',
+        'server_info',
         'directory_info',
         'printer_objects',
         'history',

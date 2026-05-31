@@ -138,6 +138,11 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		c.collectActivePrint(ch)
 	}
 
+	// Server Info
+	if slices.Contains(c.modules, "server_info") {
+		c.collectServerInfo(ch)
+	}
+
 	// System Info
 	if slices.Contains(c.modules, "system_info") {
 		c.collectSystemInfo(ch)
