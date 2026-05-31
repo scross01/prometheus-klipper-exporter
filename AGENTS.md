@@ -21,7 +21,7 @@ This file provides guidance to agents when working with code in this repository.
 - **API Key Priority**: Header > CLI arg > Environment variable
 
 ## Non-Obvious Patterns
-- **Metric Name Sanitization**: `getValidLabelName()` in collector.go converts hyphens to underscores and strips invalid characters
+- **Metric Name Sanitization**: `GetValidLabelName()` in collector.go converts hyphens to underscores and strips invalid characters
 - **Boolean Conversion**: `boolToFloat64()` converts booleans to 0/1 for Prometheus metrics
 - **Module Registration**: Collector checks `slices.Contains(c.modules, "module_name")` to enable/disable features
 - **API Response Handling**: Each collector file has `fetchMoonraker*` functions that handle HTTP requests and JSON parsing

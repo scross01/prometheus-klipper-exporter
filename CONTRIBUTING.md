@@ -91,7 +91,7 @@ The project follows these key architectural patterns:
 
 ### Key Patterns to Follow
 
-1. **Metric Name Sanitization**: Use `getValidLabelName()` from collector.go for Prometheus metric names
+1. **Metric Name Sanitization**: Use `GetValidLabelName()` from collector.go for Prometheus metric names
 2. **Boolean Conversion**: Use `boolToFloat64()` for converting booleans to 0/1 values
 3. **Module Registration**: Check `slices.Contains(c.modules, "module_name")` before collecting metrics
 4. **API Response Handling**: Implement `fetchMoonraker*` functions for HTTP requests and JSON parsing

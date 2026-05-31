@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+
 	"github.com/scross01/prometheus-klipper-exporter/collector"
 )
 
@@ -52,7 +53,7 @@ func TestGetValidLabelName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := collector.GetValidLabelName(tt.input)
 			if result != tt.expected {
-				t.Errorf("getValidLabelName(%q) = %q, want %q", tt.input, result, tt.expected)
+				t.Errorf("GetValidLabelName(%q) = %q, want %q", tt.input, result, tt.expected)
 			}
 		})
 	}
