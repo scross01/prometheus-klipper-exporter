@@ -5,3 +5,13 @@ TODO.md
 .roo/
 
 test/printer_data/
+
+# Build artifacts
+build/
+
+# Docs site (VitePress)
+docs/node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+
+reports/
