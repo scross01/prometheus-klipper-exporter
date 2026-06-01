@@ -18,7 +18,7 @@ labelled with the network interface name.
 | `klipper_network_tx_errs` | Counter | `interface` | Transmitted packet errors |
 | `klipper_network_rx_drop` | Counter | `interface` | Received dropped packets |
 | `klipper_network_tx_drop` | Counter | `interface` | Transmitted dropped packets |
-| `klipper_network_tx_bandwidth` | Gauge | `interface` | Current transmit bandwidth |
+| `klipper_network_bandwidth` | Gauge | `interface` | Current transmit bandwidth |
 
 ## Example PromQL
 

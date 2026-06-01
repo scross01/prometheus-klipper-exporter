@@ -70,7 +70,7 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 | `klipper_network_tx_errs` | Counter | `interface` |
 | `klipper_network_rx_drop` | Counter | `interface` |
 | `klipper_network_tx_drop` | Counter | `interface` |
-| `klipper_network_tx_bandwidth` | Gauge | `interface` |
+| `klipper_network_bandwidth` | Gauge | `interface` |
 
 [Full reference →](./network-stats)
 
