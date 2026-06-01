@@ -124,36 +124,43 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 
 	// Process Stats (and Network Stats)
 	if slices.Contains(c.modules, "process_stats") || slices.Contains(c.modules, "network_stats") {
+		log.Infof("Collecting process_stats for %s", c.target)
 		c.collectProcessAndNetworkStats(ch)
 	}
 
 	// Directory Information
 	if slices.Contains(c.modules, "directory_info") {
+		log.Infof("Collecting directory_info for %s", c.target)
 		c.collectDirectoryInfo(ch)
 	}
 
 	// Job Queue
 	if slices.Contains(c.modules, "job_queue") {
+		log.Infof("Collecting job_queue for %s", c.target)
 		c.collectJobQueue(ch)
 	}
 
 	// Job History
 	if slices.Contains(c.modules, "history") {
+		log.Infof("Collecting history for %s", c.target)
 		c.collectHistory(ch)
 	}
 
 	// Current Print from Job History
 	if slices.Contains(c.modules, "history") {
+		log.Infof("Collecting active print for %s", c.target)
 		c.collectActivePrint(ch)
 	}
 
 	// Server Info
 	if slices.Contains(c.modules, "server_info") {
+		log.Infof("Collecting server_info for %s", c.target)
 		c.collectServerInfo(ch)
 	}
 
 	// System Info
 	if slices.Contains(c.modules, "system_info") {
+		log.Infof("Collecting system_info for %s", c.target)
 		c.collectSystemInfo(ch)
 	}
 
@@ -161,31 +168,36 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 	// (deprecated since v0.8.0, use `printer_objects` instead)
 	// (removed with warning in v0.14.0)
 	if slices.Contains(c.modules, "temperature") {
-		log.Errorf("Collecting `temperature` metrics for %s is no longer supported, use `printer_objects` instea", c.target)
+		log.Errorf("Collecting `temperature` metrics for %s is no longer supported, use `printer_objects` instead", c.target)
 	}
 
 	// Printer Objects
 	if slices.Contains(c.modules, "printer_objects") {
+		log.Infof("Collecting printer_objects for %s", c.target)
 		c.collectPrinterObjects(ch)
 	}
 
 	// Query Endstops
 	if slices.Contains(c.modules, "query_endstops") {
+		log.Infof("Collecting query_endstops for %s", c.target)
 		c.collectQueryEndstops(ch)
 	}
 
 	// MMU (Multi-Material Unit) - Happy Hare - only if present
 	if slices.Contains(c.modules, "mmu") {
+		log.Infof("Collecting mmu for %s", c.target)
 		c.collectMMU(ch)
 	}
 
 	// Power Devices
 	if slices.Contains(c.modules, "device_power") {
+		log.Infof("Collecting device_power for %s", c.target)
 		c.collectPowerDevices(ch)
 	}
 
 	// Spoolman
 	if slices.Contains(c.modules, "spoolman") {
+		log.Infof("Collecting spoolman for %s", c.target)
 		c.collectSpoolman(ch)
 	}
 }

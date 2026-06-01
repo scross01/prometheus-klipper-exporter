@@ -31,8 +31,6 @@ type MoonrakerPowerStatusResponse struct {
 }
 
 func (c Collector) collectPowerDevices(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting device_power for %s", c.target)
-
 	// Fetch list of power devices
 	var devicesResult MoonrakerPowerDevicesResponse
 	if err := c.fetchFromMoonraker("/machine/device_power/devices", &devicesResult); err != nil {

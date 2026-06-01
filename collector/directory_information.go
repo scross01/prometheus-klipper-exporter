@@ -19,8 +19,6 @@ type MoonrakerDirecotryInfoQueryResponse struct {
 
 // collectDirectoryInfo
 func (c Collector) collectDirectoryInfo(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting directory_info for %s", c.target)
-
 	var result MoonrakerDirecotryInfoQueryResponse
 	if err := c.fetchFromMoonraker("/server/files/directory?path=gcodes&extended=false", &result); err != nil {
 		log.Error(err)

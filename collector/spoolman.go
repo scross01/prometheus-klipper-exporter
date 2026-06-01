@@ -26,8 +26,6 @@ type SpoolmanSpool struct {
 }
 
 func (c Collector) collectSpoolman(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting spoolman for %s", c.target)
-
 	var spools []SpoolmanSpool
 	if err := c.fetchFromMoonraker("/server/spoolman/spool", &spools); err != nil {
 		log.Error(err)

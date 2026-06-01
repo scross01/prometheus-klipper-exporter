@@ -60,8 +60,6 @@ type MoonrakerThrottledState struct {
 }
 
 func (c Collector) collectProcessAndNetworkStats(ch chan<- prometheus.Metric) bool {
-	log.Infof("Collecting process_stats for %s", c.target)
-
 	var result MoonrakerProcessStatsQueryResponse
 	if err := c.fetchFromMoonraker("/machine/proc_stats", &result); err != nil {
 		log.Error(err)

@@ -59,8 +59,6 @@ type MoonrakerHistoryCurrentPrintResponse struct {
 }
 
 func (c Collector) collectActivePrint(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting active print for %s", c.target)
-
 	var result MoonrakerHistoryCurrentPrintResponse
 	if err := c.fetchFromMoonraker("/server/history/list?limit=1&start=0&since=1&order=desc", &result); err != nil {
 		log.Error(err)
@@ -78,8 +76,6 @@ func (c Collector) collectActivePrint(ch chan<- prometheus.Metric) {
 }
 
 func (c Collector) collectHistory(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting history for %s", c.target)
-
 	var result MoonrakerHistoryResponse
 	if err := c.fetchFromMoonraker("/server/history/totals", &result); err != nil {
 		log.Error(err)

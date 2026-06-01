@@ -209,8 +209,6 @@ func (c Collector) fetchMMUPreGateSensors(numGates int) ([]bool, []bool, error) 
 }
 
 func (c Collector) collectMMU(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting mmu for %s", c.target)
-
 	result, err := c.fetchMMUData()
 	if err != nil {
 		log.Errorf("Failed to fetch MMU data: %v", err)

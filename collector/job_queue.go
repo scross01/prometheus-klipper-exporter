@@ -19,8 +19,6 @@ type MoonrakerQueuedJob struct {
 }
 
 func (c Collector) collectJobQueue(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting job_queue for %s", c.target)
-
 	var result MoonrakerJobQueueResponse
 	if err := c.fetchFromMoonraker("/server/job_queue/status", &result); err != nil {
 		log.Error(err)

@@ -554,8 +554,6 @@ func (c Collector) fetchMoonrakerQueryEndstops() (map[string]string, error) {
 }
 
 func (c Collector) collectQueryEndstops(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting query_endstops for %s", c.target)
-
 	endstops, err := c.fetchMoonrakerQueryEndstops()
 	if err != nil {
 		log.Error(err)
@@ -573,8 +571,6 @@ func (c Collector) collectQueryEndstops(ch chan<- prometheus.Metric) {
 }
 
 func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting printer_objects for %s", c.target)
-
 	result, err := c.fetchMoonrakerPrinterObjects()
 	if err != nil {
 		log.Error(err)

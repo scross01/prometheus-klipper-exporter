@@ -25,8 +25,6 @@ type MoonrakerSystemInfoQueryResponse struct {
 }
 
 func (c Collector) collectSystemInfo(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting system_info for %s", c.target)
-
 	var result MoonrakerSystemInfoQueryResponse
 	if err := c.fetchFromMoonraker("/machine/system_info", &result); err != nil {
 		log.Error(err)
