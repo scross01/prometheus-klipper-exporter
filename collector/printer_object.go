@@ -80,14 +80,14 @@ type PrinterObjectGcodeMove struct {
 const gcodeMoveQuery string = "gcode_move=speed_factor,speed,extrude_factor,gcode_position"
 
 type PrinterObjectToolhead struct {
-	PrintTime            float64  `json:"print_time"`
-	EstimatedPrintTime   float64  `json:"estimated_print_time"`
-	MaxVelocity          float64  `json:"max_velocity"`
-	MaxAccel             float64  `json:"max_accel"`
-	MaxAccelToDecel      float64  `json:"max_accel_to_decel"`
-	SquareCornerVelocity float64  `json:"square_corner_velocity"`
-	HomedAxes            []string `json:"homed_axes"`
-	Stalls               float64  `json:"stalls"`
+	PrintTime            float64 `json:"print_time"`
+	EstimatedPrintTime   float64 `json:"estimated_print_time"`
+	MaxVelocity          float64 `json:"max_velocity"`
+	MaxAccel             float64 `json:"max_accel"`
+	MaxAccelToDecel      float64 `json:"max_accel_to_decel"`
+	SquareCornerVelocity float64 `json:"square_corner_velocity"`
+	HomedAxes            string  `json:"homed_axes"`
+	Stalls               float64 `json:"stalls"`
 }
 
 const toolheadQuery string = "toolhead=print_time,estimated_print_time,max_velocity,max_accel,max_accel_to_decel,square_corner_velocity,homed_axes,stalls"
@@ -704,7 +704,7 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 
 	// toolhead homed axes
 	for _, axis := range result.Result.Status.Toolhead.HomedAxes {
-		emitStateInfoMetric(ch, "klipper_toolhead_homed_axes_info", "A homed axis on the toolhead.", "axis", axis)
+		emitStateInfoMetric(ch, "klipper_toolhead_homed_axes_info", "A homed axis on the toolhead.", "axis", string(axis))
 	}
 	c.emitCounter(ch, "klipper_toolhead_stalls_total", "Total number of toolhead stalls.", result.Result.Status.Toolhead.Stalls)
 

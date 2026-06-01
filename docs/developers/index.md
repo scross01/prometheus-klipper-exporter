@@ -17,7 +17,7 @@ Klipper Exporter.
 │   ├── network_stats.go            # /machine/proc_stats (network interfaces)
 │   ├── printer_object.go           # /printer/objects/query
 │   ├── process_stats.go            # /machine/proc_stats (CPU/memory)
-│   ├── spoolman.go                # /server/spoolman/spool (Spoolman filament spools)
+│   ├── spoolman.go                # POST /server/spoolman/proxy → GET /v1/spool (Spoolman filament spools)
 │   ├── system_info.go              # /machine/system_info (CPU count and service states)
 │   └── mmu.go                      # /printer/objects/query (MMU objects)
 ├── test/

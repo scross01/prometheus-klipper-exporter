@@ -17,7 +17,7 @@ Exporter. Each metric module links to a detailed reference page.
 | `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 11 |
 | `query_endstops` | ✓ | [`/printer/query_endstops`](../metrics/printer-objects#query_endstops) | 1 |
 | `server_info` | ✓ | [`/server/info`](../metrics/server-info) | 6 |
-| `spoolman` | | [`/server/spoolman/spool`](../metrics/spoolman) | 5 |
+| `spoolman` | | [`/server/spoolman/status`, `POST /server/spoolman/proxy` → `GET /v1/spool`](../metrics/spoolman) | 8 |
 | `system_info` | ✓ | [`/machine/system_info`](../metrics/system-info) | 4 |
 
 ## Default Modules
@@ -88,7 +88,10 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 
 | Metric | Type | Labels |
 |--------|------|--------|
-| `klipper_spoolman_spool_info` | Gauge=1 | `spool_id`, `filament_name`, `material`, `color` |
+| `klipper_spoolman_connected` | Gauge | |
+| `klipper_spoolman_active_spool_id` | Gauge | |
+| `klipper_spoolman_pending_reports` | Gauge | |
+| `klipper_spoolman_spool_info` | Gauge=1 | `spool_id`, `filament_name`, `material`, `color`, `vendor` |
 | `klipper_spoolman_remaining_weight` | Gauge | `spool_id` |
 | `klipper_spoolman_used_weight` | Gauge | `spool_id` |
 | `klipper_spoolman_remaining_length` | Gauge | `spool_id` |

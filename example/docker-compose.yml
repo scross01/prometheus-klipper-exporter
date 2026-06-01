@@ -1,4 +1,3 @@
-version: '2'
 services:
 
   prometheus:
@@ -27,6 +26,7 @@ services:
     restart: unless-stopped
     volumes:
       - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
     environment:
       GF_SERVER_ROOT_URL: http://localhost
       GF_SECURITY_ADMIN_PASSWORD: 'password1234!@#$' # change password
@@ -38,7 +38,11 @@ services:
 
   klipper-exporter:
     hostname: klipper-exporter
-    image: ghcr.io/scross01/prometheus-klipper-exporter:latest
+    # use image for latest released image or build for local build
+    # image: ghcr.io/scross01/prometheus-klipper-exporter:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
     container_name: klipper-exporter
     restart: unless-stopped
     expose:
