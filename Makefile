@@ -2,9 +2,15 @@ VERSIONFILE=version.txt
 VERSION=`cat $(VERSIONFILE)`
 
 build:
+	go mod tidy
 	go build .
 
-release: build-rpi build-linux build-macos build-windows
+release: tidy build-rpi build-linux build-macos build-windows
+
+tidy:
+	go mod tidy
+	@echo "Verifying module graph..."
+	go mod verify
 
 build-rpi:
 	mkdir -p build/release-$(VERSION)
@@ -48,5 +54,5 @@ install-rpi:
 	ssh pi@klipper.home.lan "rm klipper-exporter/prometheus-klipper-exporter && ln -s prometheus-klipper-exporter-rpi-armv7-$(VERSION) klipper-exporter/prometheus-klipper-exporter"
 	ssh pi@klipper.home.lan "sudo systemctl restart klipper-exporter.service"
 
-.PHONY: build test
+.PHONY: build test tidy release
 

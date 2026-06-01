@@ -17,7 +17,6 @@ type MoonrakerSystemInfoQueryResponse struct {
 			} `json:"cpu_info"`
 			AvailableServices []string `json:"available_services"`
 			ServiceState      map[string]struct {
-				Active      bool   `json:"active"`
 				ActiveState string `json:"active_state"`
 				SubState    string `json:"sub_state"`
 			} `json:"service_state"`
@@ -39,31 +38,31 @@ func (c Collector) collectSystemInfo(ch chan<- prometheus.Metric) {
 		"Klipper system CPU count.",
 		float64(result.Result.SystemInfo.CpuInfo.CpuCount))
 
-	// Emit klipper_service_available for each available service
+	// Iterate available_services and look up each in service_state to emit consistent metrics
 	for _, service := range result.Result.SystemInfo.AvailableServices {
+		labelName := GetValidLabelName(service)
+
+		// Emit availability metric
 		emitStateInfoMetric(ch, "klipper_service_available",
 			"Klipper host service availability. Always 1 when present.",
-			"service", GetValidLabelName(service))
-	}
+			"service", labelName)
 
-	// Emit klipper_service_state_info and klipper_service_sub_state_info for each service
-	for serviceName, serviceStatus := range result.Result.SystemInfo.ServiceState {
-		labelName := GetValidLabelName(serviceName)
-
-		if serviceStatus.ActiveState != "" {
-			desc := prometheus.NewDesc("klipper_service_state_info",
+		// Look up the service in service_state
+		if serviceStatus, exists := result.Result.SystemInfo.ServiceState[service]; exists {
+			emitStateInfoMetric2(ch, "klipper_service_state_info",
 				"Klipper host service state.",
-				[]string{"service", "state"}, nil,
-			)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1.0, labelName, serviceStatus.ActiveState)
-		}
-
-		if serviceStatus.SubState != "" {
-			desc := prometheus.NewDesc("klipper_service_sub_state_info",
+				"service", labelName, "state", serviceStatus.ActiveState)
+			emitStateInfoMetric2(ch, "klipper_service_sub_state_info",
 				"Klipper host service sub-state.",
-				[]string{"service", "sub_state"}, nil,
-			)
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1.0, labelName, serviceStatus.SubState)
+				"service", labelName, "sub_state", serviceStatus.SubState)
+		} else {
+			// Service is available but has no state — emit unknown sentinels
+			emitStateInfoMetric2(ch, "klipper_service_state_info",
+				"Klipper host service state.",
+				"service", labelName, "state", "unknown")
+			emitStateInfoMetric2(ch, "klipper_service_sub_state_info",
+				"Klipper host service sub-state.",
+				"service", labelName, "sub_state", "unknown")
 		}
 	}
 }

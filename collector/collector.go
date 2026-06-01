@@ -73,6 +73,15 @@ func emitStateInfoMetric(ch chan<- prometheus.Metric, metricName, description, l
 	}
 }
 
+// emitStateInfoMetric2 is the two-label variant of emitStateInfoMetric.
+// It only emits when stateValue is non-empty, and accepts two label name/value pairs.
+func emitStateInfoMetric2(ch chan<- prometheus.Metric, metricName, description, label1Name, label1Value, label2Name, label2Value string) {
+	if label1Value != "" && label2Value != "" {
+		desc := prometheus.NewDesc(metricName, description, []string{label1Name, label2Name}, nil)
+		ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, 1.0, label1Value, label2Value)
+	}
+}
+
 // fetchFromMoonraker performs an HTTP GET to the Moonraker API, JSON-unmarshals the
 // response, and checks for a 200 status code.
 func (c Collector) fetchFromMoonraker(urlPath string, response interface{}) error {

@@ -8,10 +8,10 @@ This file provides guidance to agents when working with code in this repository.
 - **Build System**: Makefile-based with cross-compilation support
 
 ## Build/Run Commands
-- `make build` - Build the exporter
+- `make build` - Tidy modules and build the exporter
 - `make run` - Run the exporter locally
 - `make fmt` - Format Go code (runs `go fmt` in both root and collector directories)
-- `make release` - Build for all platforms (RPi, Linux, macOS, Windows)
+- `make release` - Tidy and verify modules, then build for all platforms (RPi, Linux, macOS, Windows)
 - `make test` - Run tests
 - `cd docs && npm run dev` - Start VitePress docs dev server (hot-reload)
 - `cd docs && npm run build` - Build docs site for production

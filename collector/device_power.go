@@ -4,7 +4,7 @@ package collector
 // https://moonraker.readthedocs.io/en/latest/external_api/devices/
 
 import (
-	"strings"
+	"net/url"
 
 	"github.com/prometheus/client_golang/prometheus"
 	log "github.com/sirupsen/logrus"
@@ -58,7 +58,7 @@ func (c Collector) collectPowerDevices(ch chan<- prometheus.Metric) {
 	}
 	statusURL := "/machine/device_power/status"
 	if len(deviceNames) > 0 {
-		statusURL += "?" + strings.Join(deviceNames, "&")
+		statusURL += "?" + url.Values{"device": deviceNames}.Encode()
 	}
 
 	// Fetch device statuses
