@@ -1,0 +1,145 @@
+name: Release
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ 'v*.*.*' ]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify version.txt matches tag
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          if [ "$(cat version.txt)" != "$VERSION" ]; then
+            echo "ERROR: version.txt ($(cat version.txt)) does not match tag ($VERSION)"
+            exit 1
+          fi
+          echo "version.txt matches tag $VERSION"
+
+      - name: Verify CHANGELOG.md has section for this version
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          if ! grep -qFx "$VERSION" CHANGELOG.md; then
+            echo "ERROR: CHANGELOG.md does not contain a section for $VERSION"
+            exit 1
+          fi
+          echo "CHANGELOG.md has section for $VERSION"
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: rpi-armv7
+            goos: linux
+            goarch: arm
+            goarm: '7'
+          - name: rpi-arm64
+            goos: linux
+            goarch: arm64
+            goarm: ''
+          - name: linux-amd64
+            goos: linux
+            goarch: amd64
+            goarm: ''
+          - name: macos-amd64
+            goos: darwin
+            goarch: amd64
+            goarm: ''
+          - name: macos-arm64
+            goos: darwin
+            goarch: arm64
+            goarm: ''
+          - name: windows-amd64
+            goos: windows
+            goarch: amd64
+            goarm: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25'
+          cache: true
+
+      - name: Tidy and verify modules
+        run: |
+          go mod tidy
+          go mod verify
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          GOARM: ${{ matrix.goarm }}
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          EXT=""
+          [ "${{ matrix.goos }}" = "windows" ] && EXT=".exe"
+          BINARY="prometheus-klipper-exporter-${{ matrix.name }}-${VERSION}${EXT}"
+          mkdir -p build
+          go build -o "build/$BINARY" .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.name }}
+          path: build/
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: build/release-${{ github.ref_name }}
+          merge-multiple: true
+
+      - name: List release artifacts
+        run: ls -la build/release-${{ github.ref_name }}/
+
+      - name: Generate artifact attestations
+        uses: actions/attest@v4
+        with:
+          subject-path: build/release-${{ github.ref_name }}/*
+
+      - name: Generate release notes from CHANGELOG.md
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          # Extract the section for the current version from CHANGELOG.md
+          # Uses exact string comparison (not regex) to safely handle dots in version
+          awk -v ver="$VERSION" '
+            $0 == ver { found=1; next }
+            found && /^------/ { next }
+            found && /^v[0-9]/ { exit }
+            found { if (NF > 0) in_content=1; if (in_content) print }
+          ' CHANGELOG.md > /tmp/release-notes.md
+
+      - name: Create draft release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          gh release create "$VERSION" \
+            --title="$VERSION" \
+            --draft \
+            --notes-file /tmp/release-notes.md \
+            build/release-${VERSION}/*
