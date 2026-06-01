@@ -17,9 +17,9 @@ type MoonrakerSystemInfoQueryResponse struct {
 			} `json:"cpu_info"`
 			AvailableServices []string `json:"available_services"`
 			ServiceState      map[string]struct {
-				Active           bool   `json:"active"`
-				ActiveState      string `json:"active_state"`
-				SubState         string `json:"sub_state"`
+				Active      bool   `json:"active"`
+				ActiveState string `json:"active_state"`
+				SubState    string `json:"sub_state"`
 			} `json:"service_state"`
 		} `json:"system_info"`
 	} `json:"result"`

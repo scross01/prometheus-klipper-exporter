@@ -10,21 +10,21 @@ Klipper Exporter.
 ├── main.go                         # HTTP server, routing, CLI flags
 ├── collector/
 │   ├── collector.go                # Prometheus Collector interface, shared utilities
-│   ├── process_stats.go            # /machine/proc_stats (CPU/memory)
-│   ├── network_stats.go            # /machine/proc_stats (network interfaces)
-│   ├── system_info.go              # /machine/system_info
-│   ├── job_queue.go                # /server/job_queue/status
+│   ├── device_power.go            # /machine/device_power (power device status)
 │   ├── directory_info.go           # /server/files/directory
 │   ├── history.go                  # /server/history/totals
+│   ├── job_queue.go                # /server/job_queue/status
+│   ├── network_stats.go            # /machine/proc_stats (network interfaces)
 │   ├── printer_object.go           # /printer/objects/query
-│   ├── device_power.go            # /machine/device_power (power device status)
+│   ├── process_stats.go            # /machine/proc_stats (CPU/memory)
+│   ├── spoolman.go                # /server/spoolman/spool (Spoolman filament spools)
 │   ├── system_info.go              # /machine/system_info (CPU count and service states)
 │   └── mmu.go                      # /printer/objects/query (MMU objects)
 ├── test/
+│   └── README.md                   # Quick start for test env
 │   ├── docker-compose.yml          # Local test environment
 │   ├── printer_data/               # Virtual Klipper printer config
 │   ├── prometheus.yml              # Prometheus scrape config for local dev
-│   └── README.md                   # Quick start for test env
 ├── docs/                           # VitePress documentation site
 ├── example/                        # Docker deployment example
 └── Makefile                        # Build, fmt, test, release targets

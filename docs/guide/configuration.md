@@ -44,6 +44,7 @@ params:
     - printer_objects
     - history
     - device_power
+    - spoolman
     - query_endstops
     - mmu
 ```
@@ -53,17 +54,18 @@ If omitted, only the default modules are collected: `server_info`,
 
 | Module | Default | Description |
 |--------|---------|-------------|
-| `server_info` | ✓ | Klippy connection state, loaded/failed components, Moonraker/API versions |
-| `process_stats` | ✓ | Moonraker process and system CPU/memory metrics |
-| `system_info` | ✓ | System CPU count and service states |
-| `job_queue` | ✓ | Job queue length and state |
-| `query_endstops` | ✓ | Endstop triggered state |
 | `device_power` | ✓ | Power device type, status, and state |
-| `network_stats` | | Network interface traffic and errors |
 | `directory_info` | | Disk usage for gcodes directory |
 | `history` | | Historical print job statistics |
-| `printer_objects` | | Klipper printer object state (temperature, fans, MCU, etc.) |
+| `job_queue` | ✓ | Job queue length and state |
 | `mmu` | | Happy Hare Multi-Material Unit metrics |
+| `network_stats` | | Network interface traffic and errors |
+| `printer_objects` | | Klipper printer object state (temperature, fans, MCU, etc.) |
+| `process_stats` | ✓ | Moonraker process and system CPU/memory metrics |
+| `spoolman` | | Spoolman filament spool information, remaining/used weight and length |
+| `query_endstops` | ✓ | Endstop triggered state |
+| `server_info` | ✓ | Klippy connection state, loaded/failed components, Moonraker/API versions |
+| `system_info` | ✓ | System CPU count and service states |
 
 The `temperature` module was deprecated in v0.8.0 and removed in v0.14.0 —
 use `printer_objects` instead.

@@ -7,17 +7,18 @@ Exporter. Each metric module links to a detailed reference page.
 
 | Module | Default | API Endpoint | Metrics |
 |--------|---------|--------------|---------|
-| `server_info` | ✓ | [`/server/info`](../metrics/server-info) | 6 |
-| `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 11 |
-| `network_stats` | | [`/machine/proc_stats`](../metrics/network-stats) | 9 |
 | `device_power` | ✓ | [`/machine/device_power`](../metrics/device-power) | 3 |
-| `system_info` | ✓ | [`/machine/system_info`](../metrics/system-info) | 4 |
-| `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
 | `history` | | [`/server/history/totals`](../metrics/history) | 10 |
-| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 96+ |
-| `query_endstops` | ✓ | [`/printer/query_endstops`](../metrics/printer-objects#query_endstops) | 1 |
+| `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `mmu` | | [`/printer/objects/query`](../metrics/mmu) | 50+ |
+| `network_stats` | | [`/machine/proc_stats`](../metrics/network-stats) | 9 |
+| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 96+ |
+| `process_stats` | ✓ | [`/machine/proc_stats`](../metrics/process-stats) | 11 |
+| `query_endstops` | ✓ | [`/printer/query_endstops`](../metrics/printer-objects#query_endstops) | 1 |
+| `server_info` | ✓ | [`/server/info`](../metrics/server-info) | 6 |
+| `spoolman` | | [`/server/spoolman/spool`](../metrics/spoolman) | 5 |
+| `system_info` | ✓ | [`/machine/system_info`](../metrics/system-info) | 4 |
 
 ## Default Modules
 
@@ -82,6 +83,18 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 | `klipper_power_device_state_info` | Gauge=1 | `device`, `state` |
 
 [Full reference →](./device-power)
+
+### `spoolman`
+
+| Metric | Type | Labels |
+|--------|------|--------|
+| `klipper_spoolman_spool_info` | Gauge=1 | `spool_id`, `filament_name`, `material`, `color` |
+| `klipper_spoolman_remaining_weight` | Gauge | `spool_id` |
+| `klipper_spoolman_used_weight` | Gauge | `spool_id` |
+| `klipper_spoolman_remaining_length` | Gauge | `spool_id` |
+| `klipper_spoolman_used_length` | Gauge | `spool_id` |
+
+[Full reference →](./spoolman)
 
 ### `system_info`
 

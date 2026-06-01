@@ -16,6 +16,7 @@ scrape_configs:
         'printer_objects',
         'history',
         'device_power',
+        'spoolman',
         'query_endstops',
       ]
     # Enable API Key authentication.
