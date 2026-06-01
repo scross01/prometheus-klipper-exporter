@@ -523,7 +523,7 @@ type QueryEndstopsResponse struct {
 
 func (c Collector) fetchMoonrakerQueryEndstops() (map[string]string, error) {
 	var response QueryEndstopsResponse
-	if err := c.fetchFromMoonraker("/printer/query_endstops", &response); err != nil {
+	if err := c.fetchFromMoonraker("/printer/query_endstops/status", &response); err != nil {
 		return nil, err
 	}
 	return response.Result, nil

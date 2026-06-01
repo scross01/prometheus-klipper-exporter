@@ -11,10 +11,12 @@ scrape_configs:
         'network_stats',
         'system_info',
         'job_queue',
+        'server_info',
         'directory_info',
         'printer_objects',
         'history',
         'power_devices',
+        'query_endstops',
       ]
     # Enable API Key authentication.
     # Only set one of `credentials` or `credentials_file`
