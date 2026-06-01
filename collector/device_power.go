@@ -31,7 +31,7 @@ type MoonrakerPowerStatusResponse struct {
 }
 
 func (c Collector) collectPowerDevices(ch chan<- prometheus.Metric) {
-	log.Infof("Collecting power_devices for %s", c.target)
+	log.Infof("Collecting device_power for %s", c.target)
 
 	// Fetch list of power devices
 	var devicesResult MoonrakerPowerDevicesResponse

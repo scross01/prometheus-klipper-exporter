@@ -13,7 +13,8 @@ v0.15.0
 - Add `klipper_webhooks_state_info`, `klipper_pause_resume_is_paused`, `klipper_idle_timeout_state_info`, and `klipper_sdcard_active` metrics to `printer_objects` module
 - Add `klipper_system_throttled_bits` and `klipper_system_throttled_flag_info` metrics to `process_stats` module
 - Add `klipper_job_queue_state_info` metric to `job_queue` module
-- Add optional `power_devices` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
+- Add `klipper_service_available`, `klipper_service_state_info`, and `klipper_service_sub_state_info` service state metrics to `system_info` module
+- Add optional `device_power` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
 - Add optional `server_info` module with `klipper_klippy_connected`, `klipper_klippy_state_info`, `klipper_component_info`, `klipper_component_failed_info`, `klipper_moonraker_version_info`, and `klipper_api_version_info` metrics
 - Add optional `query_endstops` module with `klipper_endstop_triggered` metric
 - Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON

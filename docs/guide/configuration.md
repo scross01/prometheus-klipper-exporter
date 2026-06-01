@@ -35,24 +35,30 @@ Prometheus scrape configuration.
 ```yaml
 params:
   modules:
+    - server_info
     - process_stats
-    - job_queue
-    - system_info
     - network_stats
+    - system_info
+    - job_queue
     - directory_info
     - printer_objects
     - history
+    - device_power
+    - query_endstops
     - mmu
 ```
 
-If omitted, only the default modules are collected: `process_stats`, `job_queue`,
-`system_info`.
+If omitted, only the default modules are collected: `server_info`,
+`process_stats`, `job_queue`, `system_info`, `query_endstops`, `device_power`.
 
 | Module | Default | Description |
 |--------|---------|-------------|
+| `server_info` | ✓ | Klippy connection state, loaded/failed components, Moonraker/API versions |
 | `process_stats` | ✓ | Moonraker process and system CPU/memory metrics |
-| `job_queue` | ✓ | Job queue length |
-| `system_info` | ✓ | System CPU count |
+| `system_info` | ✓ | System CPU count and service states |
+| `job_queue` | ✓ | Job queue length and state |
+| `query_endstops` | ✓ | Endstop triggered state |
+| `device_power` | ✓ | Power device type, status, and state |
 | `network_stats` | | Network interface traffic and errors |
 | `directory_info` | | Disk usage for gcodes directory |
 | `history` | | Historical print job statistics |

@@ -15,7 +15,7 @@ Grafana Dashboards
 
 Example dashboards are auto-provisioned on startup in a **Klipper** folder:
 
-- **Klipper System** — CPU, memory, network, disk, Moonraker process stats
+- **Klipper System** — CPU, memory, network, disk, Moonraker process, service states
 - **Klipper Server Info** — Klippy connection state, loaded/failed components, Moonraker/API versions
 - **Klipper Temperatures** — Extruder, bed, sensors, fans, probes, heaters
 - **Klipper Print Status** — Print progress, g-code position, history

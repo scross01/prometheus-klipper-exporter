@@ -30,7 +30,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Set default modules
-	modules := []string{"server_info", "process_stats", "job_queue", "system_info", "query_endstops", "power_devices"}
+	modules := []string{"server_info", "process_stats", "job_queue", "system_info", "query_endstops", "device_power"}
 	// get `modules` configuration passed from the prometheus.yml
 	if len(query["modules"]) > 0 {
 		modules = query["modules"]

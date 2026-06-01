@@ -171,7 +171,7 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 	}
 
 	// Power Devices
-	if slices.Contains(c.modules, "power_devices") {
+	if slices.Contains(c.modules, "device_power") {
 		c.collectPowerDevices(ch)
 	}
 }
