@@ -15,7 +15,7 @@ Exporter. Each metric module links to a detailed reference page.
 | `job_queue` | ✓ | [`/server/job_queue/status`](../metrics/job-queue) | 2 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
 | `history` | | [`/server/history/totals`](../metrics/history) | 10 |
-| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 86+ |
+| `printer_objects` | | [`/printer/objects/query`](../metrics/printer-objects) | 96+ |
 | `query_endstops` | ✓ | [`/printer/query_endstops`](../metrics/printer-objects#query_endstops) | 1 |
 | `mmu` | | [`/printer/objects/query`](../metrics/mmu) | 50+ |
 
@@ -142,6 +142,8 @@ default modules are enabled: `server_info`, `process_stats`, `job_queue`, `syste
 | `heater_fan` | `klipper_heater_fan_rpm`, `klipper_heater_fan_speed` | `fan` |
 | `heater_generic` | `klipper_generic_heater_power`, `klipper_generic_heater_target`, `klipper_generic_heater_temperature` | `heater` |
 | `idle_timeout` | `klipper_printing_time` | |
+| `input_shaper` | `klipper_input_shaper_damping_ratio_x`, `klipper_input_shaper_damping_ratio_y`, `klipper_input_shaper_frequency_x`, `klipper_input_shaper_frequency_y`, `klipper_input_shaper_type_info{axis="...",type="..."}` | |
+| `firmware_retraction` | `klipper_firmware_retract_length`, `klipper_firmware_retract_speed`, `klipper_firmware_unretract_extra_length`, `klipper_firmware_unretract_speed` | |
 | `mcu` | `klipper_mcu_awake`, `klipper_mcu_task_avg`, `klipper_mcu_task_stddev`, `klipper_mcu_clock_frequency`, `klipper_mcu_invalid_bytes`, `klipper_mcu_read_bytes`, `klipper_mcu_ready_bytes`, `klipper_mcu_receive_seq`, `klipper_mcu_retransmit_bytes`, `klipper_mcu_retransmit_seq`, `klipper_mcu_rto`, `klipper_mcu_rttvar`, `klipper_mcu_send_seq`, `klipper_mcu_stalled_bytes`, `klipper_mcu_srtt`, `klipper_mcu_write_bytes` | `mcu` |
 | `output_pin` | `klipper_output_pin_value` | `pin` |
 | `print_stats` | `klipper_print_filament_used`, `klipper_print_total_duration`, `klipper_print_state_info{state="..."}`, `klipper_printing` | |

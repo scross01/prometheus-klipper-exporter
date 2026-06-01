@@ -4,22 +4,22 @@ Change Log
 v0.15.0
 -------
 
-- Add `power_devices` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
-- Add panels for power devices to Grafana hardware dashboard
-- Add new `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
+- Add `klipper_printing` and `klipper_print_state_info` metrics. Address issue #46
+- Add `klipper_temperature_fan_rpm` metric to `printer_objects` module
+- Add `klipper_heater_fan_speed` and `klipper_heater_fan_rpm` metrics for `heater_fan` support in `printer_objects` module
+- Add `klipper_toolhead_homed_axes_info` and `klipper_toolhead_stalls_total` metrics to `printer_objects` module
+- Add `klipper_input_shaper_frequency_{x,y}`, `klipper_input_shaper_damping_ratio_{x,y}`, `klipper_input_shaper_type_info` metrics to `printer_objects` module
+- Add `klipper_firmware_retract_length`, `klipper_firmware_retract_speed`, `klipper_firmware_unretract_extra_length`, `klipper_firmware_unretract_speed` metrics to `printer_objects` module
 - Add `klipper_webhooks_state_info`, `klipper_pause_resume_is_paused`, `klipper_idle_timeout_state_info`, and `klipper_sdcard_active` metrics to `printer_objects` module
 - Add `klipper_system_throttled_bits` and `klipper_system_throttled_flag_info` metrics to `process_stats` module
 - Add `klipper_job_queue_state_info` metric to `job_queue` module
-- Add `server_info` module with `klipper_klippy_connected`, `klipper_klippy_state_info`, `klipper_component_info`, `klipper_component_failed_info`, `klipper_moonraker_version_info`, and `klipper_api_version_info` metrics
-- Add VitePress documentation site with metrics reference, guides, and local search
+- Add optional `power_devices` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
+- Add optional `server_info` module with `klipper_klippy_connected`, `klipper_klippy_state_info`, `klipper_component_info`, `klipper_component_failed_info`, `klipper_moonraker_version_info`, and `klipper_api_version_info` metrics
+- Add optional `query_endstops` module with `klipper_endstop_triggered` metric
 - Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON
 - Fix missing `temperature_probe` query loop in `printer_objects` collector
-- Enable additional Klipper config sections in virtual test environment (`temperature_sensor`, `temperature_fan`, `temperature_probe`, `fan_generic`, `heater_generic`)
-- Add `query_endstops` module with `klipper_endstop_triggered` metric
-- Add `klipper_toolhead_homed_axes_info` and `klipper_toolhead_stalls_total` metrics to `printer_objects` module
-- Add `klipper_temperature_fan_rpm` metric to `printer_objects` module
-- Add `klipper_heater_fan_speed` and `klipper_heater_fan_rpm` metrics for `heater_fan` support in `printer_objects` module
-- Add panels for new metrics to Grafana hardware dashboard
+- Updated virtual test environment with additional metrics enabled and pre-built Grafana dashboards
+- Add VitePress documentation site with metrics reference, guides, and local search
 
 v0.14.0
 -------

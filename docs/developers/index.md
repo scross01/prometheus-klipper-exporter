@@ -138,6 +138,7 @@ The virtual MCU is an AVR atmega644p with the following available pins:
 | `temp_sensors.cfg` | `temperature_sensor`, `temperature_fan` | PA1, PA4, PD2, PD3 |
 | `miscellaneous.cfg` | `fan`, `heater_fan`, `controller_fan`, `filament_motion_sensor`, `output_pin` | PB4, PB5, PB6, PC0, PC1 |
 | `custom_features.cfg` | `temperature_probe`, `heater_generic` | PA0, PA2, PA3 |
+| `input_shaper.cfg` | `input_shaper` | — (no pins required) |
 | `timelapse.cfg` | Moonraker timelapse | — |
 
 #### Prometheus Scrape Config

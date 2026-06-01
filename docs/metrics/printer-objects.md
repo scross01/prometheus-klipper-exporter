@@ -200,6 +200,29 @@ Labels: `endstop`
 
 ---
 
+### `input_shaper`
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `klipper_input_shaper_damping_ratio_x` | Gauge | Input shaper damping ratio for X axis |
+| `klipper_input_shaper_damping_ratio_y` | Gauge | Input shaper damping ratio for Y axis |
+| `klipper_input_shaper_frequency_x` | Gauge | Input shaper frequency for X axis (Hz) |
+| `klipper_input_shaper_frequency_y` | Gauge | Input shaper frequency for Y axis (Hz) |
+| `klipper_input_shaper_type_info` | Gauge=1 | `axis`, `type` | Input shaper type per axis |
+
+---
+
+### `firmware_retraction`
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `klipper_firmware_retract_length` | Gauge | Firmware retraction length (mm) |
+| `klipper_firmware_retract_speed` | Gauge | Firmware retraction speed (mm/min) |
+| `klipper_firmware_unretract_extra_length` | Gauge | Firmware unretract extra length (mm) |
+| `klipper_firmware_unretract_speed` | Gauge | Firmware unretract speed (mm/min) |
+
+---
+
 ### `temperature_fan`
 
 Labels: `fan`

@@ -22,17 +22,19 @@ type PrinterObjectResponse struct {
 }
 
 type PrinterObjectStatus struct {
-	Webhooks      PrinterObjectWebhooks      `json:"webhooks"`
-	PauseResume   PrinterObjectPauseResume   `json:"pause_resume"`
-	GcodeMove     PrinterObjectGcodeMove     `json:"gcode_move"`
-	Toolhead      PrinterObjectToolhead      `json:"toolhead"`
-	Extruder      PrinterObjectExtruder      `json:"extruder"`
-	HeaterBed     PrinterObjectHeaterBed     `json:"heater_bed"`
-	Fan           PrinterObjectFan           `json:"fan"`
-	IdleTimeout   PrinterObjectIdleTimeout   `json:"idle_timeout"`
-	VirtualSdCard PrinterObjectVirtualSdCard `json:"virtual_sdcard"`
-	PrintStats    PrinterObjectPrintStats    `json:"print_stats"`
-	DisplayStatus PrinterObjectDisplayStatus `json:"display_status"`
+	Webhooks           PrinterObjectWebhooks           `json:"webhooks"`
+	PauseResume        PrinterObjectPauseResume        `json:"pause_resume"`
+	GcodeMove          PrinterObjectGcodeMove          `json:"gcode_move"`
+	Toolhead           PrinterObjectToolhead           `json:"toolhead"`
+	Extruder           PrinterObjectExtruder           `json:"extruder"`
+	HeaterBed          PrinterObjectHeaterBed          `json:"heater_bed"`
+	Fan                PrinterObjectFan                `json:"fan"`
+	IdleTimeout        PrinterObjectIdleTimeout        `json:"idle_timeout"`
+	VirtualSdCard      PrinterObjectVirtualSdCard      `json:"virtual_sdcard"`
+	PrintStats         PrinterObjectPrintStats         `json:"print_stats"`
+	DisplayStatus      PrinterObjectDisplayStatus      `json:"display_status"`
+	InputShaper        PrinterObjectInputShaper        `json:"input_shaper"`
+	FirmwareRetraction PrinterObjectFirmwareRetraction `json:"firmware_retraction"`
 	// dynamic sensor attributes populated using custom unmarsaling
 	Mcus               map[string]PrinterObjectMcu
 	TemperatureSensors map[string]PrinterObjectTemperatureSensor
@@ -193,6 +195,26 @@ type PrinterObjectFilamentSensor struct {
 	Detected bool `mapstructure:"filament_detected"`
 	Enabled  bool `mapstructure:"enabled"`
 }
+
+type PrinterObjectInputShaper struct {
+	ShaperTypeX   string  `json:"shaper_type_x"`
+	ShaperTypeY   string  `json:"shaper_type_y"`
+	FrequencyX    float64 `json:"frequency_x"`
+	FrequencyY    float64 `json:"frequency_y"`
+	DampingRatioX float64 `json:"damping_ratio_x"`
+	DampingRatioY float64 `json:"damping_ratio_y"`
+}
+
+const inputShaperQuery = "input_shaper"
+
+type PrinterObjectFirmwareRetraction struct {
+	RetractLength        float64 `json:"retract_length"`
+	RetractSpeed         float64 `json:"retract_speed"`
+	UnretractExtraLength float64 `json:"unretract_extra_length"`
+	UnretractSpeed       float64 `json:"unretract_speed"`
+}
+
+const firmwareRetractionQuery = "firmware_retraction"
 
 type PrinterObjectTmcDrvStatus struct {
 	// Empty struct because we only use it to check if tmc driver is enabled
@@ -506,6 +528,8 @@ func (c Collector) fetchMoonrakerPrinterObjects() (*PrinterObjectResponse, error
 		"&" + heaterQuery +
 		"&" + webhooksQuery +
 		"&" + pauseResumeQuery +
+		"&" + inputShaperQuery +
+		"&" + firmwareRetractionQuery +
 		mcuQuery +
 		customSensorsQuery
 
@@ -962,4 +986,26 @@ func (c Collector) collectPrinterObjects(ch chan<- prometheus.Metric) {
 			boolToFloat64(sv.DrvStatus != nil),
 			sensorName)
 	}
+
+	// input_shaper
+	c.emitGauge(ch, "klipper_input_shaper_frequency_x", "Input shaper frequency for X axis.", result.Result.Status.InputShaper.FrequencyX)
+	c.emitGauge(ch, "klipper_input_shaper_frequency_y", "Input shaper frequency for Y axis.", result.Result.Status.InputShaper.FrequencyY)
+	c.emitGauge(ch, "klipper_input_shaper_damping_ratio_x", "Input shaper damping ratio for X axis.", result.Result.Status.InputShaper.DampingRatioX)
+	c.emitGauge(ch, "klipper_input_shaper_damping_ratio_y", "Input shaper damping ratio for Y axis.", result.Result.Status.InputShaper.DampingRatioY)
+
+	// input_shaper type (info-style metric with axis + type labels)
+	inputShaperTypeLabels := []string{"axis", "type"}
+	inputShaperTypeDesc := prometheus.NewDesc("klipper_input_shaper_type_info", "Input shaper type per axis.", inputShaperTypeLabels, nil)
+	if result.Result.Status.InputShaper.ShaperTypeX != "" {
+		ch <- prometheus.MustNewConstMetric(inputShaperTypeDesc, prometheus.GaugeValue, 1, "x", result.Result.Status.InputShaper.ShaperTypeX)
+	}
+	if result.Result.Status.InputShaper.ShaperTypeY != "" {
+		ch <- prometheus.MustNewConstMetric(inputShaperTypeDesc, prometheus.GaugeValue, 1, "y", result.Result.Status.InputShaper.ShaperTypeY)
+	}
+
+	// firmware_retraction
+	c.emitGauge(ch, "klipper_firmware_retract_length", "Firmware retraction length in mm.", result.Result.Status.FirmwareRetraction.RetractLength)
+	c.emitGauge(ch, "klipper_firmware_retract_speed", "Firmware retraction speed in mm/min.", result.Result.Status.FirmwareRetraction.RetractSpeed)
+	c.emitGauge(ch, "klipper_firmware_unretract_extra_length", "Firmware unretract extra length in mm.", result.Result.Status.FirmwareRetraction.UnretractExtraLength)
+	c.emitGauge(ch, "klipper_firmware_unretract_speed", "Firmware unretract speed in mm/min.", result.Result.Status.FirmwareRetraction.UnretractSpeed)
 }
