@@ -43,6 +43,9 @@ fmt:
 	(cd collector && go fmt)
 	go fmt
 
+lint-docs:
+	npx markdownlint-cli2 --config .markdownlint.json "**/*.md" "#**/node_modules"
+	
 run:
 	go run .
 

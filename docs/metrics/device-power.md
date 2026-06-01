@@ -1,4 +1,4 @@
-# Power Devices
+# Device Power
 
 **Module:** `device_power` (default)
 **API Endpoints:** [`/machine/device_power/devices`](https://moonraker.readthedocs.io/en/latest/external_api/devices/) and [`/machine/device_power/status`](https://moonraker.readthedocs.io/en/latest/external_api/devices/)

@@ -15,11 +15,12 @@ v0.15.0
 - Add `klipper_job_queue_state_info` metric to `job_queue` module
 - Add `klipper_service_available`, `klipper_service_state_info`, and `klipper_service_sub_state_info` service state metrics to `system_info` module
 - Add optional `device_power` module with `klipper_power_device_info`, `klipper_power_device_status`, and `klipper_power_device_state_info` metrics
-- Add optional `spoolman` module with `klipper_spoolman_spool_info`, `klipper_spoolman_remaining_weight`, `klipper_spoolman_used_weight`, `klipper_spoolman_remaining_length`, and `klipper_spoolman_used_length` metrics
+- Add optional `spoolman` module with `klipper_spoolman_connected`, `klipper_spoolman_active_spool_id`, `klipper_spoolman_pending_reports`, `klipper_spoolman_spool_info`, `klipper_spoolman_remaining_weight`, `klipper_spoolman_used_weight`, `klipper_spoolman_remaining_length`, and `klipper_spoolman_used_length` metrics
 - Add optional `server_info` module with `klipper_klippy_connected`, `klipper_klippy_state_info`, `klipper_component_info`, `klipper_component_failed_info`, `klipper_moonraker_version_info`, and `klipper_api_version_info` metrics
 - Add optional `query_endstops` module with `klipper_endstop_triggered` metric
 - Fix missing `temperature_probe` assignment in `printer_objects` UnmarshalJSON
 - Fix missing `temperature_probe` query loop in `printer_objects` collector
+- `server_info`, `query_endstops`, and `device_power` modules are now enabled by default
 - Updated virtual test environment with additional metrics enabled and pre-built Grafana dashboards
 - Add VitePress documentation site with metrics reference, guides, and local search
 

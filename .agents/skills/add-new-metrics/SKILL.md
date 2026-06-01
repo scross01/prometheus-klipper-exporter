@@ -144,7 +144,6 @@ Brief description.
 # Comment
 klipper_your_metric
 ```
-```
 
 **Type conventions:**
 - `Gauge` — unlabeled scalar gauge

@@ -208,7 +208,7 @@ Labels: `endstop`
 | `klipper_input_shaper_damping_ratio_y` | Gauge | Input shaper damping ratio for Y axis |
 | `klipper_input_shaper_frequency_x` | Gauge | Input shaper frequency for X axis (Hz) |
 | `klipper_input_shaper_frequency_y` | Gauge | Input shaper frequency for Y axis (Hz) |
-| `klipper_input_shaper_type_info` | Gauge=1 | `axis`, `type` | Input shaper type per axis |
+| `klipper_input_shaper_type_info` | Gauge=1 | `axis`, `type` labels, input shaper type per axis |
 
 ---
 

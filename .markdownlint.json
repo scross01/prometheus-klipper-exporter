@@ -1,4 +1,16 @@
 {
-  "MD003": { "style": "setext_with_atx"},
-  "MD013": true
+  "MD001": false,
+  "MD003": false,
+  "MD013": false,
+  "MD014": false,
+  "MD022": false,
+  "MD031": false,
+  "MD032": false,
+  "MD033": {
+    "allowed_elements": [
+      "code"
+    ]
+  },
+  "MD034": false,
+  "MD060": false
 }

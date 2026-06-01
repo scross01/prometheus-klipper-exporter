@@ -5,7 +5,7 @@ Klipper Exporter.
 
 ## Project Structure
 
-```
+```txt
 .
 ├── main.go                         # HTTP server, routing, CLI flags
 ├── collector/
@@ -100,7 +100,7 @@ docker compose up -d --build  # from test/ directory
 | Prometheus | `http://localhost:9090` |
 | Grafana | `http://localhost:3000` |
 
-### Tuning `SIMULAVR_PACING_RATE`
+### Tuning SIMULAVR_PACING_RATE
 
 When using Option A (`docker-klipper-simulavr`), the `SIMULAVR_PACING_RATE`
 environment variable controls how fast the simulated MCU runs. If you see
@@ -172,7 +172,7 @@ loaded from `test/grafana/provisioning/dashboards/`. They are available at
 | **Klipper System** | System health | CPU, memory, uptime, network, disk, job queue, Moonraker process, service states |
 | **Klipper Temperatures** | Temperature monitoring | Extruder, bed, sensors, temperature fans, probes, generic heaters |
 | **Klipper Print Status** | Print progress & history | G-code progress, file position, filament used, timeline, history stats |
-| **Klipper Hardware** | MCU, fans, pins, TMC, power devices | MCU task/RTT/I/O, fan speeds/RPMs, output pins, filament sensors, TMC drivers, power device status |
+| **Klipper Hardware** | MCU, fans, pins, TMC, Device Power | MCU task/RTT/I/O, fan speeds/RPMs, output pins, filament sensors, TMC drivers, power device status |
 | **Klipper MMU** | Multi-Material Unit | Gate/tool state, encoder data, filament status, toolchange tracking |
 
 The dashboards use `job` and `instance` template variables. For the test
@@ -201,7 +201,7 @@ When adding a new Klipper config section to exercise exporter code:
 When using Option A (`docker-klipper-simulavr`), the `simulavr` MCU emulator
 can trigger `MCU shutdown: Timer too close` if the host is under load. This is
 mitigated by setting `SIMULAVR_PACING_RATE` to a lower value — see the
-[Tuning section](#tuning-simulavrpacingrate) above.
+[Tuning section](#tuning-simulavr_pacing_rate) above.
 
 When using Option B (`virtual-klipper-printer`), the MCU shutdown is
 consistently triggered ~7 seconds after Klippy reaches the `ready` state by

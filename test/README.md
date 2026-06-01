@@ -6,7 +6,7 @@ docker compose up -d
 ```
 
 Klipper/Moonraker: http://localhost:7125
-Mainsail: http://localhost:8080 
+Mainsail: http://localhost:8080
 Prometheus: http://localhost:9090
 Grafana: http://localhost:3000
 
