@@ -162,14 +162,18 @@ group of metrics is queried from a different Moonraker API endpoint.
 
 | Module | Default | Description |
 |--------|---------|-------------|
+| `server_info` | x | Moonraker server version info |
 | `process_stats` | x | Moonraker process and system CPU/memory |
 | `job_queue` | x | Job queue length |
 | `system_info` | x | System CPU count |
+| `query_endstops` | x | Endstop states |
+| `device_power` | x | Device power state (e.g. Sambaquis) |
 | `network_stats` | | Network interface traffic and errors |
 | `directory_info` | | Disk usage for gcodes directory |
 | `history` | | Historical print job statistics |
 | `printer_objects` | | Klipper printer object state (temperature, fans, MCU, etc.) |
 | `mmu` | | Happy Hare Multi-Material Unit metrics |
+| `spoolman` | | Spoolman filament tracking |
 
 For a complete list of all exported metrics with types, labels, and descriptions,
 see the [Metrics Reference](docs/metrics/index.md). For full documentation on
