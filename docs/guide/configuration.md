@@ -47,6 +47,7 @@ params:
     - spoolman
     - query_endstops
     - mmu
+    - cfs
 ```
 
 If omitted, only the default modules are collected: `server_info`,
@@ -54,6 +55,7 @@ If omitted, only the default modules are collected: `server_info`,
 
 | Module | Default | Description |
 |--------|---------|-------------|
+| `cfs` | | Creality Filament System (CFS) slot, rack, and AI-detection metrics |
 | `device_power` | ✓ | Power device type, status, and state |
 | `directory_info` | | Disk usage for gcodes directory |
 | `history` | | Historical print job statistics |
