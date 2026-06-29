@@ -233,6 +233,12 @@ func (c Collector) Collect(ch chan<- prometheus.Metric) {
 		c.collectMMU(ch)
 	}
 
+	// CFS (Creality Filament System) - native `box` object - only if present
+	if slices.Contains(c.modules, "cfs") {
+		log.Infof("Collecting cfs for %s", c.target)
+		c.collectCFS(ch)
+	}
+
 	// Power Devices
 	if slices.Contains(c.modules, "device_power") {
 		log.Infof("Collecting device_power for %s", c.target)
