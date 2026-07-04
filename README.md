@@ -173,6 +173,7 @@ group of metrics is queried from a different Moonraker API endpoint.
 | `history` | | Historical print job statistics |
 | `printer_objects` | | Klipper printer object state (temperature, fans, MCU, etc.) |
 | `mmu` | | Happy Hare Multi-Material Unit metrics |
+| `cfs` | | Creality Filament System (CFS) slot and rack metrics |
 | `spoolman` | | Spoolman filament tracking |
 
 For a complete list of all exported metrics with types, labels, and descriptions,

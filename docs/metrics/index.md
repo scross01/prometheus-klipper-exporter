@@ -7,6 +7,7 @@ Exporter. Each metric module links to a detailed reference page.
 
 | Module | Default | API Endpoint | Metrics |
 |--------|---------|--------------|---------|
+| `cfs` | | [`/printer/objects/query`](../metrics/cfs) | 15 |
 | `device_power` | ✓ | [`/machine/device_power`](../metrics/device-power) | 3 |
 | `directory_info` | | [`/server/files/directory`](../metrics/directory-info) | 3 |
 | `history` | | [`/server/history/totals`](../metrics/history) | 10 |
@@ -195,6 +196,22 @@ MMU (Multi-Material Unit) metrics for Happy Hare. 50+ metrics covering:
 | Sync drive | `klipper_mmu_sync_drive_enabled`, `klipper_mmu_sync_feedback_state_info{state="..."}` |
 
 [Full reference →](./mmu)
+
+### `cfs`
+
+Creality Filament System (CFS) metrics for K2-class printers (native `box` and
+`filament_rack` objects). Use this instead of `mmu` on Creality hardware.
+15 metrics covering:
+
+| Category | Metrics |
+|----------|---------|
+| Box state | `klipper_cfs_enabled`, `klipper_cfs_auto_refill_enabled`, `klipper_cfs_state_info{state="..."}`, `klipper_cfs_active_unit` |
+| Active slot | `klipper_cfs_active_slot{unit="..."}`, `klipper_cfs_active_slot_info{unit="...",slot="...",material="...",color="..."}` |
+| Per-unit | `klipper_cfs_unit_temperature_celsius{unit="..."}`, `klipper_cfs_unit_humidity_percent{unit="..."}`, `klipper_cfs_unit_info{...}` |
+| Per-slot | `klipper_cfs_slot_info{unit="...",slot="...",material="...",color="...",vendor="..."}`, `klipper_cfs_slot_remaining{unit="...",slot="..."}` |
+| Filament rack | `klipper_cfs_rack_loaded_info{material="...",color="..."}`, `klipper_cfs_rack_velocity` |
+
+[Full reference →](./cfs)
 
 ### `query_endstops`
 

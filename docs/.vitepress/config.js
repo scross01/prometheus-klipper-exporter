@@ -31,6 +31,7 @@ export default withMermaid(defineConfig({
           text: 'Metrics Reference',
           items: [
             { text: 'Summary', link: '/metrics/' },
+            { text: 'CFS', link: '/metrics/cfs' },
             { text: 'Device Power', link: '/metrics/device-power' },
             { text: 'Directory Info', link: '/metrics/directory-info' },
             { text: 'History', link: '/metrics/history' },

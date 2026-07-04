@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+unreleased
+-------
+
+- Add optional `cfs` module for the Creality Filament System (CFS) on K2-class printers, reading the native `box` and `filament_rack` Moonraker objects. Adds `klipper_cfs_enabled`, `klipper_cfs_auto_refill_enabled`, `klipper_cfs_filament_useup`, `klipper_cfs_state_info`, `klipper_cfs_active_unit`, `klipper_cfs_active_slot`, `klipper_cfs_active_slot_info`, `klipper_cfs_unit_state_info`, `klipper_cfs_unit_temperature_celsius`, `klipper_cfs_unit_humidity_percent`, `klipper_cfs_unit_info`, `klipper_cfs_slot_info`, `klipper_cfs_slot_remaining`, `klipper_cfs_rack_loaded_info`, and `klipper_cfs_rack_velocity` metrics
+
 v0.15.0
 -------
 
