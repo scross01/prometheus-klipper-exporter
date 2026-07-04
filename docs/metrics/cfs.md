@@ -2,7 +2,7 @@
 
 **Module:** `cfs` (optional)
 **API Endpoint:** [`/printer/objects/query`](https://moonraker.readthedocs.io/en/latest/web_api/#query-printer-object-status)
-with `box`, `filament_rack`, and `load_ai` objects.
+with `box` and `filament_rack` objects.
 
 Collects metrics from the **Creality Filament System** (CFS) on K2-class printers.
 These printers do **not** populate Happy Hare's `mmu` object, so the [`mmu`](./mmu)
@@ -11,7 +11,6 @@ objects:
 
 - `box` — the CFS unit(s) and per-slot state (active slot, temperature, humidity)
 - `filament_rack` — the filament currently loaded at the toolhead
-- `load_ai` — Creality's AI print-defect detection
 
 Up to four units (`T1`–`T4`) are reported. Disconnected units (those with
 `state == "None"`) are skipped, so only attached units emit `unit`-labelled series.
@@ -64,16 +63,6 @@ Labels: `unit`, `slot` (slot letter A–D)
 | `klipper_cfs_rack_loaded_info` | Gauge=1 | `material`, `color` | Filament currently loaded at the toolhead |
 | `klipper_cfs_rack_velocity` | Gauge | | Loaded filament velocity (units unclear, likely mm/min) |
 
-### AI Print-Defect Detection
-
-| Metric | Type | Labels | Description |
-|--------|------|--------|-------------|
-| `klipper_cfs_ai_detection_enabled` | Gauge | | AI print-defect detection enabled (0/1) |
-| `klipper_cfs_ai_waste_detection_enabled` | Gauge | | AI waste detection enabled (0/1) |
-| `klipper_cfs_ai_max_probability` | Gauge | | Maximum defect recognition probability |
-| `klipper_cfs_ai_normalized_area` | Gauge | | Normalized total defect area |
-| `klipper_cfs_ai_command_info` | Gauge=1 | `command_type` | Current AI command type (emitted only when non-empty) |
-
 ## Notes & Caveats
 
 Some fields are emitted with conservative names because their exact semantics are
@@ -99,7 +88,4 @@ klipper_cfs_active_slot_info
 
 # Unit humidity (consider drying when high)
 klipper_cfs_unit_humidity_percent > 40
-
-# AI defect detection confidence
-klipper_cfs_ai_max_probability
 ```

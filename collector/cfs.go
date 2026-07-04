@@ -7,7 +7,6 @@ package collector
 // filament system state lives in native Moonraker objects:
 //   - `box`           : the CFS unit(s) and per-slot state (active slot, temp, humidity)
 //   - `filament_rack`  : the filament currently loaded at the toolhead
-//   - `load_ai`        : Creality's AI print-defect detection
 //
 // The payload mixes string-encoded numbers and uses "None" / "-1" sentinels on
 // disconnected units. We avoid all custom unmarshalling by only declaring the fields
@@ -31,7 +30,6 @@ type CFSResponse struct {
 type CFSStatus struct {
 	Box          BoxObject          `json:"box"`
 	FilamentRack FilamentRackObject `json:"filament_rack"`
-	LoadAI       LoadAIObject       `json:"load_ai"`
 }
 
 type BoxObject struct {
@@ -72,17 +70,6 @@ type FilamentRackObject struct {
 	RemainMaterialVelocity float64 `json:"remain_material_velocity"`
 }
 
-// LoadAIObject describes Creality's AI print-defect detection.
-type LoadAIObject struct {
-	AISwitch            int     `json:"ai_switch"`
-	AIWasteSwitch       int     `json:"ai_waste_switch"`
-	CommandType         string  `json:"command_type"`
-	MaxReProb           float64 `json:"max_re_prob"`
-	NormalizedTotalArea float64 `json:"normalized_total_area"`
-	OutputWidth         int     `json:"output_width"`
-	OutputHeight        int     `json:"output_height"`
-}
-
 // slotLetterToIndex maps a CFS slot letter to its array index (A=0..D=3), returning
 // -1 for anything else (including the "None" sentinel on empty units).
 func slotLetterToIndex(s string) int {
@@ -115,7 +102,7 @@ func parseCFSFloat(s string) (float64, bool) {
 // Fetch CFS data from Moonraker
 func (c Collector) fetchCFSData() (*CFSResponse, error) {
 	var response CFSResponse
-	if err := c.fetchFromMoonraker("/printer/objects/query?box&filament_rack&load_ai", &response); err != nil {
+	if err := c.fetchFromMoonraker("/printer/objects/query?box&filament_rack", &response); err != nil {
 		return nil, err
 	}
 	return &response, nil
@@ -130,7 +117,6 @@ func (c Collector) collectCFS(ch chan<- prometheus.Metric) {
 
 	box := result.Result.Status.Box
 	rack := result.Result.Status.FilamentRack
-	ai := result.Result.Status.LoadAI
 
 	// === Box-level metrics ===
 	c.emitGauge(ch, "klipper_cfs_enabled", "CFS enabled state", boolToFloat64(box.Enable == 1))
@@ -222,11 +208,4 @@ func (c Collector) collectCFS(ch chan<- prometheus.Metric) {
 	emitStateInfoMetric2(ch, "klipper_cfs_rack_loaded_info", "Filament currently loaded at the toolhead (always 1)",
 		"material", rack.RemainMaterialType, "color", rack.RemainMaterialColor)
 	c.emitGauge(ch, "klipper_cfs_rack_velocity", "Loaded filament velocity (units unclear, likely mm/min)", rack.RemainMaterialVelocity)
-
-	// === AI print-defect detection ===
-	c.emitGauge(ch, "klipper_cfs_ai_detection_enabled", "AI print-defect detection enabled", boolToFloat64(ai.AISwitch == 1))
-	c.emitGauge(ch, "klipper_cfs_ai_waste_detection_enabled", "AI waste detection enabled", boolToFloat64(ai.AIWasteSwitch == 1))
-	c.emitGauge(ch, "klipper_cfs_ai_max_probability", "AI maximum defect recognition probability", ai.MaxReProb)
-	c.emitGauge(ch, "klipper_cfs_ai_normalized_area", "AI normalized total defect area", ai.NormalizedTotalArea)
-	emitStateInfoMetric(ch, "klipper_cfs_ai_command_info", "AI current command type (always 1)", "command_type", ai.CommandType)
 }

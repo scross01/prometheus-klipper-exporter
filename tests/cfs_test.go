@@ -55,7 +55,7 @@ func TestCFSMetrics(t *testing.T) {
 		metricNames[metric.Desc().String()] = true
 	}
 
-	// Check for key CFS metrics that should be present (box, filament_rack, load_ai)
+	// Check for key CFS metrics that should be present (box, filament_rack)
 	expectedMetrics := []string{
 		"Desc{fqName: \"klipper_cfs_enabled\", help: \"CFS enabled state\", constLabels: {}, variableLabels: {}}",
 		"Desc{fqName: \"klipper_cfs_active_slot\", help: \"Active slot index within the unit (A=0..D=3, -1 if none)\", constLabels: {}, variableLabels: {unit}}",
@@ -63,7 +63,6 @@ func TestCFSMetrics(t *testing.T) {
 		"Desc{fqName: \"klipper_cfs_slot_info\", help: \"CFS slot details (always 1)\", constLabels: {}, variableLabels: {unit,slot,material,color,vendor}}",
 		"Desc{fqName: \"klipper_cfs_unit_temperature_celsius\", help: \"CFS unit temperature in celsius\", constLabels: {}, variableLabels: {unit}}",
 		"Desc{fqName: \"klipper_cfs_rack_loaded_info\", help: \"Filament currently loaded at the toolhead (always 1)\", constLabels: {}, variableLabels: {material,color}}",
-		"Desc{fqName: \"klipper_cfs_ai_detection_enabled\", help: \"AI print-defect detection enabled\", constLabels: {}, variableLabels: {}}",
 	}
 
 	for _, expectedMetric := range expectedMetrics {
