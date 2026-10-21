@@ -10,11 +10,10 @@
   },
   "devDependencies": {
     "mermaid": "^12.2.0",
-    "vitepress": "^1.6.3",
+    "vitepress": "^2.0.0-alpha.20",
     "vitepress-plugin-mermaid": "^2.0.17"
   },
   "allowScripts": {
-    "esbuild@0.21.5": true,
     "fsevents@2.3.3": true
   }
 }
